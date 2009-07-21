@@ -1,0 +1,23 @@
+# object files
+*.o
+# Compiled binaries
+src/qlom
+# Makefiles
+Makefile
+Makefile.in
+# configure script
+configure
+config.*
+# Generated files
+INSTALL
+build-aux/depcomp
+build-aux/install-sh
+build-aux/missing
+src/*.moc.cc
+# others
+.deps
+.dirstamp
+aclocal.m4
+autom4te.cache
+stamp-h1
+*.swp
