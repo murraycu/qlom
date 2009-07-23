@@ -13,7 +13,7 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 AC_LANG([C++])
 
-AT_WITH_QT
+AT_WITH_QT([core gui],[no_keywords])
 
 PKG_CHECK_MODULES([QLOM], [glom-1.0])
 AC_SUBST([QLOM_CFLAGS])
