@@ -21,13 +21,15 @@
 
 #include <QAbstractTableModel>
 #include <QStringList>
+#include <libglom/document/document.h>
+#include <libglom/init.h>
 
 class GlomModel : public QAbstractTableModel
 {
   Q_OBJECT
 
   public:
-    GlomModel(Glom::Document document, QObject *parent = 0);
+    GlomModel(Glom::Document& document, QObject *parent = 0);
     virtual int rowCount(const QModelIndex &parent) const;
     virtual int columnCount(const QModelIndex &parent) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation,

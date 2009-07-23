@@ -17,6 +17,7 @@
  */
 
 #include "main_window.h"
+#include "glom_model.h"
 
 #include <QAction>
 #include <QApplication>
@@ -65,16 +66,17 @@ MainWindow::MainWindow()
   QObject::connect(
     file_quit, SIGNAL(triggered(bool)), this, SLOT(on_file_quit_triggered()));
 
-  Glib::libglom_init();
+  Glom::libglom_init();
 
+  Glib::ustring uri;
   try
   {
-    Glib::ustring uri = Glib::filename_to_uri("/usr/share/glom/doc/examples/example_music_collection.glom");
+    uri = Glib::filename_to_uri("/usr/share/glom/doc/examples/example_music_collection.glom");
   }
   catch(const Glib::ConvertError& ex)
   {
     std::cerr << "Exception from Glib::filename_to_uri(): " << ex.what();
-    return 1;
+    return;
   }
 
   Glom::Document document;
@@ -88,7 +90,7 @@ MainWindow::MainWindow()
   GlomModel model(document, this);
 
   QTreeView *central_treeview = new QTreeView(this);
-  tree_view->setModel(model);
+  central_treeview->setModel(&model);
   setCentralWidget(central_treeview);
 
   read_settings();

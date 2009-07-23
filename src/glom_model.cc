@@ -18,14 +18,15 @@
 
 #include "glom_model.h"
 
-GlomModel::GlomModel(Glom::Document document, QObject *parent) :
+GlomModel::GlomModel(Glom::Document& document, QObject *parent) :
   QAbstractTableModel(parent)
 {
   const std::vector<Glib::ustring> table_names = document.get_table_names();
   for(std::vector<Glib::ustring>::const_iterator iter = table_names.begin();
     iter != table_names.end(); ++iter)
   {
-    table_model.append(*iter);
+    QStringList temp = QStringList(QString(*iter->c_str()));
+    table_model.append(temp);
   }
 }
 
@@ -46,7 +47,7 @@ QVariant GlomModel::headerData(int section, Qt::Orientation orientation,
 {
   if(orientation == Qt::Horizontal)
   {
-    if(orientation == Qt::DisplayRole)
+    if(role == Qt::DisplayRole)
     {
       return table_model.at(0).at(section);
     }
@@ -62,7 +63,7 @@ QVariant GlomModel::data(const QModelIndex &index, int role) const
     return QVariant();
   }
   
-  QString table_record = table_model.at(index.row());
+  QStringList table_record = table_model.at(index.row());
 
   if(role == Qt::DisplayRole || role == Qt::EditRole)
   {
@@ -73,11 +74,11 @@ QVariant GlomModel::data(const QModelIndex &index, int role) const
     QString tip("<table>");
     QString key;
     QString value;
-    int max_lines = record.count();
+    int max_lines = table_record.count();
     for(int i = 0; i < max_lines; ++i)
     {
       key = headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();
-      value = record.at(i);
+      value = table_record.at(i);
       if(!value.isEmpty())
       {
         tip += QString("<tr><td><b>%1</b>: %2</td></tr>").arg(key, value);
