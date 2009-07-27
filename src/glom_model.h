@@ -29,14 +29,16 @@ class GlomModel : public QAbstractTableModel
   Q_OBJECT
 
   public:
-    GlomModel(Glom::Document& document, QObject *parent = 0);
-    virtual int rowCount(const QModelIndex &parent) const;
-    virtual int columnCount(const QModelIndex &parent) const;
+    explicit GlomModel(Glom::Document& document, QObject *parent = 0);
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation,
-      int role) const;
-    virtual QVariant data(const QModelIndex &index, int role) const;
+      int role = Qt::DisplayRole) const;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole)
+      const;
 
   private:
+    QStringList header_model;
     QList<QStringList> table_model;
 };
 

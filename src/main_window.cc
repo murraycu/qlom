@@ -32,7 +32,7 @@
 #include <libglom/document/document.h>
 #include <libglom/init.h>
 
-#include "config.h"
+#include <config.h>
 
 MainWindow::MainWindow()
 {
@@ -71,7 +71,7 @@ MainWindow::MainWindow()
   Glib::ustring uri;
   try
   {
-    uri = Glib::filename_to_uri("/usr/share/glom/doc/examples/example_music_collection.glom");
+    uri = Glib::filename_to_uri("/opt/gnome2/share/glom/doc/examples/example_music_collection.glom");
   }
   catch(const Glib::ConvertError& ex)
   {
@@ -87,10 +87,10 @@ MainWindow::MainWindow()
   {
     return;
   }
-  GlomModel model(document, this);
+  GlomModel *model = new GlomModel(document, this);
 
   QTreeView *central_treeview = new QTreeView(this);
-  central_treeview->setModel(&model);
+  central_treeview->setModel(model);
   setCentralWidget(central_treeview);
 
   read_settings();
