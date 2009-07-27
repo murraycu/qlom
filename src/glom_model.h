@@ -19,27 +19,24 @@
 #ifndef QLOM_GLOM_MODEL_H_
 #define QLOM_GLOM_MODEL_H_
 
-#include <QAbstractTableModel>
+#include <QAbstractListModel>
 #include <QStringList>
 #include <libglom/document/document.h>
 #include <libglom/init.h>
 
-class GlomModel : public QAbstractTableModel
+class GlomModel : public QAbstractListModel
 {
   Q_OBJECT
 
   public:
     explicit GlomModel(Glom::Document& document, QObject *parent = 0);
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation,
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation,
       int role = Qt::DisplayRole) const;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole)
-      const;
 
   private:
-    QStringList header_model;
-    QList<QStringList> table_model;
+    QStringList table_names;
 };
 
 #endif /* QLOM_GLOM_MODEL_H_ */

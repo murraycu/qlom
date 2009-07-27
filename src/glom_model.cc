@@ -19,35 +19,43 @@
 #include "glom_model.h"
 
 GlomModel::GlomModel(Glom::Document& document, QObject *parent) :
-  QAbstractTableModel(parent)
+  QAbstractListModel(parent)
 {
-  // Add titles for the header.
-  header_model.append(tr("Table names"));
-
-  // Read out table names from document, and add them to the model
-  const std::vector<Glib::ustring> table_names = document.get_table_names();
-  for(std::vector<Glib::ustring>::const_iterator iter = table_names.begin();
-    iter != table_names.end(); ++iter)
+  // Read out table names from document, and add them to the model.
+  const std::vector<Glib::ustring> tables = document.get_table_names();
+  for(std::vector<Glib::ustring>::const_iterator iter = tables.begin();
+    iter != tables.end(); ++iter)
   {
-    QStringList temp = QStringList(QString::fromUtf8((*iter).c_str()));
-    table_model.append(temp);
+    table_names.append(QString::fromUtf8((*iter).c_str()));
   }
 }
 
 int GlomModel::rowCount(const QModelIndex &parent) const
 {
   Q_UNUSED(parent);
-  return table_model.count();
+  return table_names.count();
 }
 
-int GlomModel::columnCount(const QModelIndex &parent) const
+QVariant GlomModel::data(const QModelIndex &index, int role) const
 {
-  Q_UNUSED(parent);
-  // Return the number of header items, i.e. the total number of columns
-  return header_model.count();
+  if(!index.isValid())
+  {
+    return QVariant();
+  }
+  if(index.row() >= table_names.size())
+  {
+    return QVariant();
+  }
+  if(role == Qt::DisplayRole)
+  {
+    return table_names.at(index.row());
+  }
+  else
+  {
+    return QVariant();
+  }
 }
 
-// Extract the header from the first row of the model.
 QVariant GlomModel::headerData(int section, Qt::Orientation orientation,
   int role) const
 {
@@ -55,44 +63,9 @@ QVariant GlomModel::headerData(int section, Qt::Orientation orientation,
   {
     if(role == Qt::DisplayRole)
     {
-      return header_model.at(section);
+      return tr("Table names");
     }
   }
 
-  return QAbstractTableModel::headerData(section, orientation, role);
-}
-
-// Extract data from the model, for display by the view.
-QVariant GlomModel::data(const QModelIndex &index, int role) const
-{
-  if(!index.isValid())
-  {
-    return QVariant();
-  }
-  
-  QStringList table_record = table_model.at(index.row());
-
-  if(role == Qt::DisplayRole || role == Qt::EditRole)
-  {
-    return table_record.at(index.column());
-  }
-  if(role == Qt::ToolTipRole)
-  {
-    QString tip("<table>");
-    QString key;
-    QString value;
-    int max_lines = table_record.count();
-    for(int i = 0; i < max_lines; ++i)
-    {
-      key = headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();
-      value = table_record.at(i);
-      if(!value.isEmpty())
-      {
-        tip += QString("<tr><td><b>%1</b>: %2</td></tr>").arg(key, value);
-      }
-    }
-    tip += "</table>";
-    return tip;
-  }
-  return QVariant();
+  return QAbstractListModel::headerData(section, orientation, role);
 }
