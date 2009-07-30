@@ -26,7 +26,7 @@ GlomModel::GlomModel(Glom::Document& document, QObject *parent) :
   for(std::vector<Glib::ustring>::const_iterator iter = tables.begin();
     iter != tables.end(); ++iter)
   {
-    table_names.append(QString::fromUtf8((*iter).c_str()));
+    table_names.append(QString::fromUtf8(iter->c_str()));
   }
 }
 
