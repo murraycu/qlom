@@ -26,14 +26,14 @@ GlomModel::GlomModel(Glom::Document& document, QObject *parent) :
   for(std::vector<Glib::ustring>::const_iterator iter = tables.begin();
     iter != tables.end(); ++iter)
   {
-    table_names.append(QString::fromUtf8(iter->c_str()));
+    table_names.push_back(QString::fromUtf8(iter->c_str()));
   }
 }
 
 int GlomModel::rowCount(const QModelIndex &parent) const
 {
   Q_UNUSED(parent);
-  return table_names.count();
+  return table_names.length();
 }
 
 QVariant GlomModel::data(const QModelIndex &index, int role) const
@@ -42,7 +42,7 @@ QVariant GlomModel::data(const QModelIndex &index, int role) const
   {
     return QVariant();
   }
-  if(index.row() >= table_names.size())
+  if(index.row() >= table_names.length())
   {
     return QVariant();
   }
