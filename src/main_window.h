@@ -20,7 +20,8 @@
 #define QLOM_MAIN_WINDOW_H_
 
 #include <QMainWindow>
-#include <QModelIndex>
+
+class QModelIndex;
 
 class MainWindow : public QMainWindow
 {
