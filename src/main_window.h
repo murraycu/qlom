@@ -20,6 +20,7 @@
 #define QLOM_MAIN_WINDOW_H_
 
 #include <QMainWindow>
+#include <QModelIndex>
 
 class MainWindow : public QMainWindow
 {
@@ -37,6 +38,7 @@ class MainWindow : public QMainWindow
   private Q_SLOTS:
     void on_file_quit_triggered();
     void on_help_about_triggered();
+    void on_treeview_doubleclicked(const QModelIndex &index);
 };
 
 #endif /* QLOM_MAIN_WINDOW_H_ */

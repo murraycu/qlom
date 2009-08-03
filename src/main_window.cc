@@ -93,6 +93,9 @@ MainWindow::MainWindow()
   central_treeview->setModel(model);
   setCentralWidget(central_treeview);
 
+  QObject::connect(central_treeview, SIGNAL(doubleClicked(const QModelIndex&)),
+    this, SLOT(on_treeview_doubleclicked(const QModelIndex&)));
+
   read_settings();
 }
 
@@ -130,4 +133,10 @@ void MainWindow::on_file_quit_triggered()
 void MainWindow::on_help_about_triggered()
 {
   show_about_dialog();
+}
+
+void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
+{
+  std::cout << index.data().toString().toLocal8Bit().constData() <<
+    " was double-clicked" << std::endl;
 }
