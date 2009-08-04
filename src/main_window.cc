@@ -38,16 +38,14 @@ MainWindow::MainWindow(const std::string& document_uri)
 {
   setWindowTitle(PACKAGE_NAME);
 
-  // TODO: What is the status bar useful for?
+  // The statusBar shows tooltips for menuitems.
   statusBar();
   statusBar()->showMessage(tr("Qlom successfully started"));
 
-  // TODO: Why do we want a toolbar?
-  QToolBar *main_toolbar = addToolBar(tr("Main Toolbar"));
-  main_toolbar->setObjectName("MainToolbar");
-
   // Create the menu:
-  // TODO: Doesn't Qt have some stock UI items?
+  // TODO: Doesn't Qt have some stock UI items? murrayc
+  // Currently, no, although see:
+  // http://labs.trolltech.com/blogs/2009/02/13/freedesktop-icons-in-qt/
   QAction *file_quit = new QAction(tr("&Quit"), this);
   file_quit->setShortcut(tr("Ctrl+Q"));
   file_quit->setStatusTip(tr("Quit the application"));
@@ -69,7 +67,6 @@ MainWindow::MainWindow(const std::string& document_uri)
     help_about, SIGNAL(triggered(bool)), this, SLOT(on_help_about_triggered()));
   QObject::connect(
     file_quit, SIGNAL(triggered(bool)), this, SLOT(on_file_quit_triggered()));
-
 
   // Load the Glom document:
   Glom::libglom_init();
