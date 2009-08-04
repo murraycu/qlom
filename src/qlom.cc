@@ -18,6 +18,10 @@
 
 #include <QApplication>
 #include "main_window.h"
+
+#include <glibmm/convert.h>
+#include <iostream>
+
 #include "config.h"
 
 int main(int argc, char **argv)
@@ -28,8 +32,19 @@ int main(int argc, char **argv)
   QCoreApplication::setOrganizationDomain("openismus.com");
   QCoreApplication::setApplicationName(PACKAGE_TARNAME);
 
-  MainWindow main_window;
-
+  // TODO: Find a Qt way to get a URI from a filename:
+  std::string uri;
+  try
+  {
+    uri = Glib::filename_to_uri("/opt/gnome2/share/glom/doc/examples/example_music_collection.glom");
+  }
+  catch(const Glib::ConvertError& ex)
+  {
+    std::cerr << "Exception from Glib::filename_to_uri(): " << ex.what();
+    return 1;
+  }
+  
+  MainWindow main_window(uri);
   main_window.show();
 
   return app.exec();

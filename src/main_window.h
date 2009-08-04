@@ -28,7 +28,12 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
   public:
-    MainWindow();
+  
+    /** 
+     * @param document_uri The URI of a .glom document.
+     */
+    MainWindow(const std::string& document_uri);
+    
     virtual ~MainWindow();
 
   private:

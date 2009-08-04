@@ -34,16 +34,20 @@
 
 #include <config.h>
 
-MainWindow::MainWindow()
+MainWindow::MainWindow(const std::string& document_uri)
 {
   setWindowTitle(PACKAGE_NAME);
 
+  // TODO: What is the status bar useful for?
   statusBar();
   statusBar()->showMessage(tr("Qlom successfully started"));
 
+  // TODO: Why do we want a toolbar?
   QToolBar *main_toolbar = addToolBar(tr("Main Toolbar"));
   main_toolbar->setObjectName("MainToolbar");
 
+  // Create the menu:
+  // TODO: Doesn't Qt have some stock UI items?
   QAction *file_quit = new QAction(tr("&Quit"), this);
   file_quit->setShortcut(tr("Ctrl+Q"));
   file_quit->setStatusTip(tr("Quit the application"));
@@ -66,27 +70,20 @@ MainWindow::MainWindow()
   QObject::connect(
     file_quit, SIGNAL(triggered(bool)), this, SLOT(on_file_quit_triggered()));
 
+
+  // Load the Glom document:
   Glom::libglom_init();
 
-  Glib::ustring uri;
-  try
-  {
-    uri = Glib::filename_to_uri("/opt/gnome2/share/glom/doc/examples/example_music_collection.glom");
-  }
-  catch(const Glib::ConvertError& ex)
-  {
-    std::cerr << "Exception from Glib::filename_to_uri(): " << ex.what();
-    return;
-  }
-
   Glom::Document document;
-  document.set_file_uri(uri);
+  document.set_file_uri(document_uri);
   int failure_code = 0;
   const bool test = document.load(failure_code);
   if(!test)
   {
+    std::cerr << "Document loading failed with uri=" << document_uri << std::endl;
     return;
   }
+  
   GlomModel *model = new GlomModel(document, this);
 
   QTreeView *central_treeview = new QTreeView(this);
@@ -106,6 +103,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::show_about_dialog()
 {
+  //TODO: A modal dialog window? The horror!
   QMessageBox::about(this, tr("About Qlom"), tr(PACKAGE_NAME "\n"
     "A Qt Glom database viewer\n"
     "Copyright 2009 Openismus GmbH"));
