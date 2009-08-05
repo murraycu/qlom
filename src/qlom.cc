@@ -37,15 +37,13 @@ int main(int argc, char **argv)
   std::list<QString> options = app.arguments().toStdList();
   if(options.size() < 2)
   {
-    std::cout << "Usage: glom filepath" << std::endl;
+    std::cout << "Usage: glom absolute_file_path" << std::endl;
     return 1;
   }
 
   QString filepath_qt = *++options.begin();
 
-  /* TODO: toStdString() converts UTF-8 to ASCII, suggesting that it will
-     corrupt some filepaths. Avoid that - we just want a raw char*. */
-  std::string filepath = filepath_qt.toStdString();
+  std::string filepath = filepath_qt.toUtf8().constData();
 
   /* Qt does not have the concept of file URIs. However, only '/' is supported
      for directory separators, so prepending "file://" to the path and escaping
