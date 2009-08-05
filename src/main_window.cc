@@ -100,7 +100,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::show_about_dialog()
 {
-  //TODO: A modal dialog window? The horror!
+  // About dialogs are window-modal in Qt, except on Mac OS X.
   QMessageBox::about(this, tr("About Qlom"), tr(PACKAGE_NAME "\n"
     "A Qt Glom database viewer\n"
     "Copyright 2009 Openismus GmbH"));
