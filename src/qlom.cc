@@ -32,25 +32,24 @@ int main(int argc, char **argv)
   QCoreApplication::setOrganizationDomain("openismus.com");
   QCoreApplication::setApplicationName(PACKAGE_TARNAME);
 
-  // TODO: Confirm that Qt has not equivalent to GOption,
-  // meaning no way to specify option details (short name, long name, description, type).
-  // TODO: I keep hearing that STL containers can be used with Qt, but how would we use std::list<> here instead of QStringList? murrayc. 
-  QStringList options = app.arguments();
+  /* Qt does not have an equivalent to GOption, except the arguments() static
+     method used below. */
+  std::list<QString> options = app.arguments().toStdList();
   if(options.size() < 2)
   {
     std::cout << "Usage: glom filepath" << std::endl;
     return 1;
   }
   
-  QString filepath_qt = options[1];
+  QString filepath_qt = *++options.begin();
   
-  //TODO: toStdString() converts UTF-8 to ASCII, suggesting that it will corrupt 
-  //some filepaths. Avoid that - we just want a raw char*.
+  /* TODO: toStdString() converts UTF-8 to ASCII, suggesting that it will
+     corrupt some filepaths. Avoid that - we just want a raw char*. */
   std::string filepath = filepath_qt.toStdString();
-  //Note that QString cannot be used directly with std::cout.
-  //std::cout << "DEBUG: filepath=" << filepath << std::endl;
   
-  // TODO: Find a Qt way to get a URI from a filename:
+  /* Qt does not have the concept of file URIs. However, only '/' is supported
+     for directory separators, so prepending "file://" to the path and escaping
+     the necessary characters should work, i.e. filename_to_uri(). */
   std::string uri;
   try
   {
