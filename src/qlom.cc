@@ -40,13 +40,13 @@ int main(int argc, char **argv)
     std::cout << "Usage: glom filepath" << std::endl;
     return 1;
   }
-  
+
   QString filepath_qt = *++options.begin();
-  
+
   /* TODO: toStdString() converts UTF-8 to ASCII, suggesting that it will
      corrupt some filepaths. Avoid that - we just want a raw char*. */
   std::string filepath = filepath_qt.toStdString();
-  
+
   /* Qt does not have the concept of file URIs. However, only '/' is supported
      for directory separators, so prepending "file://" to the path and escaping
      the necessary characters should work, i.e. filename_to_uri(). */
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
     std::cerr << "Exception from Glib::filename_to_uri(): " << ex.what() << std::endl;
     return 1;
   }
-  
+
   MainWindow main_window(uri);
   main_window.show();
 

@@ -76,11 +76,11 @@ MainWindow::MainWindow(const std::string& document_uri)
     std::cerr << "Document loading failed with uri=" << document_uri << std::endl;
     return;
   }
-  
+
   //TODO: Check that the document is: 
   //a) Not an example document, which must be resaved - that would be an extra feature.
   //b) Not self-hosting, because that would require starting/stopping postgresql.
-  
+
   GlomModel *model = new GlomModel(document, this);
 
   QTreeView *central_treeview = new QTreeView(this);
