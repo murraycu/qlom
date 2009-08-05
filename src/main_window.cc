@@ -29,12 +29,9 @@
 #include <QToolBar>
 #include <QTreeView>
 
-#include <libglom/document/document.h>
-#include <libglom/init.h>
-
 #include <config.h>
 
-MainWindow::MainWindow(const std::string& document_uri)
+MainWindow::MainWindow(const Glom::Document &document)
 {
   setWindowTitle(PACKAGE_NAME);
 
@@ -63,23 +60,6 @@ MainWindow::MainWindow(const std::string& document_uri)
     help_about, SIGNAL(triggered(bool)), this, SLOT(on_help_about_triggered()));
   QObject::connect(
     file_quit, SIGNAL(triggered(bool)), this, SLOT(on_file_quit_triggered()));
-
-  // Load the Glom document:
-  Glom::libglom_init();
-
-  Glom::Document document;
-  document.set_file_uri(document_uri);
-  int failure_code = 0;
-  const bool test = document.load(failure_code);
-  if(!test)
-  {
-    std::cerr << "Document loading failed with uri=" << document_uri << std::endl;
-    return;
-  }
-
-  //TODO: Check that the document is: 
-  //a) Not an example document, which must be resaved - that would be an extra feature.
-  //b) Not self-hosting, because that would require starting/stopping postgresql.
 
   GlomModel *model = new GlomModel(document, this);
 

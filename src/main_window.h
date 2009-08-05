@@ -22,6 +22,10 @@
 #include <QMainWindow>
 
 class QModelIndex;
+namespace Glom
+{
+class Document;
+};
 
 class MainWindow : public QMainWindow
 {
@@ -30,9 +34,9 @@ class MainWindow : public QMainWindow
   public:
 
     /** 
-     * @param document_uri The URI of a .glom document.
+     * @param document A .glom document.
      */
-    MainWindow(const std::string& document_uri);
+    MainWindow(const Glom::Document &document);
 
     virtual ~MainWindow();
 

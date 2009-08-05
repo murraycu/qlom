@@ -19,6 +19,8 @@
 #include <QApplication>
 #include "main_window.h"
 
+#include <libglom/document/document.h>
+#include <libglom/init.h>
 #include <glibmm/convert.h>
 #include <iostream>
 
@@ -59,7 +61,40 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  MainWindow main_window(uri);
+  // Load the Glom document:
+  Glom::libglom_init();
+
+  Glom::Document document;
+  document.set_file_uri(uri);
+  int failure_code = 0;
+  const bool test = document.load(failure_code);
+  if(!test)
+  {
+    std::cerr << "Document loading failed with uri=" << uri << std::endl;
+    return 1;
+  }
+
+  /* Check that the document is:
+     a) Not an example document, which must be resaved - that would be an extra
+     feature.
+     b) Not self-hosting, because that would require starting/stopping
+     PostgreSQL. */
+  if(document.get_is_example_file())
+  {
+    std::cerr << "Document is an example file, cannot process" << std::endl;
+    return 1;
+  }
+
+  if(document.get_hosting_mode() !=
+    Glom::Document::HOSTING_MODE_POSTGRES_CENTRAL)
+  {
+    std::cerr <<
+      "Document is not hosted on an external PostgreSQL server, cannot process"
+      << std::endl;
+    return 1;
+  }
+
+  MainWindow main_window(document);
   main_window.show();
 
   return app.exec();

@@ -18,7 +18,7 @@
 
 #include "glom_model.h"
 
-GlomModel::GlomModel(Glom::Document& document, QObject *parent) :
+GlomModel::GlomModel(const Glom::Document& document, QObject *parent) :
   QAbstractListModel(parent)
 {
   // Read out table names from document, and add them to the model.
