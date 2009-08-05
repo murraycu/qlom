@@ -56,12 +56,8 @@ MainWindow::MainWindow(const std::string& document_uri)
 
   QMenu *file_menu = menuBar()->addMenu(tr("&File"));
   file_menu->addAction(file_quit);
-  QMenu *view_menu = menuBar()->addMenu(tr("&View"));
-  view_menu->addAction(main_toolbar->toggleViewAction());
   QMenu *about_menu = menuBar()->addMenu(tr("&Help"));
   about_menu->addAction(help_about);
-
-  main_toolbar->addAction(file_quit);
 
   QObject::connect(
     help_about, SIGNAL(triggered(bool)), this, SLOT(on_help_about_triggered()));
