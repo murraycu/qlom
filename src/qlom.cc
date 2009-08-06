@@ -17,6 +17,8 @@
  */
 
 #include <QApplication>
+#include <QInputDialog>
+#include <QtSql>
 #include "main_window.h"
 
 #include <libglom/document/document.h>
@@ -92,6 +94,31 @@ int main(int argc, char **argv)
       "Document is not hosted on an external PostgreSQL server, cannot process"
       << std::endl;
     return 1;
+  }
+
+  // Try to open a database connection, and request a password.
+  QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
+  db.setHostName(document.get_connection_server().c_str());
+  db.setDatabaseName(document.get_connection_database().c_str());
+  db.setUserName(document.get_connection_user().c_str());
+
+  bool ok;
+  QString pw = QInputDialog::getText(0, ("Enter password"),
+    ("Please enter a password for the database"), QLineEdit::Password,
+    QString(), &ok);
+  if(ok && !pw.isEmpty())
+  {
+    db.setPassword(pw);
+  }
+  else
+  {
+    std::cerr << "No password entered, or dialog cancelled" << std::endl;
+    return 1;
+  }
+
+  if(!db.open())
+  {
+    std::cerr << "Database connection could not be opened" << std::endl;
   }
 
   MainWindow main_window(document);
