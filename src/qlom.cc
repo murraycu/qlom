@@ -119,6 +119,7 @@ int main(int argc, char **argv)
   if(!db.open())
   {
     std::cerr << "Database connection could not be opened" << std::endl;
+    return 1;
   }
 
   MainWindow main_window(document);
