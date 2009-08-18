@@ -20,6 +20,8 @@
 #include "glom_model.h"
 #include "glom_table_model.h"
 
+#include <memory>
+
 #include <QAction>
 #include <QApplication>
 #include <QDialog>
@@ -139,10 +141,9 @@ void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
   else
   {
     view = table_model_dialog->findChild<QTableView*>();
-    const QAbstractItemModel *transient_model = view->model();
+    std::auto_ptr<QAbstractItemModel> transient_model(view->model());
     model = new GlomTableModel(glom_doc, index.data().toString(), view);
     view->setModel(model);
-    delete transient_model;
   }
 
   table_model_dialog->show();
