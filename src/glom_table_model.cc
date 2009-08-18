@@ -92,7 +92,7 @@ QVariant GlomTableModel::data(const QModelIndex &index, int role) const
     QString tip("<table>");
     QString key;
     QString value;
-    int max_lines = table_record.count();
+    const int max_lines = table_record.count();
     for(int i = 0; i < max_lines; ++i)
     {
       key = headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();

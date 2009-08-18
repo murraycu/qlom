@@ -139,7 +139,7 @@ void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
   else
   {
     view = table_model_dialog->findChild<QTableView*>();
-    QAbstractItemModel *transient_model = view->model();
+    const QAbstractItemModel *transient_model = view->model();
     model = new GlomTableModel(glom_doc, index.data().toString(), view);
     view->setModel(model);
     delete transient_model;
