@@ -99,10 +99,11 @@ QVariant GlomTableModel::data(const QModelIndex &index, int role) const
       value = table_record.at(i);
       if(!value.isEmpty())
       {
-        tip += QString("<tr><td><b>%1</b>: %2</td></tr>").arg(key, value);
+        tip.push_back(
+          QString("<tr><td><b>%1</b>: %2</td></tr>").arg(key, value));
       }
     }
-    tip += "</table>";
+    tip.push_back("</table>");
     return tip;
   }
   return QVariant();
