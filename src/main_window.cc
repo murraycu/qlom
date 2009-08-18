@@ -20,8 +20,6 @@
 #include "glom_model.h"
 #include "glom_table_model.h"
 
-#include <memory>
-
 #include <QAction>
 #include <QApplication>
 #include <QDialog>
@@ -141,7 +139,10 @@ void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
   else
   {
     view = table_model_dialog->findChild<QTableView*>();
-    std::auto_ptr<QAbstractItemModel> transient_model(view->model());
+    /* According to the QAbstractItemView documentation, if a parent widget is
+       passed in, container ownership is used, so it is safe to set a new model
+       and to not delete the old model.
+       http://doc.trolltech.com/4.5/qabstractitemview.html#setModel */
     model = new GlomTableModel(glom_doc, index.data().toString(), view);
     view->setModel(model);
   }
