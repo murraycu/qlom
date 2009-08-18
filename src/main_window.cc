@@ -18,20 +18,26 @@
 
 #include "main_window.h"
 #include "glom_model.h"
+#include "glom_table_model.h"
 
 #include <QAction>
 #include <QApplication>
+#include <QDialog>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QSettings>
 #include <QStatusBar>
+#include <QTableView>
 #include <QToolBar>
 #include <QTreeView>
+#include <QVBoxLayout>
 
 #include <config.h>
 
-MainWindow::MainWindow(const Glom::Document &document)
+MainWindow::MainWindow(const Glom::Document &document) :
+  glom_doc(document),
+  table_model_opened(false)
 {
   setWindowTitle(PACKAGE_NAME);
 
@@ -61,11 +67,13 @@ MainWindow::MainWindow(const Glom::Document &document)
   QObject::connect(
     file_quit, SIGNAL(triggered(bool)), this, SLOT(on_file_quit_triggered()));
 
-  GlomModel *model = new GlomModel(document, this);
+  GlomModel *model = new GlomModel(glom_doc, this);
 
   QTreeView *central_treeview = new QTreeView(this);
   central_treeview->setModel(model);
   setCentralWidget(central_treeview);
+
+  table_model_dialog = new QDialog(this);
 
   QObject::connect(central_treeview, SIGNAL(doubleClicked(const QModelIndex&)),
     this, SLOT(on_treeview_doubleclicked(const QModelIndex&)));
@@ -112,6 +120,32 @@ void MainWindow::on_help_about_triggered()
 
 void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
 {
-  std::cout << index.data().toString().toLocal8Bit().constData() <<
-    " was double-clicked" << std::endl;
+  QTableView *view = 0;
+  GlomTableModel *model = 0;
+
+  /* Create a new view and layout if the dialog has not been opened, otherwise
+     re-use the existing dialog. */
+  if(!table_model_opened)
+  {
+    view = new QTableView(table_model_dialog);
+    model = new GlomTableModel(glom_doc, index.data().toString(), view);
+    view->setModel(model);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(view);
+    table_model_dialog->setLayout(layout);
+    table_model_opened = true;
+  }
+  else
+  {
+    view = table_model_dialog->findChild<QTableView*>();
+    QAbstractItemModel *transient_model = view->model();
+    model = new GlomTableModel(glom_doc, index.data().toString(), view);
+    view->setModel(model);
+    delete transient_model;
+  }
+
+  table_model_dialog->show();
+  table_model_dialog->raise();
+  table_model_dialog->activateWindow();
 }

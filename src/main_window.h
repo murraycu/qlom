@@ -21,6 +21,7 @@
 
 #include <QMainWindow>
 
+class QDialog;
 class QModelIndex;
 namespace Glom
 {
@@ -44,6 +45,10 @@ class MainWindow : public QMainWindow
     void show_about_dialog();
     void write_settings();
     void read_settings();
+
+    const Glom::Document &glom_doc;
+    QDialog *table_model_dialog;
+    bool table_model_opened;
 
   private Q_SLOTS:
     void on_file_quit_triggered();
