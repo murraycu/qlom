@@ -45,6 +45,7 @@ class MainWindow : public QMainWindow
     void show_about_dialog();
     void write_settings();
     void read_settings();
+    void setup_table_view(QString table_name);
 
     const Glom::Document &glom_doc;
     QDialog *table_model_dialog;

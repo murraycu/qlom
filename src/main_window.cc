@@ -18,7 +18,6 @@
 
 #include "main_window.h"
 #include "glom_model.h"
-#include "glom_table_model.h"
 
 #include <QAction>
 #include <QApplication>
@@ -27,6 +26,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QSettings>
+#include <QSqlRelationalTableModel>
 #include <QStatusBar>
 #include <QTableView>
 #include <QToolBar>
@@ -84,6 +84,7 @@ MainWindow::MainWindow(const Glom::Document &document) :
 MainWindow::~MainWindow()
 {
   write_settings();
+  QSqlDatabase::database().close();
 }
 
 void MainWindow::show_about_dialog()
@@ -120,15 +121,28 @@ void MainWindow::on_help_about_triggered()
 
 void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
 {
-  QTableView *view = 0;
-  GlomTableModel *model = 0;
+  setup_table_view(index.data().toString());
 
-  /* Create a new view and layout if the dialog has not been opened, otherwise
-     re-use the existing dialog. */
+  table_model_dialog->show();
+  table_model_dialog->raise();
+  table_model_dialog->activateWindow();
+}
+
+/* Create a new view and layout if the dialog has not been opened, otherwise
+   re-use the existing dialog. */
+void MainWindow::setup_table_view(QString table_name)
+{
+  QTableView *view = 0;
+  QSqlRelationalTableModel *model = 0;
+
   if(!table_model_opened)
   {
     view = new QTableView(table_model_dialog);
-    model = new GlomTableModel(glom_doc, index.data().toString(), view);
+    model = new QSqlRelationalTableModel();
+    model->setTable(table_name);
+    model->select();
+    // Remove the primary key.
+    model->removeColumn(0);
     view->setModel(model);
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -143,11 +157,11 @@ void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
        passed in, container ownership is used, so it is safe to set a new model
        and to not delete the old model.
        http://doc.trolltech.com/4.5/qabstractitemview.html#setModel */
-    model = new GlomTableModel(glom_doc, index.data().toString(), view);
+    model = qobject_cast<QSqlRelationalTableModel*>(view->model());
+    model->setTable(table_name);
+    model->select();
+    // Remove the primary key.
+    model->removeColumn(0);
     view->setModel(model);
   }
-
-  table_model_dialog->show();
-  table_model_dialog->raise();
-  table_model_dialog->activateWindow();
 }

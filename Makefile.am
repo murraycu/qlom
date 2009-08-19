@@ -10,15 +10,11 @@ src_qlom_SOURCES = src/qlom.cc \
                    src/main_window.h \
                    src/glom_model.cc \
                    src/glom_model.moc.cc \
-                   src/glom_model.h \
-                   src/glom_table_model.cc \
-                   src/glom_table_model.moc.cc \
-                   src/glom_table_model.h
+                   src/glom_model.h
 src_qlom_CXXFLAGS = $(QT_CXXFLAGS) $(QLOM_CFLAGS) $(QLOM_WARNINGS)
 src_qlom_CPPFLAGS = $(QT_CPPFLAGS)
 src_qlom_LDFLAGS  = $(QT_LDFLAGS)
 src_qlom_LDADD = $(QT_LIBS) $(QLOM_LIBS)
 
 BUILT_SOURCES = src/main_window.moc.cc \
-                src/glom_model.moc.cc \
-                src/glom_table_model.moc.cc
+                src/glom_model.moc.cc
