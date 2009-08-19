@@ -158,10 +158,15 @@ void MainWindow::setup_table_view(QString table_name)
        and to not delete the old model.
        http://doc.trolltech.com/4.5/qabstractitemview.html#setModel */
     model = qobject_cast<QSqlRelationalTableModel*>(view->model());
-    model->setTable(table_name);
-    model->select();
-    // Remove the primary key.
-    model->removeColumn(0);
+    setup_table_model(model, table_name);
     view->setModel(model);
   }
+}
+
+void MainWindow::setup_table_model(QSqlRelationalTableModel *model, QString table_name)
+{
+  model->setTable(table_name);
+  model->select();
+  // Remove the primary key.
+  model->removeColumn(0);
 }
