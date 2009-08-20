@@ -26,10 +26,14 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QSettings>
+#include <QSqlField>
+#include <QSqlIndex>
+#include <QSqlRecord>
+#include <QSqlRelationalDelegate>
 #include <QSqlRelationalTableModel>
+#include <QSqlTableModel>
 #include <QStatusBar>
 #include <QTableView>
-#include <QToolBar>
 #include <QTreeView>
 #include <QVBoxLayout>
 
@@ -139,12 +143,10 @@ void MainWindow::setup_table_view(QString table_name)
   {
     view = new QTableView(table_model_dialog);
     model = new QSqlRelationalTableModel();
-    model->setTable(table_name);
-    model->select();
-    // Remove the primary key.
-    model->removeColumn(0);
-    view->setModel(model);
+    setup_table_model(model, table_name);
 
+    view->setModel(model);
+    view->setItemDelegate(new QSqlRelationalDelegate(view));
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(view);
     table_model_dialog->setLayout(layout);
@@ -159,14 +161,50 @@ void MainWindow::setup_table_view(QString table_name)
        http://doc.trolltech.com/4.5/qabstractitemview.html#setModel */
     model = qobject_cast<QSqlRelationalTableModel*>(view->model());
     setup_table_model(model, table_name);
-    view->setModel(model);
   }
+  table_model_dialog->setWindowTitle(table_name);
 }
 
 void MainWindow::setup_table_model(QSqlRelationalTableModel *model, QString table_name)
 {
   model->setTable(table_name);
   model->select();
-  // Remove the primary key.
+
+  Glom::Document::type_vec_relationships relationships =
+    glom_doc.get_relationships(table_name.toUtf8().constData());
+  for(Glom::Document::type_vec_relationships::const_iterator iter =
+    relationships.begin(); iter != relationships.end(); ++iter)
+  {
+    const Glom::sharedptr<const Glom::Relationship> relationship = *iter;
+
+    if(!relationship)
+    {
+      continue;
+    }
+
+    const QSqlRecord record = model->record();
+    const QString from =
+      QString::fromUtf8(relationship->get_from_field().c_str());
+    const int index = record.indexOf(from);
+
+    // If the index is invalid, or the primary key, ignore it.
+    if(index == -1 || index == 0)
+    {
+      continue;
+    }
+
+    const QString to_table =
+      QString::fromUtf8(relationship->get_to_table().c_str());
+    const QString to_primary_key =
+      QString::fromUtf8(relationship->get_to_field().c_str());
+    /* TODO: Find a way to automatically retrieve a default field, rather than
+             hardcoding the location. */
+    const QString to_field = QString("name");
+    model->setRelation(index,
+      QSqlRelation(to_table, to_primary_key, to_field));
+  }
+
+  model->select();
+  // Remove the primary key from the model.
   model->removeColumn(0);
 }
