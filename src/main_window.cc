@@ -18,6 +18,7 @@
 
 #include "main_window.h"
 #include "glom_model.h"
+#include "utils.h"
 
 #include <QAction>
 #include <QApplication>
@@ -171,7 +172,7 @@ void MainWindow::setup_table_model(QSqlRelationalTableModel *model, QString tabl
   model->select();
 
   Glom::Document::type_vec_relationships relationships =
-    glom_doc.get_relationships(table_name.toUtf8().constData());
+    glom_doc.get_relationships(qstring_to_ustring(table_name));
   for(Glom::Document::type_vec_relationships::const_iterator iter =
     relationships.begin(); iter != relationships.end(); ++iter)
   {
@@ -183,8 +184,7 @@ void MainWindow::setup_table_model(QSqlRelationalTableModel *model, QString tabl
     }
 
     const QSqlRecord record = model->record();
-    const QString from =
-      QString::fromUtf8(relationship->get_from_field().c_str());
+    const QString from = ustring_to_qstring(relationship->get_from_field());
     const int index = record.indexOf(from);
 
     // If the index is invalid, or the primary key, ignore it.
@@ -193,10 +193,9 @@ void MainWindow::setup_table_model(QSqlRelationalTableModel *model, QString tabl
       continue;
     }
 
-    const QString to_table =
-      QString::fromUtf8(relationship->get_to_table().c_str());
+    const QString to_table = ustring_to_qstring(relationship->get_to_table());
     const QString to_primary_key =
-      QString::fromUtf8(relationship->get_to_field().c_str());
+      ustring_to_qstring(relationship->get_to_field());
     /* TODO: Find a way to automatically retrieve a default field, rather than
              hardcoding the location. */
     const QString to_field = QString("name");

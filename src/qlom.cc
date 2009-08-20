@@ -16,15 +16,18 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "main_window.h"
+#include "utils.h"
+
+#include <iostream>
+
 #include <QApplication>
 #include <QInputDialog>
 #include <QtSql>
-#include "main_window.h"
 
 #include <libglom/document/document.h>
 #include <libglom/init.h>
 #include <glibmm/convert.h>
-#include <iostream>
 
 #include "config.h"
 
@@ -98,9 +101,9 @@ int main(int argc, char **argv)
 
   // Try to open a database connection, and request a password.
   QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
-  db.setHostName(document.get_connection_server().c_str());
-  db.setDatabaseName(document.get_connection_database().c_str());
-  db.setUserName(document.get_connection_user().c_str());
+  db.setHostName(ustring_to_qstring(document.get_connection_server()));
+  db.setDatabaseName(ustring_to_qstring(document.get_connection_database()));
+  db.setUserName(ustring_to_qstring(document.get_connection_user()));
 
   bool ok;
   QString pw = QInputDialog::getText(0, ("Enter password"),

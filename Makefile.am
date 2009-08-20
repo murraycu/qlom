@@ -10,7 +10,9 @@ src_qlom_SOURCES = src/qlom.cc \
                    src/main_window.h \
                    src/glom_model.cc \
                    src/glom_model.moc.cc \
-                   src/glom_model.h
+                   src/glom_model.h \
+                   src/utils.cc \
+                   src/utils.h
 src_qlom_CXXFLAGS = $(QT_CXXFLAGS) $(QLOM_CFLAGS) $(QLOM_WARNINGS)
 src_qlom_CPPFLAGS = $(QT_CPPFLAGS)
 src_qlom_LDFLAGS  = $(QT_LDFLAGS)

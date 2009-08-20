@@ -17,6 +17,7 @@
  */
 
 #include "glom_model.h"
+#include "utils.h"
 
 GlomModel::GlomModel(const Glom::Document& document, QObject *parent) :
   QAbstractListModel(parent)
@@ -26,7 +27,7 @@ GlomModel::GlomModel(const Glom::Document& document, QObject *parent) :
   for(std::vector<Glib::ustring>::const_iterator iter = tables.begin();
     iter != tables.end(); ++iter)
   {
-    table_names.push_back(QString::fromUtf8(iter->c_str()));
+    table_names.push_back(ustring_to_qstring(*iter));
   }
 }
 
