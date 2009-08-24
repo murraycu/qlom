@@ -191,6 +191,17 @@ dnl Memo: AC_ARG_WITH(package, help-string, [if-given], [if-not-given])
   Try using --with-qt.])
   fi
 
+  AC_MSG_CHECKING([whether host operating system is Darwin])
+  at_darwin=no
+  at_qmake_args=
+  case $host_os in
+    darwin*)
+      at_darwin=yes
+      at_qmake_args='-spec macx-g++'
+      ;;
+  esac
+  AC_MSG_RESULT([$at_darwin])
+
   # If we don't know the path to Qt, guess it from the path to qmake.
   if test x"$QT_PATH" = x; then
     QT_PATH=`dirname "$QMAKE"`
@@ -217,9 +228,17 @@ class Foo: public QObject
 public:
   Foo();
   ~Foo() {}
+#ifdef QT3
+public slots:
+#else
 public Q_SLOTS:
+#endif /* QT3 */
   void setValue(int value);
+#ifdef QT3
+signals:
+#else
 Q_SIGNALS:
+#endif /* QT3 */
   void valueChanged(int newValue);
 private:
   int value_;
@@ -271,8 +290,8 @@ m4_ifval([$3],
   echo "$as_me:$LINENO: Invoking $QMAKE on $pro_file" >&AS_MESSAGE_LOG_FD
   sed 's/^/| /' "$pro_file" >&AS_MESSAGE_LOG_FD
 
-  if $QMAKE; then :; else
-    AX_INSTEAD_IF([$4], [Calling $QMAKE failed.])
+  if $QMAKE $at_qmake_args; then :; else
+    AX_INSTEAD_IF([$4], [Calling $QMAKE $at_qmake_args failed.])
     break
   fi
 
@@ -467,15 +486,6 @@ instead" >&AS_MESSAGE_LOG_FD
   AC_SUBST([QT_LFLAGS], [$at_cv_env_QT_LDFLAGS])
   AC_SUBST([QT_LDFLAGS], [$at_cv_env_QT_LDFLAGS])
 
-  AC_MSG_CHECKING([whether host operating system is Darwin])
-  at_darwin="no"
-  case $host_os in
-    darwin*)
-      at_darwin="yes"
-      ;;
-  esac
-  AC_MSG_RESULT([$at_darwin])
-
   # Find the LIBS of Qt.
   AC_CACHE_CHECK([for the LIBS to use with Qt], [at_cv_env_QT_LIBS],
   [at_cv_env_QT_LIBS=`sed "/^LIBS@<:@^A-Z@:>@*=/!d;$qt_sed_filter" $at_mfile`
@@ -527,8 +537,7 @@ AC_DEFUN([AT_REQUIRE_QT_VERSION],
   fi
   AC_SUBST([QT_VERSION], [$at_cv_QT_VERSION])
   AS_VERSION_COMPARE([$QT_VERSION], [$1],
-    [AX_INSTEAD_IF([$2], [This package requires Qt $1 or above.])],
-    [$2], [$2])
+    [AX_INSTEAD_IF([$2; break;], [This package requires Qt $1 or above.])])
 
   # Run the user code
   $3
