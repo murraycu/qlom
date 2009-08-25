@@ -80,7 +80,7 @@ MainWindow::MainWindow(const Glom::Document &document) :
 
   table_model_dialog = new QDialog(this);
 
-  QObject::connect(central_treeview, SIGNAL(doubleClicked(const QModelIndex&)),
+  connect(central_treeview, SIGNAL(doubleClicked(const QModelIndex&)),
     this, SLOT(on_treeview_doubleclicked(const QModelIndex&)));
 
   read_settings();
