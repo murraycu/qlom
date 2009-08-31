@@ -17,13 +17,13 @@
  */
 
 #include "main_window.h"
+#include "connection_dialog.h"
 #include "utils.h"
 
 #include <iostream>
 
 #include <QApplication>
-#include <QInputDialog>
-#include <QtSql>
+#include <QMessageBox>
 
 #include <libglom/document/document.h>
 #include <libglom/init.h>
@@ -99,29 +99,12 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  // Try to open a database connection, and request a password.
-  QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
-  db.setHostName(ustring_to_qstring(document.get_connection_server()));
-  db.setDatabaseName(ustring_to_qstring(document.get_connection_database()));
-  db.setUserName(ustring_to_qstring(document.get_connection_user()));
-
-  bool ok;
-  QString pw = QInputDialog::getText(0, ("Enter password"),
-    ("Please enter a password for the database"), QLineEdit::Password,
-    QString(), &ok);
-  if(ok && !pw.isEmpty())
+  ConnectionDialog *connection_dialog = new ConnectionDialog(document);
+  if(connection_dialog->exec() != QDialog::Accepted)
   {
-    db.setPassword(pw);
-  }
-  else
-  {
-    std::cerr << "No password entered, or dialog cancelled" << std::endl;
-    return 1;
-  }
-
-  if(!db.open())
-  {
-    std::cerr << "Database connection could not be opened" << std::endl;
+    QMessageBox::critical(0, qApp->applicationName(),
+      "Could not connect to database server", QMessageBox::Ok,
+      QMessageBox::NoButton, QMessageBox::NoButton);
     return 1;
   }
 
