@@ -44,7 +44,7 @@ MainWindow::MainWindow(const Glom::Document &document) :
   glom_doc(document),
   table_model_opened(false)
 {
-  setWindowTitle(PACKAGE_NAME);
+  setWindowTitle(qApp->applicationName());
 
   // The statusBar shows tooltips for menuitems.
   statusBar();

@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 
   QCoreApplication::setOrganizationName("openismus");
   QCoreApplication::setOrganizationDomain("openismus.com");
-  QCoreApplication::setApplicationName(PACKAGE_TARNAME);
+  QCoreApplication::setApplicationName(PACKAGE_NAME);
 
   /* Qt does not have an equivalent to GOption, except the arguments() static
      method used below. */
