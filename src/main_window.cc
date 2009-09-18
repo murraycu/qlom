@@ -18,6 +18,7 @@
 
 #include "main_window.h"
 #include "glom_model.h"
+#include "glom_layout_model.h"
 #include "utils.h"
 
 #include <QAction>
@@ -138,13 +139,12 @@ void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
 void MainWindow::setup_table_view(QString table_name)
 {
   QTableView *view = 0;
-  QSqlRelationalTableModel *model = 0;
+  GlomLayoutModel *model = 0;
 
   if(!table_model_opened)
   {
     view = new QTableView(table_model_dialog);
-    model = new QSqlRelationalTableModel();
-    setup_table_model(model, table_name);
+    model = new GlomLayoutModel(glom_doc, table_name);
 
     view->setModel(model);
     view->setItemDelegate(new QSqlRelationalDelegate(view));
@@ -160,50 +160,8 @@ void MainWindow::setup_table_view(QString table_name)
        passed in, container ownership is used, so it is safe to set a new model
        and to not delete the old model.
        http://doc.trolltech.com/4.5/qabstractitemview.html#setModel */
-    model = qobject_cast<QSqlRelationalTableModel*>(view->model());
-    setup_table_model(model, table_name);
+    model = new GlomLayoutModel(glom_doc, table_name);
+    view->setModel(model);
   }
   table_model_dialog->setWindowTitle(table_name);
-}
-
-void MainWindow::setup_table_model(QSqlRelationalTableModel *model, QString table_name)
-{
-  model->setTable(table_name);
-  model->select();
-
-  Glom::Document::type_vec_relationships relationships =
-    glom_doc.get_relationships(qstring_to_ustring(table_name));
-  for(Glom::Document::type_vec_relationships::const_iterator iter =
-    relationships.begin(); iter != relationships.end(); ++iter)
-  {
-    const Glom::sharedptr<const Glom::Relationship> relationship = *iter;
-
-    if(!relationship)
-    {
-      continue;
-    }
-
-    const QSqlRecord record = model->record();
-    const QString from = ustring_to_qstring(relationship->get_from_field());
-    const int index = record.indexOf(from);
-
-    // If the index is invalid, or the primary key, ignore it.
-    if(index == -1 || index == 0)
-    {
-      continue;
-    }
-
-    const QString to_table = ustring_to_qstring(relationship->get_to_table());
-    const QString to_primary_key =
-      ustring_to_qstring(relationship->get_to_field());
-    /* TODO: Find a way to automatically retrieve a default field, rather than
-             hardcoding the location. */
-    const QString to_field = QString("name");
-    model->setRelation(index,
-      QSqlRelation(to_table, to_primary_key, to_field));
-  }
-
-  model->select();
-  // Remove the primary key from the model.
-  model->removeColumn(0);
 }

@@ -14,6 +14,9 @@ src_qlom_SOURCES = src/qlom.cc \
                    src/connection_dialog.cc \
                    src/connection_dialog.moc.cc \
                    src/connection_dialog.h \
+                   src/glom_layout_model.cc \
+                   src/glom_layout_model.moc.cc \
+                   src/glom_layout_model.h \
                    src/utils.cc \
                    src/utils.h
 src_qlom_CXXFLAGS = $(QT_CXXFLAGS) $(QLOM_CFLAGS) $(QLOM_WARNINGS)
@@ -23,4 +26,5 @@ src_qlom_LDADD = $(QT_LIBS) $(QLOM_LIBS)
 
 BUILT_SOURCES = src/main_window.moc.cc \
                 src/glom_model.moc.cc \
+                src/glom_layout_model.moc.cc \
                 src/connection_dialog.moc.cc
