@@ -24,6 +24,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QSqlDatabase>
+#include <QSqlError>
 #include <QVBoxLayout>
 
 ConnectionDialog::ConnectionDialog(const Glom::Document& document,
@@ -72,6 +73,18 @@ void ConnectionDialog::database_connect()
 {
   // Try to open a database connection, with the details from the dialog.
   QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
+  const QString backend = QString("QSPQL");
+
+  const QSqlError error = db.lastError();
+  if(error.isValid())
+  {
+    // TODO: Give feedback in the UI.
+    std::cerr << "Database backend \"" << backend.toUtf8().constData() <<
+      "\" does not exist\n" << "Error details: " <<
+      error.text().toUtf8().constData() << std::endl;
+    done(QDialog::Rejected);
+  }
+
   db.setHostName(host->text());
   db.setDatabaseName(database->text());
   db.setUserName(user->text());
