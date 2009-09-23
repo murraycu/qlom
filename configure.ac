@@ -15,7 +15,7 @@ AC_LANG([C++])
 
 AT_WITH_QT([core gui sql],[no_keywords])
 
-PKG_CHECK_MODULES([QLOM], [glom-1.0 >= 1.11.1])
+PKG_CHECK_MODULES([QLOM], [glom-1.12 >= 1.11.1])
 AC_SUBST([QLOM_CFLAGS])
 AC_SUBST([QLOM_LIBS])
 
