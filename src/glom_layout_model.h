@@ -36,7 +36,7 @@ class GlomLayoutModel : public QSqlRelationalTableModel
   private:
     void apply_relationships(QString& table_name,
       const Glom::Document& document);
-    void keep_layout_items(Glom::sharedptr<Glom::LayoutItem> layout_item);
+    void keep_layout_items(const Glom::sharedptr<Glom::LayoutItem>& layout_item);
 };
 
 #endif /* QLOM_GLOM_LAYOUT_MODEL_H_ */
