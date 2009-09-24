@@ -72,8 +72,8 @@ ConnectionDialog::ConnectionDialog(const Glom::Document& document,
 void ConnectionDialog::database_connect()
 {
   // Try to open a database connection, with the details from the dialog.
-  QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
   const QString backend = QString("QSPQL");
+  QSqlDatabase db = QSqlDatabase::addDatabase(backend);
 
   const QSqlError error = db.lastError();
   if(error.isValid())
