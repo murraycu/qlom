@@ -79,24 +79,27 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  /* Check that the document is:
-     a) Not an example document, which must be resaved - that would be an extra
-     feature.
-     b) Not self-hosting, because that would require starting/stopping
-     PostgreSQL. */
+  /* Check that the document is not an example document, which must be resaved
+     — that would be an extra feature. */
   if(document.get_is_example_file())
   {
     std::cerr << "Document is an example file, cannot process" << std::endl;
     return 1;
   }
 
-  if(document.get_hosting_mode() !=
-    Glom::Document::HOSTING_MODE_POSTGRES_CENTRAL)
+  /* Check that the document is not self-hosting, because that would require
+     starting/stopping PostgreSQL. */
+  switch(document.get_hosting_mode())
   {
-    std::cerr <<
-      "Document is not hosted on an external PostgreSQL server, cannot process"
-      << std::endl;
-    return 1;
+    case Glom::Document::HOSTING_MODE_POSTGRES_CENTRAL:
+      break;
+    case Glom::Document::HOSTING_MODE_SQLITE:
+      break;
+    case Glom::Document::HOSTING_MODE_POSTGRES_SELF:
+    default:
+      std::cerr << "Database type not supported, cannot process" << std::endl;
+      return 1;
+      break;
   }
 
   ConnectionDialog *connection_dialog = new ConnectionDialog(document);

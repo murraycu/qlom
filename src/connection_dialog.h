@@ -42,6 +42,9 @@ class ConnectionDialog : public QDialog
     QLineEdit *user;
     QLineEdit *password;
 
+    void open_postgresql();
+    void open_sqlite();
+
   private Q_SLOTS:
     void database_connect();
 };
