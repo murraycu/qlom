@@ -77,14 +77,7 @@ void ConnectionDialog::database_connect()
   {
     case Glom::Document::HOSTING_MODE_POSTGRES_CENTRAL:
       {
-        const QString backend = QString("QSPQL");
         open_postgresql();
-      }
-      break;
-    case Glom::Document::HOSTING_MODE_SQLITE:
-      {
-        const QString backend = QString("QSQLITE");
-        open_sqlite();
       }
       break;
     default:
@@ -95,7 +88,7 @@ void ConnectionDialog::database_connect()
 
 }
 
-// Open a PostgreSQL connection.
+// Open a central-server PostgreSQL connection.
 void ConnectionDialog::open_postgresql()
 {
   const QString backend = QString("QPSQL");
@@ -114,51 +107,6 @@ void ConnectionDialog::open_postgresql()
   db.setDatabaseName(database->text());
   db.setUserName(user->text());
   db.setPassword(password->text());
-
-  if(!db.open())
-  {
-    std::cerr << "Database connection could not be opened" << std::endl;
-    done(QDialog::Rejected);
-  }
-  else
-  {
-    done(QDialog::Accepted);
-  }
-}
-
-// Open an SQLite database connection.
-// TODO: Move the logic out of the dialog, as there are no connection settings.
-void ConnectionDialog::open_sqlite()
-{
-  const QString backend = QString("QSQLITE");
-  QSqlDatabase db = QSqlDatabase::addDatabase(backend);
-
-  const QSqlError error = db.lastError();
-  if(error.isValid())
-  {
-    // TODO: Give feedback in the UI.
-    std::cerr << "Database backend \"" << backend.toUtf8().constData() <<
-      "\" does not exist\n" << "Error details: " <<
-      error.text().toUtf8().constData() << std::endl;
-    done(QDialog::Rejected);
-  }
-  QString filename = ustring_to_qstring(Glib::filename_to_utf8(Glib::filename_from_uri(glom_doc.get_connection_self_hosted_directory_uri())));
-  filename.push_back('/'); // Qt only supports '/' as a path separator.
-  filename.push_back(database->text());
-  filename.push_back(".db"); // Yes, really.
-
-  /* Check if the database exists, as otherwise a new, blank database will be
-     created and the open will succeed. */
-  const QFile sqlite_db(filename);
-  if(sqlite_db.exists())
-  {
-    db.setDatabaseName(filename);
-  }
-  else
-  {
-    std::cerr << "Sqlite database does not exist" << std::endl;
-    done(QDialog::Rejected);
-  }
 
   if(!db.open())
   {

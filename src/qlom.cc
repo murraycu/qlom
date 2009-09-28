@@ -18,6 +18,7 @@
 
 #include "main_window.h"
 #include "connection_dialog.h"
+#include "open_sqlite.h"
 #include "utils.h"
 
 #include <iostream>
@@ -92,23 +93,31 @@ int main(int argc, char **argv)
   switch(document.get_hosting_mode())
   {
     case Glom::Document::HOSTING_MODE_POSTGRES_CENTRAL:
+      {
+        ConnectionDialog *connection_dialog = new ConnectionDialog(document);
+        if(connection_dialog->exec() != QDialog::Accepted)
+        {
+          QMessageBox::critical(0, qApp->applicationName(),
+              "Could not connect to database server", QMessageBox::Ok,
+              QMessageBox::NoButton, QMessageBox::NoButton);
+          return 1;
+        }
+      }
       break;
     case Glom::Document::HOSTING_MODE_SQLITE:
+      {
+        const Glom::Document& glom_doc = document;
+        if(!open_sqlite(glom_doc))
+        {
+          return 1;
+        }
+      }
       break;
     case Glom::Document::HOSTING_MODE_POSTGRES_SELF:
     default:
       std::cerr << "Database type not supported, cannot process" << std::endl;
       return 1;
       break;
-  }
-
-  ConnectionDialog *connection_dialog = new ConnectionDialog(document);
-  if(connection_dialog->exec() != QDialog::Accepted)
-  {
-    QMessageBox::critical(0, qApp->applicationName(),
-      "Could not connect to database server", QMessageBox::Ok,
-      QMessageBox::NoButton, QMessageBox::NoButton);
-    return 1;
   }
 
   MainWindow main_window(document);

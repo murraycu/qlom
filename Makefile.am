@@ -17,6 +17,8 @@ src_qlom_SOURCES = src/qlom.cc \
                    src/glom_layout_model.cc \
                    src/glom_layout_model.moc.cc \
                    src/glom_layout_model.h \
+                   src/open_sqlite.cc \
+                   src/open_sqlite.h \
                    src/utils.cc \
                    src/utils.h
 src_qlom_CXXFLAGS = $(QT_CXXFLAGS) $(QLOM_CFLAGS) $(QLOM_WARNINGS)
