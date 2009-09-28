@@ -43,7 +43,19 @@ bool open_sqlite(const Glom::Document& document)
       error.text().toUtf8().constData() << std::endl;
     return false;
   }
-  QString filename = ustring_to_qstring(Glib::filename_to_utf8(Glib::filename_from_uri(document.get_connection_self_hosted_directory_uri())));
+
+  // Build SQLite database absolute path.
+  QString filename;
+  try
+  {
+    filename = ustring_to_qstring(Glib::filename_to_utf8(Glib::filename_from_uri(document.get_connection_self_hosted_directory_uri())));
+  }
+  catch(Glib::ConvertError &convert_exception)
+  {
+    std::cerr << "Exception from Glib::filename_to_uri(): " <<
+      convert_exception.what() << std::endl;
+    return false;
+  }
   filename.push_back('/'); // Qt only supports '/' as a path separator.
   filename.push_back(ustring_to_qstring(document.get_connection_database()));
   filename.push_back(".db"); // Yes, really.
