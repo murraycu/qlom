@@ -106,8 +106,7 @@ int main(int argc, char **argv)
       break;
     case Glom::Document::HOSTING_MODE_SQLITE:
       {
-        const Glom::Document& glom_doc = document;
-        if(!open_sqlite(glom_doc))
+        if(!open_sqlite(document))
         {
           return 1;
         }
