@@ -57,15 +57,26 @@ int main(int argc, char **argv)
      for directory separators, so prepending "file://" to the path and escaping
      the necessary characters should work, i.e. filename_to_uri(). */
   std::string uri;
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
     uri = Glib::filename_to_uri(filepath);
   }
-  catch(const Glib::ConvertError& ex)
+  catch(const Glib::ConvertError& convert_exception)
   {
-    std::cerr << "Exception from Glib::filename_to_uri(): " << ex.what() << std::endl;
+    std::cerr << "Exception from Glib::filename_to_uri(): " <<
+      convert_exception.what() << std::endl;
     return 1;
   }
+#else /* !GLIBMM_EXCEPTIONS_ENABLED */
+  std::auto_ptr<Glib::Error> convert_error;
+  uri = Glib::filename_to_uri(filepath, convert_error);
+  if(convert_error.get())
+  {
+    std::cerr << "Error from Glib::filename_to_uri(): " << convert_error->what()
+      << std::endl;
+  }
+#endif /* GLIBMM_EXCEPTIONS_ENABLED */
 
   // Load the Glom document:
   Glom::libglom_init();

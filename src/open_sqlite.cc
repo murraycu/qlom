@@ -46,9 +46,12 @@ bool open_sqlite(const Glom::Document& document)
 
   // Build SQLite database absolute path.
   QString filename;
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-    filename = ustring_to_qstring(Glib::filename_to_utf8(Glib::filename_from_uri(document.get_connection_self_hosted_directory_uri())));
+    filename = ustring_to_qstring(Glib::filename_to_utf8(
+      Glib::filename_from_uri(
+      document.get_connection_self_hosted_directory_uri())));
   }
   catch(Glib::ConvertError &convert_exception)
   {
@@ -56,6 +59,26 @@ bool open_sqlite(const Glom::Document& document)
       convert_exception.what() << std::endl;
     return false;
   }
+#else /* !GLIBMM_EXCEPTIONS_ENABLED */
+  std::auto_ptr<Glib::Error> convert_error;
+  std::string std_filename = Glib::filename_from_uri(
+    document.get_connection_self_hosted_directory_uri(),
+    convert_error);
+  if(convert_error.get())
+  {
+    std::cerr << "Error from Glib::filename_from_uri(): " <<
+      convert_error->what() << std::endl;
+    return false;
+  }
+  filename = ustring_to_qstring(Glib::filename_to_utf8(std_filename,
+      convert_error));
+  if(convert_error.get())
+  {
+    std::cerr << "Error from Glib::filename_to_utf8(): " <<
+      convert_error->what() << std::endl;
+    return false;
+  }
+#endif /* GLIBMM_EXCEPTIONS_ENABLED */
   filename.push_back('/'); // Qt only supports '/' as a path separator.
   filename.push_back(ustring_to_qstring(document.get_connection_database()));
   filename.push_back(".db"); // Yes, really.
