@@ -53,7 +53,7 @@ bool open_sqlite(const Glom::Document& document)
       Glib::filename_from_uri(
       document.get_connection_self_hosted_directory_uri())));
   }
-  catch(Glib::ConvertError &convert_exception)
+  catch(const Glib::ConvertError &convert_exception)
   {
     std::cerr << "Exception from Glib::filename_to_uri(): " <<
       convert_exception.what() << std::endl;
