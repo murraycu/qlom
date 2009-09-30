@@ -36,7 +36,7 @@ class MainWindow : public QMainWindow
   public:
 
     /** 
-     * @param document A .glom document.
+     * @param document a glom document
      */
     MainWindow(const Glom::Document &document);
 
@@ -50,7 +50,7 @@ class MainWindow : public QMainWindow
     void setup_table_model(QSqlRelationalTableModel *model, QString table_name);
 
     const Glom::Document &glom_doc;
-    QDialog *table_model_dialog;
+    QMainWindow *table_model_window;
     bool table_model_opened;
 
   private Q_SLOTS:

@@ -79,7 +79,7 @@ MainWindow::MainWindow(const Glom::Document &document) :
   central_treeview->setModel(model);
   setCentralWidget(central_treeview);
 
-  table_model_dialog = new QDialog(this);
+  table_model_window = new QMainWindow(this);
 
   connect(central_treeview, SIGNAL(doubleClicked(const QModelIndex&)),
     this, SLOT(on_treeview_doubleclicked(const QModelIndex&)));
@@ -129,9 +129,9 @@ void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
 {
   setup_table_view(index.data().toString());
 
-  table_model_dialog->show();
-  table_model_dialog->raise();
-  table_model_dialog->activateWindow();
+  table_model_window->show();
+  table_model_window->raise();
+  table_model_window->activateWindow();
 }
 
 /* Create a new view and layout if the dialog has not been opened, otherwise
@@ -143,19 +143,17 @@ void MainWindow::setup_table_view(QString table_name)
 
   if(!table_model_opened)
   {
-    view = new QTableView(table_model_dialog);
+    view = new QTableView(table_model_window);
     model = new GlomLayoutModel(glom_doc, table_name);
 
     view->setModel(model);
     view->setItemDelegate(new QSqlRelationalDelegate(view));
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(view);
-    table_model_dialog->setLayout(layout);
+    table_model_window->setCentralWidget(view);
     table_model_opened = true;
   }
   else
   {
-    view = table_model_dialog->findChild<QTableView*>();
+    view = table_model_window->findChild<QTableView*>();
     /* According to the QAbstractItemView documentation, if a parent widget is
        passed in, container ownership is used, so it is safe to set a new model
        and to not delete the old model.
@@ -163,5 +161,5 @@ void MainWindow::setup_table_view(QString table_name)
     model = new GlomLayoutModel(glom_doc, table_name);
     view->setModel(model);
   }
-  table_model_dialog->setWindowTitle(table_name);
+  table_model_window->setWindowTitle(table_name);
 }
