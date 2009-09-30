@@ -42,8 +42,7 @@
 #include <config.h>
 
 MainWindow::MainWindow(const Glom::Document &document) :
-  glom_doc(document),
-  table_model_opened(false)
+  glom_doc(document)
 {
   setWindowTitle(qApp->applicationName());
 
@@ -141,25 +140,11 @@ void MainWindow::setup_table_view(QString table_name)
   QTableView *view = 0;
   GlomLayoutModel *model = 0;
 
-  if(!table_model_opened)
-  {
-    view = new QTableView(table_model_window);
-    model = new GlomLayoutModel(glom_doc, table_name);
+  view = new QTableView(table_model_window);
+  model = new GlomLayoutModel(glom_doc, table_name);
 
-    view->setModel(model);
-    view->setItemDelegate(new QSqlRelationalDelegate(view));
-    table_model_window->setCentralWidget(view);
-    table_model_opened = true;
-  }
-  else
-  {
-    view = table_model_window->findChild<QTableView*>();
-    /* According to the QAbstractItemView documentation, if a parent widget is
-       passed in, container ownership is used, so it is safe to set a new model
-       and to not delete the old model.
-       http://doc.trolltech.com/4.5/qabstractitemview.html#setModel */
-    model = new GlomLayoutModel(glom_doc, table_name);
-    view->setModel(model);
-  }
+  view->setModel(model);
+  view->setItemDelegate(new QSqlRelationalDelegate(view));
+  table_model_window->setCentralWidget(view);
   table_model_window->setWindowTitle(table_name);
 }

@@ -51,7 +51,6 @@ class MainWindow : public QMainWindow
 
     const Glom::Document &glom_doc;
     QMainWindow *table_model_window;
-    bool table_model_opened;
 
   private Q_SLOTS:
     void on_file_quit_triggered();
