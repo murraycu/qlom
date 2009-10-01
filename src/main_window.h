@@ -35,23 +35,29 @@ class MainWindow : public QMainWindow
 
   public:
 
-    /** 
-     * @param document a glom document
-     */
+    /** Application main window.
+     *  @param[in] document a glom document */
     MainWindow(const Glom::Document &document);
 
     virtual ~MainWindow();
 
   private:
+    /** Show the application about dialog. */
     void show_about_dialog();
+    /** Write the application settings to disk. */
     void write_settings();
+    /** Read the application settings from disk. */
     void read_settings();
 
-    const Glom::Document &glom_doc;
+    const Glom::Document &glom_doc; /**< a Glom document to view */
 
   private Q_SLOTS:
+    /** Slot for the signal from the Quit menu item. */
     void on_file_quit_triggered();
+    /** Slot for the signal from the Help menu item. */
     void on_help_about_triggered();
+    /** Slot for the signal from a double-click on the table names treeview.
+     *  @param[in] index the row that was double-clicked */
     void on_treeview_doubleclicked(const QModelIndex &index);
 };
 

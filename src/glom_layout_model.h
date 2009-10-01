@@ -29,13 +29,24 @@ class GlomLayoutModel : public QSqlRelationalTableModel
   Q_OBJECT
 
   public:
+    /** Create a model of the layouts in a table from a Glom document.
+     *  @param[in] document a Glom document
+     *  @param[in] table_name the table name
+     *  @param[in] parent a parent QObject
+     *  @param[in] db a database connection */
     explicit GlomLayoutModel(const Glom::Document& document,
       QString& table_name, QObject *parent = 0,
       QSqlDatabase db = QSqlDatabase());
 
   private:
+    /** Read relationships from the Glom document, and apply them to the model.
+     *  @param[in] table_name the table name
+     *  @param[in] document a Glom document */
     void apply_relationships(QString& table_name,
       const Glom::Document& document);
+    /** Discard columns that are not mentioned in the document.
+     *  @param[in] layout_item the layout containing the columns that should
+     not be discarded */
     void keep_layout_items(const Glom::sharedptr<Glom::LayoutItem>& layout_item);
 };
 

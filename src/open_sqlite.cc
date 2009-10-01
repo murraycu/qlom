@@ -28,7 +28,6 @@
 #include <libglom/document/document.h>
 #include <glibmm/convert.h>
 
-// Open an SQLite database connection.
 bool open_sqlite(const Glom::Document& document)
 {
   const QString backend("QSQLITE");

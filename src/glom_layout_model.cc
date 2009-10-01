@@ -53,7 +53,6 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document& document,
   select();
 }
 
-// Apply relationships from Glom document to relational model.
 void GlomLayoutModel::apply_relationships(QString& table_name,
   const Glom::Document& document)
 {
@@ -89,8 +88,6 @@ void GlomLayoutModel::apply_relationships(QString& table_name,
   }
 }
 
-/* Keep the colums respreseted by the layout items in the model, and discard
-   the remaining columns. */
 void GlomLayoutModel::keep_layout_items(const Glom::sharedptr<Glom::LayoutItem>& layout_item)
 {
   Glom::sharedptr<Glom::LayoutGroup> layout_group(

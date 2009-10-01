@@ -50,9 +50,8 @@ MainWindow::MainWindow(const Glom::Document &document) :
   statusBar();
   statusBar()->showMessage(tr("Qlom successfully started"));
 
-  // Create the menu:
-  // TODO: Doesn't Qt have some stock UI items? murrayc
-  // Currently, no, although see:
+  // Create the menu.
+  // Qt does not have stock items, but it might get stock _icons_:
   // http://labs.trolltech.com/blogs/2009/02/13/freedesktop-icons-in-qt/
   QAction *file_quit = new QAction(tr("&Quit"), this);
   file_quit->setShortcut(tr("Ctrl+Q"));
@@ -122,8 +121,6 @@ void MainWindow::on_help_about_triggered()
   show_about_dialog();
 }
 
-/* Create a new view and layout if the dialog has not been opened, otherwise
-   re-use the existing dialog. */
 void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
 {
   QString table_name(index.data().toString());
