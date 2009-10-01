@@ -137,6 +137,7 @@ void MainWindow::setup_table_view(QString table_name)
   GlomLayoutModel *model = new GlomLayoutModel(glom_doc, table_name);
 
   view->setModel(model);
+  view->resizeColumnsToContents();
   view->setItemDelegate(new QSqlRelationalDelegate(view));
   table_model_window->setCentralWidget(view);
   table_model_window->setWindowTitle(table_name);
