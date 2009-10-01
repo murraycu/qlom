@@ -23,8 +23,8 @@ GlomModel::GlomModel(const Glom::Document& document, QObject *parent) :
   QAbstractListModel(parent)
 {
   // Read out table names from document, and add them to the model.
-  const std::vector<Glib::ustring> tables = document.get_table_names();
-  for(std::vector<Glib::ustring>::const_iterator iter = tables.begin();
+  const std::vector<Glib::ustring> tables(document.get_table_names());
+  for(std::vector<Glib::ustring>::const_iterator iter(tables.begin());
     iter != tables.end(); ++iter)
   {
     table_names.push_back(ustring_to_qstring(*iter));

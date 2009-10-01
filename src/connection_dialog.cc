@@ -91,10 +91,10 @@ void ConnectionDialog::database_connect()
 // Open a central-server PostgreSQL connection.
 void ConnectionDialog::open_postgresql()
 {
-  const QString backend = QString("QPSQL");
-  QSqlDatabase db = QSqlDatabase::addDatabase(backend);
+  const QString backend(QString("QPSQL"));
+  QSqlDatabase db(QSqlDatabase::addDatabase(backend));
 
-  const QSqlError error = db.lastError();
+  const QSqlError error(db.lastError());
   if(error.isValid())
   {
     // TODO: Give feedback in the UI.

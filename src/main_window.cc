@@ -125,7 +125,6 @@ void MainWindow::on_help_about_triggered()
 void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
 {
   setup_table_view(index.data().toString());
-
 }
 
 /* Create a new view and layout if the dialog has not been opened, otherwise

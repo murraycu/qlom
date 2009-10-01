@@ -49,9 +49,9 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  QString filepath_qt = *++options.begin();
+  QString filepath_qt(*++options.begin());
 
-  std::string filepath = filepath_qt.toUtf8().constData();
+  std::string filepath(filepath_qt.toUtf8().constData());
 
   /* Qt does not have the concept of file URIs. However, only '/' is supported
      for directory separators, so prepending "file://" to the path and escaping

@@ -31,13 +31,13 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document& document,
 
   apply_relationships(table_name, document);
 
-  const Glib::ustring table_name_u = qstring_to_ustring(table_name);
-  const Glom::Document::type_list_layout_groups list_layout =
-    document.get_data_layout_groups("list", table_name_u);
-  for(Glom::Document::type_list_layout_groups::const_iterator iter =
-    list_layout.begin(); iter != list_layout.end(); ++iter)
+  const Glib::ustring table_name_u(qstring_to_ustring(table_name));
+  const Glom::Document::type_list_layout_groups list_layout(
+    document.get_data_layout_groups("list", table_name_u));
+  for(Glom::Document::type_list_layout_groups::const_iterator iter(
+    list_layout.begin()); iter != list_layout.end(); ++iter)
   {
-    Glom::sharedptr<Glom::LayoutGroup> layout_group = *iter;
+    Glom::sharedptr<Glom::LayoutGroup> layout_group(*iter);
     if(!layout_group)
     {
       continue;
@@ -57,20 +57,20 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document& document,
 void GlomLayoutModel::apply_relationships(QString& table_name,
   const Glom::Document& document)
 {
-  const Glib::ustring table_name_u = qstring_to_ustring(table_name);
-  Glom::Document::type_vec_relationships relationships =
-    document.get_relationships(table_name_u);
-  for(Glom::Document::type_vec_relationships::const_iterator iter =
-    relationships.begin(); iter != relationships.end(); ++iter)
+  const Glib::ustring table_name_u(qstring_to_ustring(table_name));
+  Glom::Document::type_vec_relationships relationships(
+    document.get_relationships(table_name_u));
+  for(Glom::Document::type_vec_relationships::const_iterator iter(
+    relationships.begin()); iter != relationships.end(); ++iter)
   {
-    const Glom::sharedptr<const Glom::Relationship> relationship = *iter;
+    const Glom::sharedptr<const Glom::Relationship> relationship(*iter);
     if(!relationship)
     {
       continue;
     }
 
-    const QSqlRecord record = this->record();
-    const QString from = ustring_to_qstring(relationship->get_from_field());
+    const QSqlRecord record(this->record());
+    const QString from(ustring_to_qstring(relationship->get_from_field()));
     const int index = record.indexOf(from);
 
     // If the index is invalid, or the primary key, ignore it.
@@ -79,12 +79,12 @@ void GlomLayoutModel::apply_relationships(QString& table_name,
       continue;
     }
 
-    const QString to_table = ustring_to_qstring(relationship->get_to_table());
-    const QString to_primary_key =
-      ustring_to_qstring(relationship->get_to_field());
+    const QString to_table(ustring_to_qstring(relationship->get_to_table()));
+    const QString to_primary_key(
+      ustring_to_qstring(relationship->get_to_field()));
     /* TODO: Find a way to automatically retrieve a default field, rather than
              hardcoding the location. */
-    const QString to_field = QString("name");
+    const QString to_field("name");
     setRelation(index, QSqlRelation(to_table, to_primary_key, to_field));
   }
 }
@@ -93,24 +93,24 @@ void GlomLayoutModel::apply_relationships(QString& table_name,
    the remaining columns. */
 void GlomLayoutModel::keep_layout_items(const Glom::sharedptr<Glom::LayoutItem>& layout_item)
 {
-  Glom::sharedptr<Glom::LayoutGroup> layout_group =
-    Glom::sharedptr<Glom::LayoutGroup>::cast_dynamic(layout_item);
+  Glom::sharedptr<Glom::LayoutGroup> layout_group(
+    Glom::sharedptr<Glom::LayoutGroup>::cast_dynamic(layout_item));
   if(layout_group)
   {
     QStringList keep_items;
-    const Glom::LayoutGroup::type_list_items items = layout_group->get_items();
-    for(Glom::LayoutGroup::type_list_items::const_iterator iter = items.begin();
+    const Glom::LayoutGroup::type_list_items items(layout_group->get_items());
+    for(Glom::LayoutGroup::type_list_items::const_iterator iter(items.begin());
       iter != items.end(); ++iter)
     {
-      Glom::sharedptr<Glom::LayoutItem> layout_item = *iter;
+      Glom::sharedptr<Glom::LayoutItem> layout_item(*iter);
       if(!layout_item)
       {
         continue;
       }
 
       // Only keep these layout items in the model.
-      QString keep_item =
-        ustring_to_qstring(layout_item->get_layout_display_name());
+      QString keep_item(
+        ustring_to_qstring(layout_item->get_layout_display_name()));
       if(keep_item.isEmpty())
       {
         continue;

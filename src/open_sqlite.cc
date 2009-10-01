@@ -31,10 +31,10 @@
 // Open an SQLite database connection.
 bool open_sqlite(const Glom::Document& document)
 {
-  const QString backend = QString("QSQLITE");
-  QSqlDatabase db = QSqlDatabase::addDatabase(backend);
+  const QString backend("QSQLITE");
+  QSqlDatabase db(QSqlDatabase::addDatabase(backend));
 
-  const QSqlError error = db.lastError();
+  const QSqlError error(db.lastError());
   if(error.isValid())
   {
     // TODO: Give feedback in the UI.
@@ -61,9 +61,9 @@ bool open_sqlite(const Glom::Document& document)
   }
 #else /* !GLIBMM_EXCEPTIONS_ENABLED */
   std::auto_ptr<Glib::Error> convert_error;
-  std::string std_filename = Glib::filename_from_uri(
+  std::string std_filename(Glib::filename_from_uri(
     document.get_connection_self_hosted_directory_uri(),
-    convert_error);
+    convert_error));
   if(convert_error.get())
   {
     std::cerr << "Error from Glib::filename_from_uri(): " <<
