@@ -78,8 +78,6 @@ MainWindow::MainWindow(const Glom::Document &document) :
   central_treeview->setModel(model);
   setCentralWidget(central_treeview);
 
-  table_model_window = new QMainWindow(this);
-
   connect(central_treeview, SIGNAL(doubleClicked(const QModelIndex&)),
     this, SLOT(on_treeview_doubleclicked(const QModelIndex&)));
 
@@ -128,23 +126,21 @@ void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
 {
   setup_table_view(index.data().toString());
 
-  table_model_window->show();
-  table_model_window->raise();
-  table_model_window->activateWindow();
 }
 
 /* Create a new view and layout if the dialog has not been opened, otherwise
    re-use the existing dialog. */
 void MainWindow::setup_table_view(QString table_name)
 {
-  QTableView *view = 0;
-  GlomLayoutModel *model = 0;
-
-  view = new QTableView(table_model_window);
-  model = new GlomLayoutModel(glom_doc, table_name);
+  QMainWindow *table_model_window = new QMainWindow(this);
+  QTableView *view = new QTableView(table_model_window);
+  GlomLayoutModel *model = new GlomLayoutModel(glom_doc, table_name);
 
   view->setModel(model);
   view->setItemDelegate(new QSqlRelationalDelegate(view));
   table_model_window->setCentralWidget(view);
   table_model_window->setWindowTitle(table_name);
+  table_model_window->show();
+  table_model_window->raise();
+  table_model_window->activateWindow();
 }

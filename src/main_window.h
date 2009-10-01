@@ -50,7 +50,6 @@ class MainWindow : public QMainWindow
     void setup_table_model(QSqlRelationalTableModel *model, QString table_name);
 
     const Glom::Document &glom_doc;
-    QMainWindow *table_model_window;
 
   private Q_SLOTS:
     void on_file_quit_triggered();
