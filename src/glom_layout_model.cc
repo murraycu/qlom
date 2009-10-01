@@ -118,6 +118,15 @@ void GlomLayoutModel::keep_layout_items(const Glom::sharedptr<Glom::LayoutItem>&
       else
       {
         keep_items.push_back(keep_item);
+        // Use the column names from the Document, not the database table.
+        for(int index = 0; index < record().count(); ++index)
+        {
+          if(keep_item == record().fieldName(index))
+          {
+            setHeaderData(index, Qt::Horizontal, ustring_to_qstring(
+                  layout_item->get_title_or_name()));
+          }
+        }
       }
     }
 
