@@ -122,15 +122,11 @@ void MainWindow::on_help_about_triggered()
   show_about_dialog();
 }
 
-void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
-{
-  setup_table_view(index.data().toString());
-}
-
 /* Create a new view and layout if the dialog has not been opened, otherwise
    re-use the existing dialog. */
-void MainWindow::setup_table_view(QString table_name)
+void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
 {
+  QString table_name(index.data().toString());
   QMainWindow *table_model_window = new QMainWindow(this);
   QTableView *view = new QTableView(table_model_window);
   GlomLayoutModel *model = new GlomLayoutModel(glom_doc, table_name);
