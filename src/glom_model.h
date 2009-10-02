@@ -21,8 +21,20 @@
 
 #include <QAbstractListModel>
 #include <QStringList>
-#include <libglom/document/document.h>
-#include <libglom/init.h>
+
+namespace Glom
+{
+class Document;
+};
+
+namespace Qlom
+{
+/** Roles for GlomModel. */
+enum GlomModelRoles
+{
+  TableNameRole = 32 /**< retrieves the table name from the model */
+};
+};
 
 class GlomModel : public QAbstractListModel
 {
@@ -53,6 +65,7 @@ class GlomModel : public QAbstractListModel
       int role = Qt::DisplayRole) const;
 
   private:
+    const Glom::Document& glom_doc; /**< the Glom document */
     QStringList table_names; /**< the list of tables in the Glom document */
 };
 

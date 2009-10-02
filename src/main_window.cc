@@ -123,7 +123,7 @@ void MainWindow::on_help_about_triggered()
 
 void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
 {
-  QString table_name(index.data().toString());
+  QString table_name(index.data(Qlom::TableNameRole).toString());
   QMainWindow *table_model_window = new QMainWindow(this);
   QTableView *view = new QTableView(table_model_window);
   GlomLayoutModel *model = new GlomLayoutModel(glom_doc, table_name);
@@ -132,7 +132,8 @@ void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
   view->resizeColumnsToContents();
   view->setItemDelegate(new QSqlRelationalDelegate(view));
   table_model_window->setCentralWidget(view);
-  table_model_window->setWindowTitle(table_name);
+  table_model_window->setWindowTitle(ustring_to_qstring(
+    glom_doc.get_table_title(qstring_to_ustring(table_name))));
   table_model_window->show();
   table_model_window->raise();
   table_model_window->activateWindow();

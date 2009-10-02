@@ -19,8 +19,12 @@
 #include "glom_model.h"
 #include "utils.h"
 
+#include <libglom/document/document.h>
+#include <libglom/init.h>
+
 GlomModel::GlomModel(const Glom::Document& document, QObject *parent) :
-  QAbstractListModel(parent)
+  QAbstractListModel(parent),
+  glom_doc(document)
 {
   // Read out table names from document, and add them to the model.
   const std::vector<Glib::ustring> tables(document.get_table_names());
@@ -47,13 +51,16 @@ QVariant GlomModel::data(const QModelIndex &index, int role) const
   {
     return QVariant();
   }
-  if(role == Qt::DisplayRole)
+  switch(role)
   {
-    return table_names.at(index.row());
-  }
-  else
-  {
-    return QVariant();
+    case Qt::DisplayRole:
+      return ustring_to_qstring(glom_doc.get_table_title(qstring_to_ustring(table_names.at(index.row()))));
+      break;
+    case Qlom::TableNameRole:
+      return table_names.at(index.row());
+    default:
+      return QVariant();
+      break;
   }
 }
 
@@ -64,7 +71,7 @@ QVariant GlomModel::headerData(int section, Qt::Orientation orientation,
   {
     if(role == Qt::DisplayRole)
     {
-      return tr("Table names");
+      return tr("Table titles");
     }
   }
 
