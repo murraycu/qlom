@@ -47,7 +47,6 @@ MainWindow::MainWindow(const Glom::Document &document) :
   setWindowTitle(qApp->applicationName());
 
   // The statusBar shows tooltips for menuitems.
-  statusBar();
   statusBar()->showMessage(tr("Qlom successfully started"));
 
   // Create the menu.
@@ -134,7 +133,9 @@ void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
   table_model_window->setCentralWidget(view);
   table_model_window->setWindowTitle(ustring_to_qstring(
     glom_doc.get_table_title(qstring_to_ustring(table_name))));
+
   table_model_window->show();
   table_model_window->raise();
   table_model_window->activateWindow();
+  statusBar()->showMessage(tr("%1 table opened").arg(table_name));
 }
