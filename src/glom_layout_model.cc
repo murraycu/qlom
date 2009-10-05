@@ -29,7 +29,7 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document& document,
 {
   setTable(table_name);
 
-  apply_relationships(table_name, document);
+  apply_relationships(document);
 
   const Glib::ustring table_name_u(qstring_to_ustring(table_name));
   const Glom::Document::type_list_layout_groups list_layout(
@@ -53,10 +53,9 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document& document,
   select();
 }
 
-void GlomLayoutModel::apply_relationships(QString& table_name,
-  const Glom::Document& document)
+void GlomLayoutModel::apply_relationships(const Glom::Document& document)
 {
-  const Glib::ustring table_name_u(qstring_to_ustring(table_name));
+  const Glib::ustring table_name_u(qstring_to_ustring(tableName()));
   Glom::Document::type_vec_relationships relationships(
     document.get_relationships(table_name_u));
   for(Glom::Document::type_vec_relationships::const_iterator iter(
