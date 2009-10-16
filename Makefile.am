@@ -20,7 +20,10 @@ src_qlom_SOURCES = src/qlom.cc \
                    src/open_sqlite.cc \
                    src/open_sqlite.h \
                    src/utils.cc \
-                   src/utils.h
+                   src/utils.h \
+                   src/query_builder.cc \
+                   src/query_builder.h
+
 src_qlom_CXXFLAGS = $(QT_CXXFLAGS) $(QLOM_CFLAGS) $(QLOM_WARNINGS)
 src_qlom_CPPFLAGS = $(QT_CPPFLAGS)
 src_qlom_LDFLAGS  = $(QT_LDFLAGS)
