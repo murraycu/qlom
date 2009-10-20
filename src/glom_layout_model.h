@@ -42,6 +42,7 @@ class GlomLayoutModel : public QSqlRelationalTableModel
     /** Read relationships from the Glom document, and apply them to the model.
      *  @param[in] document a Glom document */
     void apply_relationships(const Glom::Document& document);
+
     /** Discard columns that are not mentioned in the document.
      *  @param[in] layout_item the layout containing the columns that should
      not be discarded */

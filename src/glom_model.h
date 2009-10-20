@@ -44,18 +44,21 @@ class GlomModel : public QAbstractListModel
     /** Construct a new model from a Glom document.
      *  @param[in] document a Glom document to read metadata from
      *  @param[in] parent a parent QObject, that will take ownership of the
-     *  model */
+     model */
     explicit GlomModel(const Glom::Document& document, QObject *parent = 0);
+
     /** Calculate the number of rows in the model.
      *  @param[in] parent the parent index in the heirarchy
      *  @returns the number of rows in the model
      */
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+
     /** Retrieve data from the model.
      *  @param[in] index the index to retrieve data from
      *  @param[in] role the Qt::ItemDataRole to retrieve data for
      *  @returns the data from the model */
     QVariant data(const QModelIndex &index, int role) const;
+
     /** Retrieve the column titles from the model.
      *  @param[in] section the index of the header item
      *  @param[in] orientation the orientation of the header

@@ -44,8 +44,10 @@ class MainWindow : public QMainWindow
   private:
     /** Show the application about dialog. */
     void show_about_dialog();
+
     /** Write the application settings to disk. */
     void write_settings();
+
     /** Read the application settings from disk. */
     void read_settings();
 
@@ -54,8 +56,10 @@ class MainWindow : public QMainWindow
   private Q_SLOTS:
     /** Slot for the signal from the Quit menu item. */
     void on_file_quit_triggered();
+
     /** Slot for the signal from the Help menu item. */
     void on_help_about_triggered();
+
     /** Slot for the signal from a double-click on the table names treeview.
      *  @param[in] index the row that was double-clicked */
     void on_treeview_doubleclicked(const QModelIndex &index);
