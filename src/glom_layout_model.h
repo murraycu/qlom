@@ -30,6 +30,10 @@ class GlomLayoutModel : public QSqlRelationalTableModel
     Q_OBJECT
 
 public:
+    /* Note: QSqlDatabase should be passed by const reference, but the base
+       class makes the same mistake.
+       TODO: File a bug when there is a public Qt bug tracker. */
+
     /** Create a model of the layouts in a table from a Glom document.
      *  @param[in] document a Glom document
      *  @param[in] table_name the table name TODO: Should this be const?
