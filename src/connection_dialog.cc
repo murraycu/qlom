@@ -88,6 +88,10 @@ void ConnectionDialog::databaseConnect()
 // Open a central-server PostgreSQL connection.
 void ConnectionDialog::openPostgresql()
 {
+    /* Create and open the default connection for QSqlDatabase,
+       so other code can use QSqlDatabase::database() to get that open
+       connection. */
+
     const QString backend(QString("QPSQL"));
     QSqlDatabase db(QSqlDatabase::addDatabase(backend));
 

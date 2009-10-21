@@ -125,6 +125,9 @@ void MainWindow::onTreeviewDoubleclicked(const QModelIndex& index)
     QString tableName(index.data(Qlom::TableNameRole).toString());
     QMainWindow *tableModelWindow = new QMainWindow(this);
     QTableView *view = new QTableView(tableModelWindow);
+
+    /* Create a model for the rows of data, using the default QSqlDatabase
+       connection, previously opened by ConnectionDialog or openSqlite(). */
     GlomLayoutModel *model = new GlomLayoutModel(glomDoc, tableName);
 
     view->setModel(model);

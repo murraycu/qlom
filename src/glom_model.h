@@ -37,6 +37,8 @@ enum GlomModelRoles {
 
 } // namespace Qlom
 
+//TODO: Rename to GlomTableListModel.
+/** A model of the tables in a Glom document. */
 class GlomModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -46,7 +48,7 @@ public:
      *  @param[in] document a Glom document to read metadata from
      *  @param[in] parent a parent QObject, that will take ownership of the
      model */
-    explicit GlomModel(const Glom::Document& document, QObject *parent = 0);
+    explicit GlomModel(const Glom::Document &document, QObject *parent = 0);
 
     /** Calculate the number of rows in the model.
      *  @param[in] parent the parent index in the heirarchy

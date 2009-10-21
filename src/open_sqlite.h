@@ -19,5 +19,9 @@
 #include <libglom/document/document.h>
 
 /** Open an SQLite database connection.
- *  @param[in] document a Glom document with data in an SQLite database */
+ *  Creates and opens a default QSqlDatabase connection.
+ *
+ *  @param[in] document a Glom document with data in an SQLite database
+ *
+ *  @see ConnectionDialog */
 bool openSqlite(const Glom::Document &document);

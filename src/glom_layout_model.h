@@ -34,7 +34,7 @@ public:
      *  @param[in] document a Glom document
      *  @param[in] table_name the table name TODO: Should this be const?
      *  @param[in] parent a parent QObject
-     *  @param[in] db a database connection */
+     *  @param[in] db a database connection, or the default connection */
     explicit GlomLayoutModel(const Glom::Document &document,
         QString &tableName, QObject *parent = 0,
         QSqlDatabase db = QSqlDatabase());

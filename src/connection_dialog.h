@@ -30,7 +30,12 @@ class Document;
 
 /** A dialog to ask the user for connection details.
  *  Some database backends require authentication details, which can be
- *  requested with a ConnectionDialog. */
+ *  requested with a ConnectionDialog.
+ *
+ *  The default connection for QSqlDatabase is created and opened by the dialog.
+ *
+ *  @see openSqlite()
+ */
 class ConnectionDialog : public QDialog
 {
     Q_OBJECT
