@@ -32,25 +32,16 @@
 
 #include "config.h"
 
-int main(int argc, char **argv)
+Glom::Document* document = 0;
+MainWindow *main_window = 0;
+
+void print_usage()
 {
-  QApplication app(argc, argv);
+  std::cout << "Usage: glom absolute_file_path" << std::endl;
+}
 
-  QCoreApplication::setOrganizationName("openismus");
-  QCoreApplication::setOrganizationDomain("openismus.com");
-  QCoreApplication::setApplicationName(PACKAGE_NAME);
-
-  /* Qt does not have an equivalent to GOption, except the arguments() static
-     method used below. */
-  std::list<QString> options = app.arguments().toStdList();
-  if(options.size() < 2)
-  {
-    std::cout << "Usage: glom absolute_file_path" << std::endl;
-    return 1;
-  }
-
-  QString filepath_qt(*++options.begin());
-
+std::string qlom_filepath_to_uri(const QString& filepath_qt)
+{
   std::string filepath(filepath_qt.toUtf8().constData());
 
   /* Qt does not have the concept of file URIs. However, only '/' is supported
@@ -66,72 +57,125 @@ int main(int argc, char **argv)
   {
     std::cerr << "Exception from Glib::filename_to_uri(): " <<
       convert_exception.what() << std::endl;
-    return 1;
   }
 #else /* !GLIBMM_EXCEPTIONS_ENABLED */
   std::auto_ptr<Glib::Error> convert_error;
   uri = Glib::filename_to_uri(filepath, convert_error);
   if(convert_error.get())
   {
-    std::cerr << "Error from Glib::filename_to_uri(): " << convert_error->what()
-      << std::endl;
+    std::cerr << "Error from Glib::filename_to_uri(): "
+      << convert_error->what() << std::endl;
   }
 #endif /* GLIBMM_EXCEPTIONS_ENABLED */
 
-  // Load the Glom document:
-  Glom::libglom_init();
+  return uri;
+}
 
-  Glom::Document document;
-  document.set_file_uri(uri);
+/** Load the document and show it in the main window.
+ @result true for success, false otherwise
+ */
+bool load_document(const QString& filepath)
+{
+  const std::string uri(qlom_filepath_to_uri(filepath));
+  if(uri.empty())
+  {
+    print_usage();
+    return false;
+  }
+
+  /* The Glom::Document is instantiated dynamically because a static instance
+     could be instantiated before libglom has been initialised. */
+  document = new Glom::Document();
+  document->set_file_uri(uri);
   int failure_code = 0;
-  const bool test = document.load(failure_code);
+  const bool test = document->load(failure_code);
   if(!test)
   {
     std::cerr << "Document loading failed with uri=" << uri << std::endl;
-    return 1;
+    return false;
   }
 
   /* Check that the document is not an example document, which must be resaved
      — that would be an extra feature. */
-  if(document.get_is_example_file())
+  if(document->get_is_example_file())
   {
     std::cerr << "Document is an example file, cannot process" << std::endl;
-    return 1;
+    return false;
   }
 
   /* Check that the document is not self-hosting, because that would require
      starting/stopping PostgreSQL. */
-  switch(document.get_hosting_mode())
+  switch (document->get_hosting_mode())
   {
     case Glom::Document::HOSTING_MODE_POSTGRES_CENTRAL:
       {
-        ConnectionDialog *connection_dialog = new ConnectionDialog(document);
+        ConnectionDialog *connection_dialog = new ConnectionDialog(*document);
         if(connection_dialog->exec() != QDialog::Accepted)
         {
           QMessageBox::critical(0, qApp->applicationName(),
               "Could not connect to database server", QMessageBox::Ok,
               QMessageBox::NoButton, QMessageBox::NoButton);
-          return 1;
+          return false;
         }
       }
       break;
     case Glom::Document::HOSTING_MODE_SQLITE:
       {
-        if(!open_sqlite(document))
+        if(!openSqlite(*document))
         {
-          return 1;
+          return false;
         }
       }
       break;
     case Glom::Document::HOSTING_MODE_POSTGRES_SELF:
     default:
       std::cerr << "Database type not supported, cannot process" << std::endl;
-      return 1;
+      return false;
       break;
   }
 
-  MainWindow main_window(document);
-  main_window.show();
+  main_window = new MainWindow(*document);
+  main_window->show();
 
-  return app.exec();
+  return true;
+}
+
+int main(int argc, char **argv)
+{
+  QApplication app(argc, argv);
+
+  QCoreApplication::setOrganizationName("openismus");
+  QCoreApplication::setOrganizationDomain("openismus.com");
+  QCoreApplication::setApplicationName(PACKAGE_NAME);
+
+  Glom::libglom_init();
+
+  /* Qt does not have an equivalent to GOption, except the arguments() static
+     method used below. */
+  std::list<QString> options = app.arguments().toStdList();
+  if(options.size() < 2)
+  {
+    print_usage();
+    return 1;
+  }
+
+  const QString filepath(*++options.begin());
+  if(filepath.isEmpty())
+  {
+    print_usage();
+    return 1;
+  }
+
+  if(!load_document(filepath))
+  {
+    // Load the Glom document.
+    return 1;
+  }
+
+  const int result = app.exec();
+
+  delete main_window;
+  delete document;
+
+  return result;
 }
