@@ -23,116 +23,104 @@
 #include <QSqlRecord>
 #include <QStringList>
 
-GlomLayoutModel::GlomLayoutModel(const Glom::Document& document,
-  QString& table_name, QObject *parent, QSqlDatabase db) :
-  QSqlRelationalTableModel(parent, db)
+GlomLayoutModel::GlomLayoutModel(const Glom::Document &document,
+    QString &table_name, QObject *parent, QSqlDatabase db) :
+    QSqlRelationalTableModel(parent, db)
 {
-  setTable(table_name);
+    setTable(table_name);
 
-  apply_relationships(document);
+    applyRelationships(document);
 
-  const Glib::ustring table_name_u(qstring_to_ustring(table_name));
-  const Glom::Document::type_list_layout_groups list_layout(
-    document.get_data_layout_groups("list", table_name_u));
-  for(Glom::Document::type_list_layout_groups::const_iterator iter(
-    list_layout.begin()); iter != list_layout.end(); ++iter)
-  {
-    Glom::sharedptr<Glom::LayoutGroup> layout_group(*iter);
-    if(!layout_group)
-    {
-      continue;
-    }
-    else
-    {
-      keep_layout_items(layout_group);
-    }
-    break;
-  }
-
-  // Fill the model from the database.
-  select();
-}
-
-void GlomLayoutModel::apply_relationships(const Glom::Document& document)
-{
-  const Glib::ustring table_name_u(qstring_to_ustring(tableName()));
-  Glom::Document::type_vec_relationships relationships(
-    document.get_relationships(table_name_u));
-  for(Glom::Document::type_vec_relationships::const_iterator iter(
-    relationships.begin()); iter != relationships.end(); ++iter)
-  {
-    const Glom::sharedptr<const Glom::Relationship> relationship(*iter);
-    if(!relationship)
-    {
-      continue;
-    }
-
-    const QSqlRecord record(this->record());
-    const QString from(ustring_to_qstring(relationship->get_from_field()));
-    const int index = record.indexOf(from);
-
-    // If the index is invalid, or the primary key, ignore it.
-    if(index == -1 || index == 0)
-    {
-      continue;
-    }
-
-    const QString to_table(ustring_to_qstring(relationship->get_to_table()));
-    const QString to_primary_key(
-      ustring_to_qstring(relationship->get_to_field()));
-    /* TODO: Find a way to automatically retrieve a default field, rather than
-             hardcoding the location. */
-    const QString to_field("name");
-    setRelation(index, QSqlRelation(to_table, to_primary_key, to_field));
-  }
-}
-
-void GlomLayoutModel::keep_layout_items(const Glom::sharedptr<Glom::LayoutItem>& layout_item)
-{
-  Glom::sharedptr<Glom::LayoutGroup> layout_group(
-    Glom::sharedptr<Glom::LayoutGroup>::cast_dynamic(layout_item));
-  if(layout_group)
-  {
-    QStringList keep_items;
-    const Glom::LayoutGroup::type_list_items items(layout_group->get_items());
-    for(Glom::LayoutGroup::type_list_items::const_iterator iter(items.begin());
-      iter != items.end(); ++iter)
-    {
-      Glom::sharedptr<Glom::LayoutItem> layout_item(*iter);
-      if(!layout_item)
-      {
-        continue;
-      }
-
-      // Only keep these layout items in the model.
-      QString keep_item(
-        ustring_to_qstring(layout_item->get_layout_display_name()));
-      if(keep_item.isEmpty())
-      {
-        continue;
-      }
-      else
-      {
-        keep_items.push_back(keep_item);
-        // Use the column names from the Document, not the database table.
-        for(int index = 0; index < record().count(); ++index)
-        {
-          if(keep_item == record().fieldName(index))
-          {
-            setHeaderData(index, Qt::Horizontal, ustring_to_qstring(
-                  layout_item->get_title_or_name()));
-          }
+    const Glib::ustring tableNameU(qstringToUstring(table_name));
+    const Glom::Document::type_list_layout_groups listLayout(
+        document.get_data_layout_groups("list", tableNameU));
+    for (Glom::Document::type_list_layout_groups::const_iterator iter(
+        listLayout.begin()); iter != listLayout.end(); ++iter) {
+        Glom::sharedptr<Glom::LayoutGroup> layoutGroup(*iter);
+        if (!layoutGroup) {
+            continue;
+        } else {
+            keepLayoutItems(layoutGroup);
         }
-      }
+
+        break;
     }
 
-    for(int index = 0; index < record().count(); ++index)
-    {
-      // Remove columns from model.
-      if(!keep_items.contains(record().fieldName(index)))
-      {
-        removeColumn(index);
-      }
+    // Fill the model from the database.
+    select();
+}
+
+void GlomLayoutModel::applyRelationships(const Glom::Document &document)
+{
+    const Glib::ustring tableNameU(qstringToUstring(tableName()));
+    Glom::Document::type_vec_relationships relationships(
+        document.get_relationships(tableNameU));
+    for (Glom::Document::type_vec_relationships::const_iterator iter(
+        relationships.begin()); iter != relationships.end(); ++iter) {
+        const Glom::sharedptr<const Glom::Relationship> relationship(*iter);
+        if (!relationship) {
+            // Skip if the relationship is invalid. Can this happen?
+            continue;
+        }
+
+        const QSqlRecord record(this->record());
+        const QString from(ustringToQstring(relationship->get_from_field()));
+        const int index = record.indexOf(from);
+
+        if (index == -1 || index == 0) {
+            // If the index is invalid, or the primary key, ignore it.
+            continue;
+        }
+
+        const QString toTable(ustringToQstring(relationship->get_to_table()));
+        const QString toPrimaryKey(
+            ustringToQstring(relationship->get_to_field()));
+        /* TODO: Find a way to automatically retrieve a default field, rather
+           than hardcoding the location. */
+        const QString toField("name");
+        setRelation(index, QSqlRelation(toTable, toPrimaryKey, toField));
     }
-  }
+}
+
+void GlomLayoutModel::keepLayoutItems(const Glom::sharedptr<Glom::LayoutItem>
+    &layoutItem)
+{
+    Glom::sharedptr<Glom::LayoutGroup> layoutGroup(
+        Glom::sharedptr<Glom::LayoutGroup>::cast_dynamic(layoutItem));
+    if (layoutGroup) {
+        QStringList keep_items;
+        const Glom::LayoutGroup::type_list_items
+            items(layoutGroup->get_items());
+        for (Glom::LayoutGroup::type_list_items::const_iterator
+            iter(items.begin()); iter != items.end(); ++iter) {
+            Glom::sharedptr<Glom::LayoutItem> layoutItem(*iter);
+            if (!layoutItem) {
+                // Skip if the layoutItem is invalid. Can this happen?
+                continue;
+            }
+
+            // Only keep these layout items in the model.
+            QString keep_item(
+                ustringToQstring(layoutItem->get_layout_display_name()));
+            if(keep_item.isEmpty()) {
+                continue;
+            } else {
+                keep_items.push_back(keep_item);
+                /* Use the column names from the Document, not the database
+                   table. */
+                for (int index = 0; index < record().count(); ++index) {
+                    if (keep_item == record().fieldName(index)) {
+                        setHeaderData(index, Qt::Horizontal, ustringToQstring(
+                            layoutItem->get_title_or_name()));
+                    }
+                }
+            }
+        }
+
+        for (int index = 0; index < record().count(); ++index) {
+            // Remove columns from model.
+            if (!keep_items.contains(record().fieldName(index)))
+                removeColumn(index);
+        }
+    }
 }

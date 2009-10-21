@@ -42,100 +42,100 @@
 #include <config.h>
 
 MainWindow::MainWindow(const Glom::Document &document) :
-  glom_doc(document)
+    glomDoc(document)
 {
-  setWindowTitle(qApp->applicationName());
+    setWindowTitle(qApp->applicationName());
 
-  // The statusBar shows tooltips for menuitems.
-  statusBar()->showMessage(tr("Qlom successfully started"));
+    // The statusBar shows tooltips for menuitems.
+    statusBar()->showMessage(tr("Qlom successfully started"));
 
-  // Create the menu.
-  // Qt does not have stock items, but it might get stock _icons_:
-  // http://labs.trolltech.com/blogs/2009/02/13/freedesktop-icons-in-qt/
-  QAction *file_quit = new QAction(tr("&Quit"), this);
-  file_quit->setShortcut(tr("Ctrl+Q"));
-  file_quit->setStatusTip(tr("Quit the application"));
-  QAction *help_about = new QAction(tr("About"), this);
-  help_about->setShortcut(tr("Ctrl+A"));
-  help_about->setStatusTip(
-    tr("Display credits and license information for Qlom"));
+    // Create the menu.
+    // Qt does not have stock items, but it might get stock _icons_:
+    // http://labs.trolltech.com/blogs/2009/02/13/freedesktop-icons-in-qt/
+    QAction *fileQuit = new QAction(tr("&Quit"), this);
+    fileQuit->setShortcut(tr("Ctrl+Q"));
+    fileQuit->setStatusTip(tr("Quit the application"));
+    QAction *helpAbout = new QAction(tr("About"), this);
+    helpAbout->setShortcut(tr("Ctrl+A"));
+    helpAbout->setStatusTip(
+        tr("Display credits and license information for Qlom"));
 
-  QMenu *file_menu = menuBar()->addMenu(tr("&File"));
-  file_menu->addAction(file_quit);
-  QMenu *about_menu = menuBar()->addMenu(tr("&Help"));
-  about_menu->addAction(help_about);
+    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(fileQuit);
+    QMenu *aboutMenu = menuBar()->addMenu(tr("&Help"));
+    aboutMenu->addAction(helpAbout);
 
-  QObject::connect(
-    help_about, SIGNAL(triggered(bool)), this, SLOT(on_help_about_triggered()));
-  QObject::connect(
-    file_quit, SIGNAL(triggered(bool)), this, SLOT(on_file_quit_triggered()));
+    QObject::connect(
+        helpAbout, SIGNAL(triggered(bool)), this, SLOT(onHelpAboutTriggered()));
+    QObject::connect(
+        fileQuit, SIGNAL(triggered(bool)), this, SLOT(onFileQuitTriggered()));
 
-  GlomModel *model = new GlomModel(glom_doc, this);
+    GlomModel *model = new GlomModel(glomDoc, this);
 
-  QTreeView *central_treeview = new QTreeView(this);
-  central_treeview->setModel(model);
-  setCentralWidget(central_treeview);
+    QTreeView *centralTreeview = new QTreeView(this);
+    centralTreeview->setModel(model);
+    setCentralWidget(centralTreeview);
 
-  connect(central_treeview, SIGNAL(doubleClicked(const QModelIndex&)),
-    this, SLOT(on_treeview_doubleclicked(const QModelIndex&)));
+    connect(centralTreeview, SIGNAL(doubleClicked(const QModelIndex&)),
+        this, SLOT(onTreeviewDoubleclicked(const QModelIndex&)));
 
-  read_settings();
+    readSettings();
 }
 
 MainWindow::~MainWindow()
 {
-  write_settings();
-  QSqlDatabase::database().close();
+    writeSettings();
+    QSqlDatabase::database().close();
 }
 
-void MainWindow::show_about_dialog()
+void MainWindow::showAboutDialog()
 {
-  // About dialogs are window-modal in Qt, except on Mac OS X.
-  QMessageBox::about(this, tr("About Qlom"), tr(PACKAGE_NAME "\n"
-    "A Qt Glom database viewer\n"
-    "Copyright 2009 Openismus GmbH"));
+    // About dialogs are window-modal in Qt, except on Mac OS X.
+    QMessageBox::about(this, tr("About Qlom"), tr(PACKAGE_NAME "\n"
+        "A Qt Glom database viewer\n"
+        "Copyright 2009 Openismus GmbH"));
 }
 
-void MainWindow::write_settings()
+void MainWindow::writeSettings()
 {
-  QSettings settings;
-  settings.setValue("MainWindow/Size", size());
-  settings.setValue("MainWindow/InternalProperties", saveState());
+    QSettings settings;
+    settings.setValue("MainWindow/Size", size());
+    settings.setValue("MainWindow/InternalProperties", saveState());
 }
 
-void MainWindow::read_settings()
+void MainWindow::readSettings()
 {
-  QSettings settings;
-  resize(settings.value("MainWindow/Size", sizeHint()).toSize());
-  restoreState(settings.value("MainWindow/InternalProperties").toByteArray());
+    QSettings settings;
+    resize(settings.value("MainWindow/Size", sizeHint()).toSize());
+    restoreState(settings.value("MainWindow/InternalProperties").toByteArray());
 }
 
-void MainWindow::on_file_quit_triggered()
+void MainWindow::onFileQuitTriggered()
 {
-  qApp->quit();
+    qApp->quit();
 }
 
-void MainWindow::on_help_about_triggered()
+void MainWindow::onHelpAboutTriggered()
 {
-  show_about_dialog();
+    showAboutDialog();
 }
 
-void MainWindow::on_treeview_doubleclicked(const QModelIndex& index)
+void MainWindow::onTreeviewDoubleclicked(const QModelIndex& index)
 {
-  QString table_name(index.data(Qlom::TableNameRole).toString());
-  QMainWindow *table_model_window = new QMainWindow(this);
-  QTableView *view = new QTableView(table_model_window);
-  GlomLayoutModel *model = new GlomLayoutModel(glom_doc, table_name);
+    QString tableName(index.data(Qlom::TableNameRole).toString());
+    QMainWindow *tableModelWindow = new QMainWindow(this);
+    QTableView *view = new QTableView(tableModelWindow);
+    GlomLayoutModel *model = new GlomLayoutModel(glomDoc, tableName);
 
-  view->setModel(model);
-  view->resizeColumnsToContents();
-  view->setItemDelegate(new QSqlRelationalDelegate(view));
-  table_model_window->setCentralWidget(view);
-  table_model_window->setWindowTitle(ustring_to_qstring(
-    glom_doc.get_table_title(qstring_to_ustring(table_name))));
+    view->setModel(model);
+    view->resizeColumnsToContents();
+    view->setItemDelegate(new QSqlRelationalDelegate(view));
+    tableModelWindow->setCentralWidget(view);
+    tableModelWindow->setWindowTitle(ustringToQstring(
+        glomDoc.get_table_title(qstringToUstring(tableName))));
 
-  table_model_window->show();
-  table_model_window->raise();
-  table_model_window->activateWindow();
-  statusBar()->showMessage(tr("%1 table opened").arg(table_name));
+    tableModelWindow->show();
+    tableModelWindow->raise();
+    tableModelWindow->activateWindow();
+    statusBar()->showMessage(tr("%1 table opened").arg(tableName));
 }

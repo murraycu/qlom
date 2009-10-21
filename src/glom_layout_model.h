@@ -24,29 +24,30 @@
 #include <libglom/document/document.h>
 #include <libglom/init.h>
 
+/** A model to show rows of data from a Glom database. */
 class GlomLayoutModel : public QSqlRelationalTableModel
 {
-  Q_OBJECT
+    Q_OBJECT
 
-  public:
+public:
     /** Create a model of the layouts in a table from a Glom document.
      *  @param[in] document a Glom document
-     *  @param[in] table_name the table name
+     *  @param[in] table_name the table name TODO: Should this be const?
      *  @param[in] parent a parent QObject
      *  @param[in] db a database connection */
-    explicit GlomLayoutModel(const Glom::Document& document,
-      QString& table_name, QObject *parent = 0,
-      QSqlDatabase db = QSqlDatabase());
+    explicit GlomLayoutModel(const Glom::Document &document,
+        QString &tableName, QObject *parent = 0,
+        QSqlDatabase db = QSqlDatabase());
 
-  private:
+private:
     /** Read relationships from the Glom document, and apply them to the model.
      *  @param[in] document a Glom document */
-    void apply_relationships(const Glom::Document& document);
+    void applyRelationships(const Glom::Document &document);
 
     /** Discard columns that are not mentioned in the document.
      *  @param[in] layout_item the layout containing the columns that should
      not be discarded */
-    void keep_layout_items(const Glom::sharedptr<Glom::LayoutItem>& layout_item);
+    void keepLayoutItems(const Glom::sharedptr<Glom::LayoutItem> &layout_item);
 };
 
 #endif /* QLOM_GLOM_LAYOUT_MODEL_H_ */

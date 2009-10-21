@@ -22,7 +22,7 @@
 #include <QString>
 #include <glibmm/ustring.h>
 
-Glib::ustring qstring_to_ustring(QString qstring);
-QString ustring_to_qstring(Glib::ustring ustring);
+Glib::ustring qstringToUstring(QString qstring);
+QString ustringToQstring(Glib::ustring ustring);
 
 #endif /* GLOM_UTILS_H_ */

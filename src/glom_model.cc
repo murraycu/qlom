@@ -23,57 +23,59 @@
 #include <libglom/init.h>
 
 GlomModel::GlomModel(const Glom::Document& document, QObject *parent) :
-  QAbstractListModel(parent),
-  glom_doc(document)
+    QAbstractListModel(parent),
+    glomDoc(document)
 {
-  // Read out table names from document, and add them to the model.
-  const std::vector<Glib::ustring> tables(document.get_table_names());
-  for(std::vector<Glib::ustring>::const_iterator iter(tables.begin());
-    iter != tables.end(); ++iter)
-  {
-    table_names.push_back(ustring_to_qstring(*iter));
-  }
+    // Read out table names from document, and add them to the model.
+    const std::vector<Glib::ustring> tables(glomDoc.get_table_names());
+    for(std::vector<Glib::ustring>::const_iterator iter(tables.begin());
+        iter != tables.end(); ++iter)
+    {
+        tableNames.push_back(ustringToQstring(*iter));
+    }
 }
 
 int GlomModel::rowCount(const QModelIndex &parent) const
 {
-  Q_UNUSED(parent);
-  return table_names.length();
+    Q_UNUSED(parent);
+    return tableNames.length();
 }
 
 QVariant GlomModel::data(const QModelIndex &index, int role) const
 {
-  if(!index.isValid())
-  {
-    return QVariant();
-  }
-  if(index.row() >= table_names.length())
-  {
-    return QVariant();
-  }
-  switch(role)
-  {
-    case Qt::DisplayRole:
-      return ustring_to_qstring(glom_doc.get_table_title(qstring_to_ustring(table_names.at(index.row()))));
-      break;
-    case Qlom::TableNameRole:
-      return table_names.at(index.row());
-    default:
-      return QVariant();
-      break;
-  }
+    if(!index.isValid())
+    {
+        return QVariant();
+    }
+    if(index.row() >= tableNames.length())
+    {
+        return QVariant();
+    }
+    switch(role)
+    {
+        case Qt::DisplayRole:
+            return ustringToQstring(glomDoc.get_table_title(
+                qstringToUstring(tableNames.at(index.row()))));
+            break;
+        case Qlom::TableNameRole:
+            return tableNames.at(index.row());
+            break;
+        default:
+            return QVariant();
+            break;
+    }
 }
 
 QVariant GlomModel::headerData(int section, Qt::Orientation orientation,
-  int role) const
+    int role) const
 {
-  if(orientation == Qt::Horizontal)
-  {
-    if(role == Qt::DisplayRole)
+    if(orientation == Qt::Horizontal)
     {
-      return tr("Table titles");
+        if(role == Qt::DisplayRole)
+        {
+            return tr("Table titles");
+        }
     }
-  }
 
-  return QAbstractListModel::headerData(section, orientation, role);
+    return QAbstractListModel::headerData(section, orientation, role);
 }

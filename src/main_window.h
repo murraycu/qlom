@@ -24,6 +24,7 @@
 class QDialog;
 class QModelIndex;
 class QSqlRelationalTableModel;
+
 namespace Glom
 {
 class Document;
@@ -31,9 +32,9 @@ class Document;
 
 class MainWindow : public QMainWindow
 {
-  Q_OBJECT
+    Q_OBJECT
 
-  public:
+public:
 
     /** Application main window.
      *  @param[in] document a glom document */
@@ -41,28 +42,28 @@ class MainWindow : public QMainWindow
 
     virtual ~MainWindow();
 
-  private:
+private:
     /** Show the application about dialog. */
-    void show_about_dialog();
+    void showAboutDialog();
 
     /** Write the application settings to disk. */
-    void write_settings();
+    void writeSettings();
 
     /** Read the application settings from disk. */
-    void read_settings();
+    void readSettings();
 
-    const Glom::Document &glom_doc; /**< a Glom document to view */
+    const Glom::Document &glomDoc; /**< a Glom document to view */
 
-  private Q_SLOTS:
+private Q_SLOTS:
     /** Slot for the signal from the Quit menu item. */
-    void on_file_quit_triggered();
+    void onFileQuitTriggered();
 
     /** Slot for the signal from the Help menu item. */
-    void on_help_about_triggered();
+    void onHelpAboutTriggered();
 
     /** Slot for the signal from a double-click on the table names treeview.
      *  @param[in] index the row that was double-clicked */
-    void on_treeview_doubleclicked(const QModelIndex &index);
+    void onTreeviewDoubleclicked(const QModelIndex &index);
 };
 
 #endif /* QLOM_MAIN_WINDOW_H_ */

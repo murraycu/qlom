@@ -20,4 +20,4 @@
 
 /** Open an SQLite database connection.
  *  @param[in] document a Glom document with data in an SQLite database */
-bool open_sqlite(const Glom::Document& document);
+bool openSqlite(const Glom::Document &document);

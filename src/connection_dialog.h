@@ -28,25 +28,28 @@ namespace Glom
 class Document;
 };
 
+/** A dialog to ask the user for connection details.
+ *  Some database backends require authentication details, which can be
+ *  requested with a ConnectionDialog. */
 class ConnectionDialog : public QDialog
 {
-  Q_OBJECT
+    Q_OBJECT
 
-  public:
-    ConnectionDialog(const Glom::Document& document, QWidget *parent = 0);
+public:
+    explicit ConnectionDialog(const Glom::Document &document,
+        QWidget *parent = 0);
 
-  private:
-    const Glom::Document &glom_doc;
+private:
+    const Glom::Document &glomDoc;
     QLineEdit *host;
     QLineEdit *database;
     QLineEdit *user;
     QLineEdit *password;
 
-    void open_postgresql();
-    void open_sqlite();
+    void openPostgresql();
 
-  private Q_SLOTS:
-    void database_connect();
+private Q_SLOTS:
+    void databaseConnect();
 };
 
 #endif /* QLOM_CONNECTION_DIALOG_H_ */

@@ -28,80 +28,70 @@
 #include <libglom/document/document.h>
 #include <glibmm/convert.h>
 
-bool open_sqlite(const Glom::Document& document)
+bool openSqlite(const Glom::Document &document)
 {
-  const QString backend("QSQLITE");
-  QSqlDatabase db(QSqlDatabase::addDatabase(backend));
+    const QString backend("QSQLITE");
+    QSqlDatabase db(QSqlDatabase::addDatabase(backend));
 
-  const QSqlError error(db.lastError());
-  if(error.isValid())
-  {
-    // TODO: Give feedback in the UI.
-    std::cerr << "Database backend \"" << backend.toUtf8().constData() <<
-      "\" does not exist\n" << "Error details: " <<
-      error.text().toUtf8().constData() << std::endl;
-    return false;
-  }
+    const QSqlError error(db.lastError());
+    if (error.isValid()) {
+        // TODO: Give feedback in the UI.
+        std::cerr << "Database backend \"" << backend.toUtf8().constData()
+          << "\" does not exist\n" << "Error details: "
+          << error.text().toUtf8().constData() << std::endl;
+        return false;
+    }
 
-  // Build SQLite database absolute path.
-  QString filename;
+    // Build SQLite database absolute path.
+    QString filename;
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
-  try
-  {
-    filename = ustring_to_qstring(Glib::filename_to_utf8(
-      Glib::filename_from_uri(
-      document.get_connection_self_hosted_directory_uri())));
-  }
-  catch(const Glib::ConvertError &convert_exception)
-  {
-    std::cerr << "Exception from Glib::filename_to_uri(): " <<
-      convert_exception.what() << std::endl;
-    return false;
-  }
+    try {
+        filename = ustringToQstring(Glib::filename_to_utf8(
+            Glib::filename_from_uri(
+                document.get_connection_self_hosted_directory_uri())));
+    }
+    catch (const Glib::ConvertError &convertException) {
+        std::cerr << "Exception from Glib::filename_to_uri(): "
+            << convertException.what() << std::endl;
+        return false;
+    }
 #else /* !GLIBMM_EXCEPTIONS_ENABLED */
-  std::auto_ptr<Glib::Error> convert_error;
-  std::string std_filename(Glib::filename_from_uri(
-    document.get_connection_self_hosted_directory_uri(),
-    convert_error));
-  if(convert_error.get())
-  {
-    std::cerr << "Error from Glib::filename_from_uri(): " <<
-      convert_error->what() << std::endl;
-    return false;
-  }
-  filename = ustring_to_qstring(Glib::filename_to_utf8(std_filename,
-      convert_error));
-  if(convert_error.get())
-  {
-    std::cerr << "Error from Glib::filename_to_utf8(): " <<
-      convert_error->what() << std::endl;
-    return false;
-  }
+    std::auto_ptr<Glib::Error> convertError;
+    std::string stdFilename(Glib::filename_from_uri(
+        document.get_connection_self_hosted_directory_uri(),
+        convertError));
+    if (convertError.get()) {
+        std::cerr << "Error from Glib::filename_from_uri(): "
+            << convertError->what() << std::endl;
+        return false;
+    }
+
+    filename = ustringToQstring(Glib::filename_to_utf8(stdFilename,
+        convertError));
+    if (convertError.get()) {
+        std::cerr << "Error from Glib::filename_to_utf8(): "
+            << convertError->what() << std::endl;
+        return false;
+    }
 #endif /* GLIBMM_EXCEPTIONS_ENABLED */
-  filename.push_back('/'); // Qt only supports '/' as a path separator.
-  filename.push_back(ustring_to_qstring(document.get_connection_database()));
-  filename.push_back(".db"); // Yes, really.
+    filename.push_back('/'); // Qt only supports '/' as a path separator.
+    filename.push_back(ustringToQstring(document.get_connection_database()));
+    filename.push_back(".db"); // Yes, really.
 
-  /* Check if the database exists, as otherwise a new, blank database will be
-     created and the open will succeed. */
-  const QFile sqlite_db(filename);
-  if(sqlite_db.exists())
-  {
-    db.setDatabaseName(filename);
-  }
-  else
-  {
-    std::cerr << "Sqlite database does not exist" << std::endl;
-    return false;
-  }
+    /* Check if the database exists, as otherwise a new, blank database will be
+         created and the open will succeed. */
+    const QFile sqliteDb(filename);
+    if (sqliteDb.exists()) {
+        db.setDatabaseName(filename);
+    } else {
+        std::cerr << "Sqlite database does not exist" << std::endl;
+        return false;
+    }
 
-  if(!db.open())
-  {
-    std::cerr << "Database connection could not be opened" << std::endl;
-    return false;
-  }
-  else
-  {
-    return true;
-  }
+    if (!db.open()) {
+        std::cerr << "Database connection could not be opened" << std::endl;
+        return false;
+    } else {
+        return true;
+    }
 }
