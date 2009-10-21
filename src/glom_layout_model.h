@@ -40,7 +40,7 @@ public:
      *  @param[in] parent a parent QObject
      *  @param[in] db a database connection, or the default connection */
     explicit GlomLayoutModel(const Glom::Document &document,
-        QString &tableName, QObject *parent = 0,
+        const QString &tableName, QObject *parent = 0,
         QSqlDatabase db = QSqlDatabase());
 
 private:
@@ -51,7 +51,8 @@ private:
     /** Discard columns that are not mentioned in the document.
      *  @param[in] layout_item the layout containing the columns that should
      not be discarded */
-    void keepLayoutItems(const Glom::sharedptr<Glom::LayoutItem> &layout_item);
+    void keepLayoutItems(
+        const Glom::sharedptr<const Glom::LayoutItem> &layout_item);
 };
 
 #endif /* QLOM_GLOM_LAYOUT_MODEL_H_ */

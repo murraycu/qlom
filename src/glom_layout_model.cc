@@ -24,7 +24,7 @@
 #include <QStringList>
 
 GlomLayoutModel::GlomLayoutModel(const Glom::Document &document,
-    QString &table_name, QObject *parent, QSqlDatabase db) :
+    const QString& table_name, QObject *parent, QSqlDatabase db) :
     QSqlRelationalTableModel(parent, db)
 {
     setTable(table_name);
@@ -82,18 +82,18 @@ void GlomLayoutModel::applyRelationships(const Glom::Document &document)
     }
 }
 
-void GlomLayoutModel::keepLayoutItems(const Glom::sharedptr<Glom::LayoutItem>
-    &layoutItem)
+void GlomLayoutModel::keepLayoutItems(
+    const Glom::sharedptr<const Glom::LayoutItem> &layoutItem)
 {
-    Glom::sharedptr<Glom::LayoutGroup> layoutGroup(
-        Glom::sharedptr<Glom::LayoutGroup>::cast_dynamic(layoutItem));
+    Glom::sharedptr<const Glom::LayoutGroup> layoutGroup(
+        Glom::sharedptr<const Glom::LayoutGroup>::cast_dynamic(layoutItem));
     if (layoutGroup) {
         QStringList keep_items;
-        const Glom::LayoutGroup::type_list_items
+        const Glom::LayoutGroup::type_list_const_items
             items(layoutGroup->get_items());
-        for (Glom::LayoutGroup::type_list_items::const_iterator
+        for (Glom::LayoutGroup::type_list_const_items::const_iterator
             iter(items.begin()); iter != items.end(); ++iter) {
-            Glom::sharedptr<Glom::LayoutItem> layoutItem(*iter);
+            Glom::sharedptr<const Glom::LayoutItem> layoutItem(*iter);
             if (!layoutItem) {
                 // Skip if the layoutItem is invalid. Can this happen?
                 continue;
