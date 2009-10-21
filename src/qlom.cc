@@ -25,6 +25,7 @@
 
 #include <QApplication>
 #include <QMessageBox>
+#include <QFileDialog>
 
 #include <libglom/document/document.h>
 #include <libglom/init.h>
@@ -142,40 +143,43 @@ bool load_document(const QString& filepath)
 
 int main(int argc, char **argv)
 {
-  QApplication app(argc, argv);
+    QApplication app(argc, argv);
 
-  QCoreApplication::setOrganizationName("openismus");
-  QCoreApplication::setOrganizationDomain("openismus.com");
-  QCoreApplication::setApplicationName(PACKAGE_NAME);
+    QCoreApplication::setOrganizationName("openismus");
+    QCoreApplication::setOrganizationDomain("openismus.com");
+    QCoreApplication::setApplicationName(PACKAGE_NAME);
 
-  Glom::libglom_init();
+    Glom::libglom_init();
 
-  /* Qt does not have an equivalent to GOption, except the arguments() static
-     method used below. */
-  std::list<QString> options = app.arguments().toStdList();
-  if(options.size() < 2)
-  {
-    print_usage();
-    return 1;
-  }
+    QString filepath;
+    
+    /* Qt does not have an equivalent to GOption, except the arguments() static
+       method used below. */
+    std::list<QString> options = app.arguments().toStdList();
+    if (options.size() >= 2) {
+        filepath = *(++options.begin()); 
+    }
 
-  const QString filepath(*++options.begin());
-  if(filepath.isEmpty())
-  {
-    print_usage();
-    return 1;
-  }
+    // If no filepath was specified on the command line, ask for one in the UI.
+    if (filepath.isEmpty()) {
+        filepath = QFileDialog::getOpenFileName(0 /* parent window */, 
+            "Open Glom file", 
+            "", "Glom files (*.glom);;All files (*)");
+        if(filepath.isEmpty()) {
+          // The user cancelled the dialog.
+          return 0;
+        }
+    }
 
-  if(!load_document(filepath))
-  {
-    // Load the Glom document.
-    return 1;
-  }
+    if (!load_document(filepath)) {
+        // Load the Glom document.
+        return 1;
+    }
 
-  const int result = app.exec();
+    const int result = app.exec();
 
-  delete main_window;
-  delete document;
+    delete main_window;
+    delete document;
 
-  return result;
+    return result;
 }
