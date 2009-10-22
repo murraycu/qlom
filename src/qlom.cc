@@ -34,111 +34,103 @@
 #include "config.h"
 
 Glom::Document* document = 0;
-MainWindow *main_window = 0;
+MainWindow *mainWindow = 0;
 
-void print_usage()
+void printUsage()
 {
-  std::cout << "Usage: glom absolute_file_path" << std::endl;
+    std::cout << "Usage: glom absolute_file_path" << std::endl;
 }
 
-std::string qlom_filepath_to_uri(const QString& filepath_qt)
+std::string qlomFilepathToUri(const QString& filepath_qt)
 {
-  std::string filepath(filepath_qt.toUtf8().constData());
+    std::string filepath(filepath_qt.toUtf8().constData());
 
-  /* Qt does not have the concept of file URIs. However, only '/' is supported
-     for directory separators, so prepending "file://" to the path and escaping
-     the necessary characters should work, i.e. filename_to_uri(). */
-  std::string uri;
+    /* Qt does not have the concept of file URIs. However, only '/' is supported
+       for directory separators, so prepending "file://" to the path and
+       escaping the necessary characters should work, i.e. filename_to_uri(). */
+    std::string uri;
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
-  try
-  {
-    uri = Glib::filename_to_uri(filepath);
-  }
-  catch(const Glib::ConvertError& convert_exception)
-  {
-    std::cerr << "Exception from Glib::filename_to_uri(): " <<
-      convert_exception.what() << std::endl;
-  }
+    try {
+        uri = Glib::filename_to_uri(filepath);
+    }
+    catch(const Glib::ConvertError& convertException) {
+        std::cerr << "Exception from Glib::filename_to_uri(): "
+            << convertException.what() << std::endl;
+    }
 #else /* !GLIBMM_EXCEPTIONS_ENABLED */
-  std::auto_ptr<Glib::Error> convert_error;
-  uri = Glib::filename_to_uri(filepath, convert_error);
-  if(convert_error.get())
-  {
-    std::cerr << "Error from Glib::filename_to_uri(): "
-      << convert_error->what() << std::endl;
-  }
+    std::auto_ptr<Glib::Error> convertError;
+    uri = Glib::filename_to_uri(filepath, convert_error);
+    if(convertError.get()) {
+        std::cerr << "Error from Glib::filename_to_uri(): "
+            << convertError->what() << std::endl;
+    }
 #endif /* GLIBMM_EXCEPTIONS_ENABLED */
 
-  return uri;
+    return uri;
 }
 
 /** Load the document and show it in the main window.
  @result true for success, false otherwise
  */
-bool load_document(const QString& filepath)
+bool loadDocument(const QString& filepath)
 {
-  const std::string uri(qlom_filepath_to_uri(filepath));
-  if(uri.empty())
-  {
-    print_usage();
-    return false;
-  }
+    const std::string uri(qlomFilepathToUri(filepath));
+    if(uri.empty()) {
+        printUsage();
+        return false;
+    }
 
-  /* The Glom::Document is instantiated dynamically because a static instance
-     could be instantiated before libglom has been initialised. */
-  document = new Glom::Document();
-  document->set_file_uri(uri);
-  int failure_code = 0;
-  const bool test = document->load(failure_code);
-  if(!test)
-  {
-    std::cerr << "Document loading failed with uri=" << uri << std::endl;
-    return false;
-  }
+    /* The Glom::Document is instantiated dynamically because a static instance
+       could be instantiated before libglom has been initialised. */
+    document = new Glom::Document();
+    document->set_file_uri(uri);
+    int failure_code = 0;
+    const bool test = document->load(failure_code);
+    if(!test) {
+        std::cerr << "Document loading failed with uri=" << uri << std::endl;
+        return false;
+    }
 
-  /* Check that the document is not an example document, which must be resaved
-     — that would be an extra feature. */
-  if(document->get_is_example_file())
-  {
-    std::cerr << "Document is an example file, cannot process" << std::endl;
-    return false;
-  }
+    /* Check that the document is not an example document, which must be resaved
+      — that would be an extra feature. */
+    if(document->get_is_example_file()) {
+        std::cerr << "Document is an example file, cannot process" << std::endl;
+        return false;
+    }
 
-  /* Check that the document is not self-hosting, because that would require
-     starting/stopping PostgreSQL. */
-  switch (document->get_hosting_mode())
-  {
+    /* Check that the document is not self-hosting, because that would require
+       starting/stopping PostgreSQL. */
+    switch (document->get_hosting_mode()) {
     case Glom::Document::HOSTING_MODE_POSTGRES_CENTRAL:
-      {
+    {
         ConnectionDialog *connection_dialog = new ConnectionDialog(*document);
-        if(connection_dialog->exec() != QDialog::Accepted)
-        {
-          QMessageBox::critical(0, qApp->applicationName(),
-              "Could not connect to database server", QMessageBox::Ok,
-              QMessageBox::NoButton, QMessageBox::NoButton);
-          return false;
+        if(connection_dialog->exec() != QDialog::Accepted) {
+            QMessageBox::critical(0, qApp->applicationName(),
+                "Could not connect to database server", QMessageBox::Ok,
+                QMessageBox::NoButton, QMessageBox::NoButton);
+            return false;
         }
-      }
-      break;
+    }
+    break;
     case Glom::Document::HOSTING_MODE_SQLITE:
-      {
-        if(!openSqlite(*document))
-        {
-          return false;
+    {
+        if(!openSqlite(*document)) {
+            return false;
         }
-      }
-      break;
+    }
+    break;
     case Glom::Document::HOSTING_MODE_POSTGRES_SELF:
+    // Fall through.
     default:
-      std::cerr << "Database type not supported, cannot process" << std::endl;
-      return false;
-      break;
-  }
+        std::cerr << "Database type not supported, cannot process" << std::endl;
+        return false;
+        break;
+    }
 
-  main_window = new MainWindow(*document);
-  main_window->show();
+    mainWindow = new MainWindow(*document);
+    mainWindow->show();
 
-  return true;
+    return true;
 }
 
 int main(int argc, char **argv)
@@ -163,22 +155,21 @@ int main(int argc, char **argv)
     // If no filepath was specified on the command line, ask for one in the UI.
     if (filepath.isEmpty()) {
         filepath = QFileDialog::getOpenFileName(0 /* parent window */, 
-            "Open Glom file", 
-            "", "Glom files (*.glom);;All files (*)");
-        if(filepath.isEmpty()) {
+            "Open Glom file", "", "Glom files (*.glom);;All files (*)");
+        if (filepath.isEmpty()) {
           // The user cancelled the dialog.
           return 0;
         }
     }
 
-    if (!load_document(filepath)) {
+    if (!loadDocument(filepath)) {
         // Load the Glom document.
         return 1;
     }
 
     const int result = app.exec();
 
-    delete main_window;
+    delete mainWindow;
     delete document;
 
     return result;
