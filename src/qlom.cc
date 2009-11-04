@@ -59,7 +59,7 @@ std::string qlomFilepathToUri(const QString& filepath_qt)
     }
 #else /* !GLIBMM_EXCEPTIONS_ENABLED */
     std::auto_ptr<Glib::Error> convertError;
-    uri = Glib::filename_to_uri(filepath, convert_error);
+    uri = Glib::filename_to_uri(filepath, convertError);
     if(convertError.get()) {
         std::cerr << "Error from Glib::filename_to_uri(): "
             << convertError->what() << std::endl;
