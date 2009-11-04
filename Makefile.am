@@ -30,3 +30,10 @@ BUILT_SOURCES = src/main_window.moc.cc \
                 src/glom_model.moc.cc \
                 src/glom_layout_model.moc.cc \
                 src/connection_dialog.moc.cc
+
+mimedir = $(datadir)/mime
+mimepackagesdir = $(mimedir)/packages
+dist_mimepackages_DATA = qlom.xml
+
+desktopdir = $(datadir)/applications
+dist_desktop_DATA = qlom.desktop

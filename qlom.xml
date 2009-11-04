@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info" xmlns:osso="http://nokia.com/osso/mime-categories">
+  <mime-type type="application/x-glom">
+    <comment>Glom document</comment>
+    <comment xml:lang="en">Glom document</comment>
+    <osso:category name="documents"/>
+
+    <glob pattern="*.glom"/>
+
+    <!-- This string match exists for systems that may not support root-XML,
+         and for old .glom files that do not mention the xmlns ID. --> 
+    <magic priority="80">
+      <match type="string" value="&lt;glom_document" offset="0:100"/>
+    </magic>
+
+    <root-XML namespaceURI="http://glom.org/glom_document" localName="glom_document"/>
+
+  </mime-type>
+</mime-info>

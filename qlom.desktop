@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Qlom
+GenericName=Glom database viewer
+Comment=A Glom database viewer, using Qt
+TryExec=qlom
+Exec=qlom %f
+Terminal=false
+Icon=qlom
+Categories=Office;Database;Qt
+MimeType=application/x-glom;
