@@ -46,6 +46,12 @@ public:
         QSqlDatabase db = QSqlDatabase());
 
 private:
+    /** Filters input data.
+     *  @param[in] index the index to retrieve data from
+     *  @param[in] role the Qt::ItemDataRole to retrieve fata for
+     *  @returns the data from the model */
+    QVariant data(const QModelIndex &index, int role) const;
+
     /** Read relationships from the Glom document, and apply them to the model.
      *  @param[in] document a Glom document */
     void applyRelationships(const Glom::Document &document);

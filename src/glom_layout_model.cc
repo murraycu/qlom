@@ -23,6 +23,7 @@
 #include <QSqlIndex>
 #include <QSqlRecord>
 #include <QStringList>
+#include <QRegExp>
 
 GlomLayoutModel::GlomLayoutModel(const Glom::Document &document,
     const QString& table_name, QObject *parent, QSqlDatabase db) :
@@ -103,4 +104,31 @@ void GlomLayoutModel::createProjectionFromLayoutGroup(
                 .arg(currDisplayName));
         }
     }
+}
+
+QVariant GlomLayoutModel::data(const QModelIndex &index, int role) const
+{
+    static const QRegExp matchDouble("\\d+\\.\\d+");
+
+    if(!index.isValid() && Qt::DisplayRole != role) {
+        return QVariant();
+    }
+
+    const QVariant &data = QSqlTableModel::data(index, role);
+
+    if(matchDouble.exactMatch(data.toString())) {
+        QStringList doubleParts = data.toString().split(".");
+        QString reduceMe = doubleParts[1];
+        while(reduceMe.endsWith("0")) {
+            reduceMe.chop(1);
+        }
+
+        if(!reduceMe.isEmpty()) {
+            return QVariant(QString("%1.%2").arg(doubleParts[0], reduceMe));
+        } else {
+            return QVariant(doubleParts[0]);
+        }
+    }
+
+    return QSqlTableModel::data(index, role);
 }
