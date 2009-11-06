@@ -19,6 +19,7 @@
 #include "glom_layout_model.h"
 #include "utils.h"
 
+#include <QSqlQuery>
 #include <QSqlIndex>
 #include <QSqlRecord>
 #include <QStringList>
@@ -28,6 +29,7 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document &document,
     QSqlRelationalTableModel(parent, db)
 {
     setTable(table_name);
+    queryBuilder.addRelation(table_name);
 
     applyRelationships(document);
 
@@ -40,14 +42,13 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document &document,
         if (!layoutGroup) {
             continue;
         } else {
-            keepLayoutItems(layoutGroup);
+            createProjectionFromLayoutGroup(layoutGroup);
         }
 
         break;
     }
 
-    // Fill the model from the database.
-    select();
+    setQuery(QSqlQuery(queryBuilder.getQuery()));
 }
 
 void GlomLayoutModel::applyRelationships(const Glom::Document &document)
@@ -63,32 +64,23 @@ void GlomLayoutModel::applyRelationships(const Glom::Document &document)
             continue;
         }
 
-        const QSqlRecord record(this->record());
         const QString from(ustringToQstring(relationship->get_from_field()));
-        const int index = record.indexOf(from);
-
-        if (index == -1 || index == 0) {
-            // If the index is invalid, or the primary key, ignore it.
-            continue;
-        }
-
         const QString toTable(ustringToQstring(relationship->get_to_table()));
         const QString toPrimaryKey(
             ustringToQstring(relationship->get_to_field()));
-        /* TODO: Find a way to automatically retrieve a default field, rather
-           than hardcoding the location. */
-        const QString toField("name");
-        setRelation(index, QSqlRelation(toTable, toPrimaryKey, toField));
+
+        queryBuilder.equiJoinWith(toTable,
+            QString("%1.%2").arg(toTable).arg(toPrimaryKey),
+            QString("%1.%2").arg(tableName()).arg(from));
     }
 }
 
-void GlomLayoutModel::keepLayoutItems(
+void GlomLayoutModel::createProjectionFromLayoutGroup(
     const Glom::sharedptr<const Glom::LayoutItem> &layoutItem)
 {
     Glom::sharedptr<const Glom::LayoutGroup> layoutGroup(
         Glom::sharedptr<const Glom::LayoutGroup>::cast_dynamic(layoutItem));
     if (layoutGroup) {
-        QStringList keep_items;
         const Glom::LayoutGroup::type_list_const_items
             items(layoutGroup->get_items());
         for (Glom::LayoutGroup::type_list_const_items::const_iterator
@@ -99,28 +91,16 @@ void GlomLayoutModel::keepLayoutItems(
                 continue;
             }
 
-            // Only keep these layout items in the model.
-            QString keep_item(
-                ustringToQstring(layoutItem->get_layout_display_name()));
-            if(keep_item.isEmpty()) {
-                continue;
-            } else {
-                keep_items.push_back(keep_item);
-                /* Use the column names from the Document, not the database
-                   table. */
-                for (int index = 0; index < record().count(); ++index) {
-                    if (keep_item == record().fieldName(index)) {
-                        setHeaderData(index, Qt::Horizontal, ustringToQstring(
-                            layoutItem->get_title_or_name()));
-                    }
-                }
-            }
-        }
+            /* The default setting for a projection is
+               "table.col AS display_name". */
+            QString currTableName(tableName());
+            QString currColName(ustringToQstring(layoutItem->get_name()));
+            QString currDisplayName(
+                ustringToQstring(layoutItem->get_title_or_name()));
 
-        for (int index = 0; index < record().count(); ++index) {
-            // Remove columns from model.
-            if (!keep_items.contains(record().fieldName(index)))
-                removeColumn(index);
+            queryBuilder.addProjection(QString("%1.%2 AS \"%3\"")
+                .arg(currTableName).arg(currColName)
+                .arg(currDisplayName));
         }
     }
 }

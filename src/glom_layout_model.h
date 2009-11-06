@@ -19,6 +19,8 @@
 #ifndef QLOM_GLOM_LAYOUT_MODEL_H_
 #define QLOM_GLOM_LAYOUT_MODEL_H_
 
+#include "query_builder.h"
+
 #include <QSqlDatabase>
 #include <QSqlRelationalTableModel>
 #include <libglom/document/document.h>
@@ -36,7 +38,7 @@ public:
 
     /** Create a model of the layouts in a table from a Glom document.
      *  @param[in] document a Glom document
-     *  @param[in] table_name the table name TODO: Should this be const?
+     *  @param[in] tableName the table name
      *  @param[in] parent a parent QObject
      *  @param[in] db a database connection, or the default connection */
     explicit GlomLayoutModel(const Glom::Document &document,
@@ -49,10 +51,12 @@ private:
     void applyRelationships(const Glom::Document &document);
 
     /** Discard columns that are not mentioned in the document.
-     *  @param[in] layout_item the layout containing the columns that should
-     not be discarded */
-    void keepLayoutItems(
-        const Glom::sharedptr<const Glom::LayoutItem> &layout_item);
+     *  @param[in] layoutItem the layout containing the columns that should not
+     be discarded */
+    void createProjectionFromLayoutGroup(
+        const Glom::sharedptr<const Glom::LayoutItem> &layoutItem);
+
+    QlomQueryBuilder queryBuilder; /**< an SQL query builder */
 };
 
 #endif /* QLOM_GLOM_LAYOUT_MODEL_H_ */
