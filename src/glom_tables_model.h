@@ -16,8 +16,8 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QLOM_GLOM_MODEL_H_
-#define QLOM_GLOM_MODEL_H_
+#ifndef QLOM_GLOM_TABLES_MODEL_H_
+#define QLOM_GLOM_TABLES_MODEL_H_
 
 #include <QAbstractListModel>
 #include <QStringList>
@@ -31,15 +31,14 @@ namespace Qlom
 {
 
 /** Roles for GlomModel. */
-enum GlomModelRoles {
+enum GlomTablesModelRoles {
     TableNameRole = 32 /**< retrieves the table name from the model */
 };
 
 } // namespace Qlom
 
-//TODO: Rename to GlomTableListModel.
 /** A model of the tables in a Glom document. */
-class GlomModel : public QAbstractListModel
+class GlomTablesModel : public QAbstractListModel
 {
     Q_OBJECT
 
@@ -48,7 +47,7 @@ public:
      *  @param[in] document a Glom document to read metadata from
      *  @param[in] parent a parent QObject, that will take ownership of the
      model */
-    explicit GlomModel(const Glom::Document &document, QObject *parent = 0);
+    GlomTablesModel(const Glom::Document *document, QObject *parent = 0);
 
     /** Calculate the number of rows in the model.
      *  @param[in] parent the parent index in the heirarchy
@@ -70,8 +69,8 @@ public:
         int role = Qt::DisplayRole) const;
 
 private:
-    const Glom::Document &glomDoc; /**< the Glom document */
+    const Glom::Document *glomDoc; /**< the Glom document */
     QStringList tableNames; /**< the list of tables in the Glom document */
 };
 
-#endif /* QLOM_GLOM_MODEL_H_ */
+#endif /* QLOM_GLOM_TABLES_MODEL_H_ */

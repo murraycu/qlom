@@ -19,16 +19,13 @@
 #ifndef QLOM_MAIN_WINDOW_H_
 #define QLOM_MAIN_WINDOW_H_
 
+#include "glom_document.h"
 #include <QMainWindow>
 
 class QDialog;
 class QModelIndex;
 class QSqlRelationalTableModel;
-
-namespace Glom
-{
-class Document;
-};
+class QTreeView;
 
 class MainWindow : public QMainWindow
 {
@@ -36,13 +33,19 @@ class MainWindow : public QMainWindow
 
 public:
 
+    /** Application main window. */
+    MainWindow();
+
     /** Application main window.
-     *  @param[in] document a glom document */
-    MainWindow(const Glom::Document &document);
+     *  @param[in] filepath a path to a Glom document */
+    explicit MainWindow(const QString &filepath);
 
     virtual ~MainWindow();
 
 private:
+    /** General setup method. */
+    void setup();
+
     /** Show the application about dialog. */
     void showAboutDialog();
 
@@ -52,7 +55,8 @@ private:
     /** Read the application settings from disk. */
     void readSettings();
 
-    const Glom::Document &glomDoc; /**< a Glom document to view */
+    GlomDocument glomDocument; /**< a Glom document to view */
+    QTreeView *centralTreeView; /**< a tree view for the table names model */
 
 private Q_SLOTS:
     /** Slot for the signal from the Quit menu item. */

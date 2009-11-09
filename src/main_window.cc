@@ -17,7 +17,8 @@
  */
 
 #include "main_window.h"
-#include "glom_model.h"
+#include "glom_document.h"
+#include "glom_tables_model.h"
 #include "glom_layout_model.h"
 #include "utils.h"
 
@@ -31,7 +32,6 @@
 #include <QSqlField>
 #include <QSqlIndex>
 #include <QSqlRecord>
-#include <QSqlRelationalDelegate>
 #include <QSqlRelationalTableModel>
 #include <QSqlTableModel>
 #include <QStatusBar>
@@ -41,8 +41,20 @@
 
 #include <config.h>
 
-MainWindow::MainWindow(const Glom::Document &document) :
-    glomDoc(document)
+MainWindow::MainWindow()
+{
+  setup();
+}
+
+MainWindow::MainWindow(const QString &filepath)
+{
+    glomDocument.loadDocument(filepath);
+    GlomTablesModel *model = glomDocument.tablesModel();
+    setup();
+    centralTreeView->setModel(model);
+}
+
+void MainWindow::setup()
 {
     setWindowTitle(qApp->applicationName());
 
@@ -50,8 +62,6 @@ MainWindow::MainWindow(const Glom::Document &document) :
     statusBar()->showMessage(tr("Qlom successfully started"));
 
     // Create the menu.
-    // Qt does not have stock items, but it might get stock _icons_:
-    // http://labs.trolltech.com/blogs/2009/02/13/freedesktop-icons-in-qt/
     QAction *fileQuit = new QAction(tr("&Quit"), this);
     fileQuit->setShortcut(tr("Ctrl+Q"));
     fileQuit->setStatusTip(tr("Quit the application"));
@@ -70,13 +80,10 @@ MainWindow::MainWindow(const Glom::Document &document) :
     QObject::connect(
         fileQuit, SIGNAL(triggered(bool)), this, SLOT(onFileQuitTriggered()));
 
-    GlomModel *model = new GlomModel(glomDoc, this);
+    centralTreeView = new QTreeView(this);
+    setCentralWidget(centralTreeView);
 
-    QTreeView *centralTreeview = new QTreeView(this);
-    centralTreeview->setModel(model);
-    setCentralWidget(centralTreeview);
-
-    connect(centralTreeview, SIGNAL(doubleClicked(const QModelIndex&)),
+    connect(centralTreeView, SIGNAL(doubleClicked(const QModelIndex&)),
         this, SLOT(onTreeviewDoubleclicked(const QModelIndex&)));
 
     readSettings();
@@ -122,17 +129,16 @@ void MainWindow::onHelpAboutTriggered()
 
 void MainWindow::onTreeviewDoubleclicked(const QModelIndex& index)
 {
+#if 0
     QString tableName(index.data(Qlom::TableNameRole).toString());
     QMainWindow *tableModelWindow = new QMainWindow(this);
     QTableView *view = new QTableView(tableModelWindow);
 
-    /* Create a model for the rows of data, using the default QSqlDatabase
-       connection, previously opened by ConnectionDialog or openSqlite(). */
+    /* Create a model for the rows of data. */
     GlomLayoutModel *model = new GlomLayoutModel(glomDoc, tableName);
 
     view->setModel(model);
     view->resizeColumnsToContents();
-    view->setItemDelegate(new QSqlRelationalDelegate(view));
     tableModelWindow->setCentralWidget(view);
     tableModelWindow->setWindowTitle(ustringToQstring(
         glomDoc.get_table_title(qstringToUstring(tableName))));
@@ -141,4 +147,5 @@ void MainWindow::onTreeviewDoubleclicked(const QModelIndex& index)
     tableModelWindow->raise();
     tableModelWindow->activateWindow();
     statusBar()->showMessage(tr("%1 table opened").arg(tableName));
+#endif
 }

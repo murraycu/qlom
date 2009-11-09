@@ -16,32 +16,31 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "glom_model.h"
+#include "glom_tables_model.h"
 #include "utils.h"
 
 #include <libglom/document/document.h>
-#include <libglom/init.h>
 
-GlomModel::GlomModel(const Glom::Document& document, QObject *parent) :
+GlomTablesModel::GlomTablesModel(const Glom::Document *document,
+    QObject *parent) :
     QAbstractListModel(parent),
     glomDoc(document)
 {
     // Read out table names from document, and add them to the model.
-    const std::vector<Glib::ustring> tables(glomDoc.get_table_names());
+    const std::vector<Glib::ustring> tables(glomDoc->get_table_names());
     for(std::vector<Glib::ustring>::const_iterator iter(tables.begin());
-        iter != tables.end(); ++iter)
-    {
+        iter != tables.end(); ++iter) {
         tableNames.push_back(ustringToQstring(*iter));
     }
 }
 
-int GlomModel::rowCount(const QModelIndex &parent) const
+int GlomTablesModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return tableNames.length();
 }
 
-QVariant GlomModel::data(const QModelIndex &index, int role) const
+QVariant GlomTablesModel::data(const QModelIndex &index, int role) const
 {
     if(!index.isValid())
     {
@@ -54,7 +53,7 @@ QVariant GlomModel::data(const QModelIndex &index, int role) const
     switch(role)
     {
         case Qt::DisplayRole:
-            return ustringToQstring(glomDoc.get_table_title(
+            return ustringToQstring(glomDoc->get_table_title(
                 qstringToUstring(tableNames.at(index.row()))));
             break;
         case Qlom::TableNameRole:
@@ -66,7 +65,7 @@ QVariant GlomModel::data(const QModelIndex &index, int role) const
     }
 }
 
-QVariant GlomModel::headerData(int section, Qt::Orientation orientation,
+QVariant GlomTablesModel::headerData(int section, Qt::Orientation orientation,
     int role) const
 {
     if(orientation == Qt::Horizontal)
