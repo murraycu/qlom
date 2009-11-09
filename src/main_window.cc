@@ -23,6 +23,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QFileDialog>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -43,10 +44,13 @@ MainWindow::MainWindow()
 
 MainWindow::MainWindow(const QString &filepath)
 {
+    setup();
+
     glomDocument.loadDocument(filepath);
     GlomTablesModel *model = glomDocument.tablesModel();
-    setup();
     centralTreeView->setModel(model);
+    connect(centralTreeView, SIGNAL(doubleClicked(const QModelIndex&)),
+        this, SLOT(treeviewDoubleclicked(const QModelIndex&)));
 }
 
 void MainWindow::setup()
@@ -57,6 +61,12 @@ void MainWindow::setup()
     statusBar()->showMessage(tr("Qlom successfully started"));
 
     // Create the menu.
+    QAction *fileOpen = new QAction(tr("&Open"), this);
+    fileOpen->setShortcut(tr("Ctrl+O"));
+    fileOpen->setStatusTip(tr("Open a Glom document"));
+    QAction *fileClose = new QAction(tr("&Close"), this);
+    fileClose->setShortcut(tr("Ctrl+W"));
+    fileClose->setStatusTip(tr("Close the current Glom document"));
     QAction *fileQuit = new QAction(tr("&Quit"), this);
     fileQuit->setShortcut(tr("Ctrl+Q"));
     fileQuit->setStatusTip(tr("Quit the application"));
@@ -66,20 +76,23 @@ void MainWindow::setup()
         tr("Display credits and license information for Qlom"));
 
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(fileOpen);
+    fileMenu->addAction(fileClose);
     fileMenu->addAction(fileQuit);
     QMenu *aboutMenu = menuBar()->addMenu(tr("&Help"));
     aboutMenu->addAction(helpAbout);
 
     QObject::connect(
-        helpAbout, SIGNAL(triggered(bool)), this, SLOT(onHelpAboutTriggered()));
+        fileOpen, SIGNAL(triggered(bool)), this, SLOT(fileOpenTriggered()));
     QObject::connect(
-        fileQuit, SIGNAL(triggered(bool)), this, SLOT(onFileQuitTriggered()));
+        fileClose, SIGNAL(triggered(bool)), this, SLOT(fileCloseTriggered()));
+    QObject::connect(
+        fileQuit, SIGNAL(triggered(bool)), this, SLOT(fileQuitTriggered()));
+    QObject::connect(
+        helpAbout, SIGNAL(triggered(bool)), this, SLOT(helpAboutTriggered()));
 
     centralTreeView = new QTreeView(this);
     setCentralWidget(centralTreeView);
-
-    connect(centralTreeView, SIGNAL(doubleClicked(const QModelIndex&)),
-        this, SLOT(onTreeviewDoubleclicked(const QModelIndex&)));
 
     readSettings();
 }
@@ -112,17 +125,42 @@ void MainWindow::readSettings()
     restoreState(settings.value("MainWindow/InternalProperties").toByteArray());
 }
 
-void MainWindow::onFileQuitTriggered()
+void MainWindow::fileOpenTriggered()
+{
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setNameFilter("Glom document (*.glom)");
+    if (dialog.exec()) {
+        // Close the document before opening a document.
+        fileCloseTriggered();
+
+        QStringList files = dialog.selectedFiles();
+        glomDocument.loadDocument(files.first());
+        GlomTablesModel *model = glomDocument.tablesModel();
+        centralTreeView->setModel(model);
+    }
+}
+
+void MainWindow::fileCloseTriggered()
+{
+    delete centralTreeView;
+    centralTreeView = new QTreeView(this);
+    setCentralWidget(centralTreeView);
+    connect(centralTreeView, SIGNAL(doubleClicked(const QModelIndex&)),
+        this, SLOT(treeviewDoubleclicked(const QModelIndex&)));
+}
+
+void MainWindow::fileQuitTriggered()
 {
     qApp->quit();
 }
 
-void MainWindow::onHelpAboutTriggered()
+void MainWindow::helpAboutTriggered()
 {
     showAboutDialog();
 }
 
-void MainWindow::onTreeviewDoubleclicked(const QModelIndex& index)
+void MainWindow::treeviewDoubleclicked(const QModelIndex& index)
 {
     const QString &tableName = index.data(Qlom::TableNameRole).toString();
     GlomLayoutModel *model = glomDocument.listLayoutModel(tableName);

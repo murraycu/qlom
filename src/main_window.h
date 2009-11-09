@@ -59,15 +59,21 @@ private:
     QTreeView *centralTreeView; /**< a tree view for the table names model */
 
 private Q_SLOTS:
+    /** Slot for the signal from the Open menu item. */
+    void fileOpenTriggered();
+
+    /** Slot for the signal from the Close menu item. */
+    void fileCloseTriggered();
+
     /** Slot for the signal from the Quit menu item. */
-    void onFileQuitTriggered();
+    void fileQuitTriggered();
 
     /** Slot for the signal from the Help menu item. */
-    void onHelpAboutTriggered();
+    void helpAboutTriggered();
 
     /** Slot for the signal from a double-click on the table names treeview.
      *  @param[in] index the row that was double-clicked */
-    void onTreeviewDoubleclicked(const QModelIndex &index);
+    void treeviewDoubleclicked(const QModelIndex &index);
 };
 
 #endif /* QLOM_MAIN_WINDOW_H_ */
