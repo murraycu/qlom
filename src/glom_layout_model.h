@@ -24,7 +24,6 @@
 #include <QSqlDatabase>
 #include <QSqlRelationalTableModel>
 #include <libglom/document/document.h>
-#include <libglom/init.h>
 
 /** A model to show rows of data from a Glom database. */
 class GlomLayoutModel : public QSqlRelationalTableModel
@@ -41,7 +40,7 @@ public:
      *  @param[in] tableName the table name
      *  @param[in] parent a parent QObject
      *  @param[in] db a database connection, or the default connection */
-    explicit GlomLayoutModel(const Glom::Document &document,
+    explicit GlomLayoutModel(const Glom::Document *document,
         const QString &tableName, QObject *parent = 0,
         QSqlDatabase db = QSqlDatabase());
 
@@ -54,7 +53,7 @@ private:
 
     /** Read relationships from the Glom document, and apply them to the model.
      *  @param[in] document a Glom document */
-    void applyRelationships(const Glom::Document &document);
+    void applyRelationships(const Glom::Document *document);
 
     /** Discard columns that are not mentioned in the document.
      *  @param[in] layoutItem the layout containing the columns that should not

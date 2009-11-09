@@ -129,23 +129,19 @@ void MainWindow::onHelpAboutTriggered()
 
 void MainWindow::onTreeviewDoubleclicked(const QModelIndex& index)
 {
-#if 0
-    QString tableName(index.data(Qlom::TableNameRole).toString());
+    const QString &tableName = index.data(Qlom::TableNameRole).toString();
+    GlomLayoutModel *model = glomDocument.listLayoutModel(tableName);
     QMainWindow *tableModelWindow = new QMainWindow(this);
     QTableView *view = new QTableView(tableModelWindow);
-
-    /* Create a model for the rows of data. */
-    GlomLayoutModel *model = new GlomLayoutModel(glomDoc, tableName);
 
     view->setModel(model);
     view->resizeColumnsToContents();
     tableModelWindow->setCentralWidget(view);
-    tableModelWindow->setWindowTitle(ustringToQstring(
-        glomDoc.get_table_title(qstringToUstring(tableName))));
+    // TODO: Get correct display table name from GlomDocument.
+    tableModelWindow->setWindowTitle(tableName);
+    statusBar()->showMessage(tr("%1 table opened").arg(tableName));
 
     tableModelWindow->show();
     tableModelWindow->raise();
     tableModelWindow->activateWindow();
-    statusBar()->showMessage(tr("%1 table opened").arg(tableName));
-#endif
 }

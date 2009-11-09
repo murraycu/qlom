@@ -25,6 +25,7 @@ class Document;
 };
 
 #include "glom_tables_model.h"
+#include "glom_layout_model.h"
 
 #include <string>
 #include <QString>
@@ -40,9 +41,14 @@ public:
      *  @param[in] filepath the location of the Glom document
      *  @returns true on success, false on failure */
     bool loadDocument(const QString &filepath);
+
     /** Get a list of tables in the document.
-     *  @returns a model of the tables in the document, or a blank model */
+     *  @returns a model of the tables in the document */
     GlomTablesModel* tablesModel();
+
+    /** Get a layout from the document.
+     *  @returns a model of the layout */
+    GlomLayoutModel* listLayoutModel(const QString &tableName);
 
 private:
     std::string filepathToUri(const QString &theFilepath);

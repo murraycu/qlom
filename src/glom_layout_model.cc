@@ -25,18 +25,18 @@
 #include <QStringList>
 #include <QRegExp>
 
-GlomLayoutModel::GlomLayoutModel(const Glom::Document &document,
-    const QString& table_name, QObject *parent, QSqlDatabase db) :
+GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
+    const QString& tableName, QObject *parent, QSqlDatabase db) :
     QSqlRelationalTableModel(parent, db)
 {
-    setTable(table_name);
-    queryBuilder.addRelation(table_name);
+    setTable(tableName);
+    queryBuilder.addRelation(tableName);
 
     applyRelationships(document);
 
-    const Glib::ustring tableNameU(qstringToUstring(table_name));
+    const Glib::ustring tableNameU(qstringToUstring(tableName));
     const Glom::Document::type_list_layout_groups listLayout(
-        document.get_data_layout_groups("list", tableNameU));
+        document->get_data_layout_groups("list", tableNameU));
     for (Glom::Document::type_list_layout_groups::const_iterator iter(
         listLayout.begin()); iter != listLayout.end(); ++iter) {
         Glom::sharedptr<Glom::LayoutGroup> layoutGroup(*iter);
@@ -52,11 +52,11 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document &document,
     setQuery(QSqlQuery(queryBuilder.getQuery()));
 }
 
-void GlomLayoutModel::applyRelationships(const Glom::Document &document)
+void GlomLayoutModel::applyRelationships(const Glom::Document *document)
 {
     const Glib::ustring tableNameU(qstringToUstring(tableName()));
     Glom::Document::type_vec_relationships relationships(
-        document.get_relationships(tableNameU));
+        document->get_relationships(tableNameU));
     for (Glom::Document::type_vec_relationships::const_iterator iter(
         relationships.begin()); iter != relationships.end(); ++iter) {
         const Glom::sharedptr<const Glom::Relationship> relationship(*iter);

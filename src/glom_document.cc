@@ -102,6 +102,12 @@ GlomTablesModel* GlomDocument::tablesModel()
     return new GlomTablesModel(document, qobject_cast<QObject*>(this));
 }
 
+GlomLayoutModel* GlomDocument::listLayoutModel(const QString &tableName)
+{
+    return new GlomLayoutModel(document, tableName,
+        qobject_cast<QObject*>(this));
+}
+
 std::string GlomDocument::filepathToUri(const QString &theFilepath)
 {
     std::string filepath(theFilepath.toUtf8().constData());
