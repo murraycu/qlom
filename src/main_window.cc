@@ -20,11 +20,9 @@
 #include "glom_document.h"
 #include "glom_tables_model.h"
 #include "glom_layout_model.h"
-#include "utils.h"
 
 #include <QAction>
 #include <QApplication>
-#include <QDialog>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -32,14 +30,11 @@
 #include <QSqlField>
 #include <QSqlIndex>
 #include <QSqlRecord>
-#include <QSqlRelationalTableModel>
-#include <QSqlTableModel>
 #include <QStatusBar>
 #include <QTableView>
 #include <QTreeView>
-#include <QVBoxLayout>
 
-#include <config.h>
+#include "config.h"
 
 MainWindow::MainWindow()
 {

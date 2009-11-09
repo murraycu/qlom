@@ -25,7 +25,10 @@ src_qlom_SOURCES = src/qlom.cc \
                    src/query_builder.cc \
                    src/query_builder.h
 
-src_qlom_CXXFLAGS = $(QT_CXXFLAGS) $(QLOM_CFLAGS) $(QLOM_WARNINGS)
+qlom_includes = -I$(top_builddir) -I$(top_srcdir)/src
+
+src_qlom_CXXFLAGS = $(qlom_includes) $(QT_CXXFLAGS) $(QLOM_CFLAGS) \
+                    $(QLOM_WARNINGS)
 src_qlom_CPPFLAGS = $(QT_CPPFLAGS)
 src_qlom_LDFLAGS  = $(QT_LDFLAGS)
 src_qlom_LDADD = $(QT_LIBS) $(QLOM_LIBS)
