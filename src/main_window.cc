@@ -58,20 +58,20 @@ void MainWindow::setup()
     setWindowTitle(qApp->applicationName());
 
     // The statusBar shows tooltips for menuitems.
-    statusBar()->showMessage(tr("Qlom successfully started"));
+    statusBar()->showMessage(tr("Qlom started successfully"));
 
     // Create the menu.
     QAction *fileOpen = new QAction(tr("&Open"), this);
-    fileOpen->setShortcut(tr("Ctrl+O"));
+    fileOpen->setShortcut(tr("Ctrl+O", "Open file"));
     fileOpen->setStatusTip(tr("Open a Glom document"));
     QAction *fileClose = new QAction(tr("&Close"), this);
-    fileClose->setShortcut(tr("Ctrl+W"));
+    fileClose->setShortcut(tr("Ctrl+W", "Close file"));
     fileClose->setStatusTip(tr("Close the current Glom document"));
     QAction *fileQuit = new QAction(tr("&Quit"), this);
-    fileQuit->setShortcut(tr("Ctrl+Q"));
+    fileQuit->setShortcut(tr("Ctrl+Q", "Quit application"));
     fileQuit->setStatusTip(tr("Quit the application"));
     QAction *helpAbout = new QAction(tr("About"), this);
-    helpAbout->setShortcut(tr("Ctrl+A"));
+    helpAbout->setShortcut(tr("Ctrl+A", "About application"));
     helpAbout->setStatusTip(
         tr("Display credits and license information for Qlom"));
 
@@ -107,8 +107,10 @@ void MainWindow::showAboutDialog()
 {
     // About dialogs are window-modal in Qt, except on Mac OS X.
     QMessageBox::about(this, tr("About Qlom"), tr(PACKAGE_NAME "\n"
-        "A Qt Glom database viewer\n"
-        "Copyright 2009 Openismus GmbH"));
+          "A Qt Glom database viewer\n"
+          "Copyright 2009 Openismus GmbH"));
+    /* lupdate does not recognise the above string, although if the string is
+     * manually concatenated then it works fine. TODO: File bug. */
 }
 
 void MainWindow::writeSettings()

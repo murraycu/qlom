@@ -30,7 +30,7 @@
 
 void printUsage()
 {
-    std::cout << "Usage: glom [absolute_file_path]" << std::endl;
+    std::cout << "Usage: qlom [absolute_file_path]" << std::endl;
 }
 
 int main(int argc, char **argv)
