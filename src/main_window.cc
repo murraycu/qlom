@@ -145,7 +145,7 @@ void MainWindow::fileOpenTriggered()
 
 void MainWindow::fileCloseTriggered()
 {
-    delete centralTreeView;
+    centralTreeView->deleteLater();
     centralTreeView = new QTreeView(this);
     setCentralWidget(centralTreeView);
     connect(centralTreeView, SIGNAL(doubleClicked(const QModelIndex&)),
