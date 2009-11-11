@@ -44,11 +44,11 @@ public:
 
     /** Get a list of tables in the document.
      *  @returns a model of the tables in the document */
-    GlomTablesModel* tablesModel();
+    GlomTablesModel* createTablesModel();
 
     /** Get a layout from the document.
      *  @returns a model of the layout */
-    GlomLayoutModel* listLayoutModel(const QString &tableName);
+    GlomLayoutModel* createListLayoutModel(const QString &tableName);
 
 private:
     std::string filepathToUri(const QString &theFilepath);

@@ -47,7 +47,7 @@ MainWindow::MainWindow(const QString &filepath)
     setup();
 
     glomDocument.loadDocument(filepath);
-    GlomTablesModel *model = glomDocument.tablesModel();
+    GlomTablesModel *model = glomDocument.createTablesModel();
     centralTreeView->setModel(model);
     connect(centralTreeView, SIGNAL(doubleClicked(const QModelIndex&)),
         this, SLOT(treeviewDoubleclicked(const QModelIndex&)));
@@ -138,7 +138,7 @@ void MainWindow::fileOpenTriggered()
 
         QStringList files = dialog.selectedFiles();
         glomDocument.loadDocument(files.first());
-        GlomTablesModel *model = glomDocument.tablesModel();
+        GlomTablesModel *model = glomDocument.createTablesModel();
         centralTreeView->setModel(model);
     }
 }
@@ -165,7 +165,7 @@ void MainWindow::helpAboutTriggered()
 void MainWindow::treeviewDoubleclicked(const QModelIndex& index)
 {
     const QString &tableName = index.data(Qlom::TableNameRole).toString();
-    GlomLayoutModel *model = glomDocument.listLayoutModel(tableName);
+    GlomLayoutModel *model = glomDocument.createListLayoutModel(tableName);
     QMainWindow *tableModelWindow = new QMainWindow(this);
     QTableView *view = new QTableView(tableModelWindow);
 

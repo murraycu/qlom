@@ -97,12 +97,12 @@ bool GlomDocument::loadDocument(const QString &filepath)
     return true;
 }
 
-GlomTablesModel* GlomDocument::tablesModel()
+GlomTablesModel* GlomDocument::createTablesModel()
 {
     return new GlomTablesModel(document, qobject_cast<QObject*>(this));
 }
 
-GlomLayoutModel* GlomDocument::listLayoutModel(const QString &tableName)
+GlomLayoutModel* GlomDocument::createListLayoutModel(const QString &tableName)
 {
     return new GlomLayoutModel(document, tableName,
         qobject_cast<QObject*>(this));
