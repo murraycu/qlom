@@ -108,6 +108,13 @@ GlomLayoutModel* GlomDocument::createListLayoutModel(const QString &tableName)
         qobject_cast<QObject*>(this));
 }
 
+GlomLayoutModel* GlomDocument::createDefaultTableListLayoutModel()
+{
+    return new GlomLayoutModel(document,
+        ustringToQstring(document->get_default_table()),
+            qobject_cast<QObject*>(this));
+}
+
 std::string GlomDocument::filepathToUri(const QString &theFilepath)
 {
     std::string filepath(theFilepath.toUtf8().constData());

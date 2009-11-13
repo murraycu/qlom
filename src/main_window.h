@@ -55,6 +55,9 @@ private:
     /** Read the application settings from disk. */
     void readSettings();
 
+    /** Show a list layout of the default table. */
+    void showDefaultTable();
+
     GlomDocument glomDocument; /**< a Glom document to view */
     QTreeView *centralTreeView; /**< a tree view for the table names model */
 

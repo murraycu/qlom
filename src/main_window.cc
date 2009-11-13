@@ -49,8 +49,12 @@ MainWindow::MainWindow(const QString &filepath)
     glomDocument.loadDocument(filepath);
     GlomTablesModel *model = glomDocument.createTablesModel();
     centralTreeView->setModel(model);
+
     connect(centralTreeView, SIGNAL(doubleClicked(const QModelIndex&)),
         this, SLOT(treeviewDoubleclicked(const QModelIndex&)));
+    show();
+    // Open default table.
+    showDefaultTable();
 }
 
 void MainWindow::setup()
@@ -140,6 +144,8 @@ void MainWindow::fileOpenTriggered()
         glomDocument.loadDocument(files.first());
         GlomTablesModel *model = glomDocument.createTablesModel();
         centralTreeView->setModel(model);
+        // Open default table.
+        showDefaultTable();
     }
 }
 
@@ -175,6 +181,26 @@ void MainWindow::treeviewDoubleclicked(const QModelIndex& index)
     // TODO: Get correct display table name from GlomDocument.
     tableModelWindow->setWindowTitle(tableName);
     statusBar()->showMessage(tr("%1 table opened").arg(tableName));
+
+    tableModelWindow->show();
+    tableModelWindow->raise();
+    tableModelWindow->activateWindow();
+}
+
+void MainWindow::showDefaultTable()
+{
+    GlomLayoutModel *model = glomDocument.createDefaultTableListLayoutModel();
+    QMainWindow *tableModelWindow = new QMainWindow(this);
+    QTableView *view = new QTableView(tableModelWindow);
+
+    view->setModel(model);
+    view->resizeColumnsToContents();
+    tableModelWindow->setCentralWidget(view);
+    // TODO: Get the display table name from GlomDocument.
+#if 0
+    tableModelWindow->setWindowTitle(tableName);
+#endif
+    statusBar()->showMessage(tr("Default table opened"));
 
     tableModelWindow->show();
     tableModelWindow->raise();

@@ -50,6 +50,10 @@ public:
      *  @returns a model of the layout */
     GlomLayoutModel* createListLayoutModel(const QString &tableName);
 
+    /** Get a layout of the default table from the document.
+     *  @returns a model of the layout */
+    GlomLayoutModel* createDefaultTableListLayoutModel();
+
 private:
     std::string filepathToUri(const QString &theFilepath);
     /** Open an SQLite database connection.
