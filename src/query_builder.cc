@@ -64,19 +64,41 @@ void QlomQueryBuilder::setOrderBy(const QString& theOrderBy)
     orderBy = QString("ORDER BY (%1)").arg(theOrderBy);
 }
 
-QString QlomQueryBuilder::getQuery(bool distinct) const
+QString QlomQueryBuilder::getQuery() const
 {
-    Q_ASSERT(!projections.isEmpty() && !relations.isEmpty());
+    Q_ASSERT(!projections.isEmpty());
+
+    QString builder;
+
+    builder.push_back(QString("SELECT %1").arg(projections.join(", ")));
+    builder.push_back(buildQueryWithoutSelect());
+
+    return builder;
+}
+
+QString QlomQueryBuilder::getDistinctQuery() const
+{
+    Q_ASSERT(!projections.isEmpty());
 
     QString builder;
 
     builder.push_back(
-        QString((!distinct ? "SELECT %1": "SELECT DISTINCT %1"))
-        .arg(projections.join(", ")));
-    builder.push_back(QString(" FROM %1 ").arg(relations.join(", ")));
-    builder.push_back(equiJoins.join(" "));
-    builder.push_back(selection);
-    builder.push_back(orderBy);
+        QString("SELECT DISTINCT %1").arg(projections.join(", ")));
+    builder.push_back(buildQueryWithoutSelect());
 
     return builder;
+}
+
+QString QlomQueryBuilder::buildQueryWithoutSelect() const
+{
+    Q_ASSERT(!relations.isEmpty());
+
+    QString query;
+
+    query.push_back(QString(" FROM %1 ").arg(relations.join(", ")));
+    query.push_back(equiJoins.join(" "));
+    query.push_back(selection);
+    query.push_back(orderBy);
+
+    return query;
 }

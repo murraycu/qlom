@@ -64,17 +64,22 @@ public:
     *  @param[in] order_by the order clause to add */
     void setOrderBy(const QString& orderBy);
 
-    /** Returns the built query, but does not check for validity.
-    *  @param[in] distinct whether to add the distinct keyword to the query */
-    QString getQuery(bool distinct = false) const;
+    /** Returns the built query, but does not check for validity. */
+    QString getQuery() const;
+
+    /** Returns the built distinct query, but does not check for validity. */
+    QString getDistinctQuery() const;
 
 private:
 
-  QStringList projections; /**< the list of projections */
-  QStringList relations; /**< the list of relations */
-  QStringList equiJoins; /**< the list of qui-joins */
-  QString selection; /**< the selection */
-  QString orderBy; /**< the order clause */
+    /** Returns the built query, wthout the SELECT statement. */
+    QString buildQueryWithoutSelect() const;
+
+    QStringList projections; /**< the list of projections */
+    QStringList relations; /**< the list of relations */
+    QStringList equiJoins; /**< the list of qui-joins */
+    QString selection; /**< the selection */
+    QString orderBy; /**< the order clause */
 };
 
 #endif /* QLOM_QUERY_BUILDER_H_ */

@@ -49,7 +49,7 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
         break;
     }
 
-    setQuery(QSqlQuery(queryBuilder.getQuery()));
+    setQuery(QSqlQuery(queryBuilder.getDistinctQuery()));
 }
 
 void GlomLayoutModel::applyRelationships(const Glom::Document *document)
