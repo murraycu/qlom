@@ -18,9 +18,11 @@
 
 #include "main_window.h"
 #include "glom_document.h"
+#include "qlom_error.h"
 #include "glom_tables_model.h"
 #include "glom_layout_model.h"
 
+#include <memory>
 #include <QAction>
 #include <QApplication>
 #include <QFileDialog>
@@ -46,7 +48,12 @@ MainWindow::MainWindow(const QString &filepath)
 {
     setup();
 
-    glomDocument.loadDocument(filepath);
+    std::auto_ptr<QlomError> error;
+    glomDocument.loadDocument(filepath, error);
+    if(error.get()) {
+        QMessageBox::critical(this, tr("Critical error"), error->what(),
+            QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+    }
     GlomTablesModel *model = glomDocument.createTablesModel();
     centralTreeView->setModel(model);
 
@@ -141,7 +148,16 @@ void MainWindow::fileOpenTriggered()
         fileCloseTriggered();
 
         QStringList files = dialog.selectedFiles();
-        glomDocument.loadDocument(files.first());
+        std::auto_ptr<QlomError> error;
+        glomDocument.loadDocument(files.first(), error);
+        if(error.get()) {
+            if(error->severity() == Qlom::CRITICAL_ERROR_SEVERITY) {
+                QMessageBox::critical(this, tr("Critical error"),
+                    error->what(), QMessageBox::Ok, QMessageBox::NoButton,
+                    QMessageBox::NoButton);
+            }
+        }
+
         GlomTablesModel *model = glomDocument.createTablesModel();
         centralTreeView->setModel(model);
         // Open default table.

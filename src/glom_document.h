@@ -26,7 +26,9 @@ class Document;
 
 #include "glom_tables_model.h"
 #include "glom_layout_model.h"
+#include "qlom_error.h"
 
+#include <memory>
 #include <string>
 #include <QString>
 
@@ -39,8 +41,9 @@ public:
 
     /** Load a Glom document from a file.
      *  @param[in] filepath the location of the Glom document
+     *  @param[out] error the error return parameter
      *  @returns true on success, false on failure */
-    bool loadDocument(const QString &filepath);
+    bool loadDocument(const QString &filepath, std::auto_ptr<QlomError> &error);
 
     /** Get a list of tables in the document.
      *  @returns a model of the tables in the document */
@@ -55,12 +58,19 @@ public:
     GlomLayoutModel* createDefaultTableListLayoutModel();
 
 private:
-    std::string filepathToUri(const QString &theFilepath);
+    /** Convert a filepath to a URI.
+     *  @param[in] theFilepath the absolute filepath
+     *  @param[out] error any errors during the conversion process
+     *  @returns the URI of the file */
+    std::string filepathToUri(const QString &theFilepath,
+        std::auto_ptr<QlomError> &error);
+
     /** Open an SQLite database connection.
      *  Creates and opens a default QSqlDatabase connection.
      *
      *  @see ConnectionDialog */
     bool openSqlite();
+
     Glom::Document *document; /**< a Glom document */
 };
 

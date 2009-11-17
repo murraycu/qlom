@@ -17,6 +17,7 @@
  */
 
 #include "glom_document.h"
+#include "qlom_error.h"
 #include "glom_tables_model.h"
 #include "connection_dialog.h"
 #include "utils.h"
@@ -41,10 +42,10 @@ GlomDocument::GlomDocument() :
     /* No document case. */
 }
 
-bool GlomDocument::loadDocument(const QString &filepath)
+bool GlomDocument::loadDocument(const QString &filepath, std::auto_ptr<QlomError> &error)
 {
     /* Load a Glom document with a given filename. */
-    const std::string uri(filepathToUri(filepath));
+    const std::string uri(filepathToUri(filepath, error));
     if(uri.empty()) {
         return false;
     }
@@ -55,6 +56,9 @@ bool GlomDocument::loadDocument(const QString &filepath)
     const bool test = document->load(failure_code);
     if(!test) {
         std::cerr << "Document loading failed with uri=" << uri << std::endl;
+        error = std::auto_ptr<QlomError>(
+            new QlomError(tr("libglom failed to load the Glom document"),
+                Qlom::CRITICAL_ERROR_SEVERITY));
         return false;
     }
 
@@ -62,6 +66,9 @@ bool GlomDocument::loadDocument(const QString &filepath)
      * resaved — that would be an extra feature. */
     if(document->get_is_example_file()) {
         std::cerr << "Document is an example file, cannot process" << std::endl;
+        error = std::auto_ptr<QlomError>(new QlomError(
+            tr("Cannot open the document because it is an example file"),
+            Qlom::CRITICAL_ERROR_SEVERITY));
         return false;
     }
 
@@ -70,11 +77,12 @@ bool GlomDocument::loadDocument(const QString &filepath)
     switch (document->get_hosting_mode()) {
     case Glom::Document::HOSTING_MODE_POSTGRES_CENTRAL:
     {
+        // TODO: request a connection dialog from MainWindow.
         ConnectionDialog *connectionDialog = new ConnectionDialog(*document);
         if(connectionDialog->exec() != QDialog::Accepted) {
-            QMessageBox::critical(0, PACKAGE_NAME,
-                tr("Could not connect to database server"), QMessageBox::Ok,
-                QMessageBox::NoButton, QMessageBox::NoButton);
+            error = std::auto_ptr<QlomError>(new QlomError(
+                tr("Failed to connect to the PostgreSQL server"),
+                Qlom::CRITICAL_ERROR_SEVERITY));
             return false;
         }
     }
@@ -82,6 +90,9 @@ bool GlomDocument::loadDocument(const QString &filepath)
     case Glom::Document::HOSTING_MODE_SQLITE:
     {
         if(!openSqlite()) {
+            error = std::auto_ptr<QlomError>(new QlomError(
+                tr("Failed to open the SQLite database"),
+                Qlom::CRITICAL_ERROR_SEVERITY));
             return false;
         }
     }
@@ -90,6 +101,9 @@ bool GlomDocument::loadDocument(const QString &filepath)
     // Fall through.
     default:
         std::cerr << "Database type not supported, cannot process" << std::endl;
+        error = std::auto_ptr<QlomError>(new QlomError(
+            tr("Database type not supported, failed to open the Glom document"),
+            Qlom::CRITICAL_ERROR_SEVERITY));
         return false;
         break;
     }
@@ -115,7 +129,8 @@ GlomLayoutModel* GlomDocument::createDefaultTableListLayoutModel()
             qobject_cast<QObject*>(this));
 }
 
-std::string GlomDocument::filepathToUri(const QString &theFilepath)
+std::string GlomDocument::filepathToUri(const QString &theFilepath,
+   std::auto_ptr<QlomError> &error)
 {
     std::string filepath(theFilepath.toUtf8().constData());
     std::string uri;
@@ -127,6 +142,9 @@ std::string GlomDocument::filepathToUri(const QString &theFilepath)
     catch(const Glib::ConvertError& convertException) {
         std::cerr << "Exception from Glib::filename_to_uri(): "
             << convertException.what() << std::endl;
+        error = std::auto_ptr<QlomError>(new QlomError(
+            tr("Failed to convert the document file name to a URI"),
+            Qlom::CRITICAL_ERROR_SEVERITY));
     }
 #else /* !GLIBMM_EXCEPTIONS_ENABLED */
     std::auto_ptr<Glib::Error> convertError;
@@ -134,6 +152,9 @@ std::string GlomDocument::filepathToUri(const QString &theFilepath)
     if(convertError.get()) {
         std::cerr << "Error from Glib::filename_to_uri(): "
             << convertError->what() << std::endl;
+        error = std::auto_ptr<QlomError>(new QlomError(
+            tr("Failed to convert the document file name to a URI"),
+            Qlom::CRITICAL_ERROR_SEVERITY));
     }
 #endif /* GLIBMM_EXCEPTIONS_ENABLED */
 
