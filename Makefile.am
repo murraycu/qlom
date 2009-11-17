@@ -8,6 +8,8 @@ src_qlom_SOURCES = src/qlom.cc \
 		   src/glom_document.cc \
 		   src/glom_document.moc.cc \
 		   src/glom_document.h \
+		   src/qlom_error.cc \
+		   src/qlom_error.h \
                    src/main_window.cc \
                    src/main_window.moc.cc \
                    src/main_window.h \
