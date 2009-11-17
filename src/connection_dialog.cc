@@ -78,7 +78,7 @@ void ConnectionDialog::databaseConnect()
         openPostgresql();
         break;
     default:
-        std::cerr << "Unexpected database hosting mode" << std::endl;
+        qCritical("Unexpected database hosting mode");
         done(QDialog::Rejected);
         break;
     }
@@ -98,9 +98,8 @@ void ConnectionDialog::openPostgresql()
     const QSqlError error(db.lastError());
     if (error.isValid()) {
         // TODO: Give feedback in the UI.
-        std::cerr << "Database backend \"" << backend.toUtf8().constData()
-            << "\" does not exist\n" << "Error details: "
-            << error.text().toUtf8().constData() << std::endl;
+        qCritical("Database backend \"%s\" does not exist\nErrot details: %s",
+            backend.toUtf8().constData(), error.text().toUtf8().constData());
         done(QDialog::Rejected);
     }
 
@@ -111,7 +110,7 @@ void ConnectionDialog::openPostgresql()
 
     if (!db.open()) {
         //TODO: Tell the user in the UI.
-        std::cerr << "Database connection could not be opened" << std::endl;
+        qCritical("Database connection could not be opened");
         done(QDialog::Rejected);
     } else {
         done(QDialog::Accepted);
