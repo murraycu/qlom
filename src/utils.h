@@ -16,8 +16,8 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GLOM_UTILS_H_
-#define GLOM_UTILS_H_
+#ifndef QLOM_UTILS_H_
+#define QLOM_UTILS_H_
 
 #include <QString>
 #include <glibmm/ustring.h>
@@ -25,4 +25,4 @@
 Glib::ustring qstringToUstring(QString qstring);
 QString ustringToQstring(Glib::ustring ustring);
 
-#endif /* GLOM_UTILS_H_ */
+#endif /* QLOM_UTILS_H_ */
