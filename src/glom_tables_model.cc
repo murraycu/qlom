@@ -31,6 +31,8 @@ GlomTablesModel::GlomTablesModel(const Glom::Document *document,
     for(std::vector<Glib::ustring>::const_iterator iter(tables.begin());
         iter != tables.end(); ++iter) {
         tableNames.push_back(ustringToQstring(*iter));
+        tableDisplayNames.push_back(ustringToQstring(
+              glomDoc->get_table_title(*iter)));
     }
 }
 
@@ -42,26 +44,22 @@ int GlomTablesModel::rowCount(const QModelIndex &parent) const
 
 QVariant GlomTablesModel::data(const QModelIndex &index, int role) const
 {
-    if(!index.isValid())
-    {
+    if(!index.isValid()) {
         return QVariant();
     }
-    if(index.row() >= tableNames.length())
-    {
+    if(index.row() >= tableNames.length()) {
         return QVariant();
     }
-    switch(role)
-    {
-        case Qt::DisplayRole:
-            return ustringToQstring(glomDoc->get_table_title(
-                qstringToUstring(tableNames.at(index.row()))));
-            break;
-        case Qlom::TableNameRole:
-            return tableNames.at(index.row());
-            break;
-        default:
-            return QVariant();
-            break;
+    switch(role) {
+    case Qt::DisplayRole:
+        return tableDisplayNames.at(index.row());
+        break;
+    case Qlom::TableNameRole:
+        return tableNames.at(index.row());
+        break;
+    default:
+        return QVariant();
+        break;
     }
 }
 

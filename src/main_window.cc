@@ -196,9 +196,9 @@ void MainWindow::treeviewDoubleclicked(const QModelIndex& index)
     view->setModel(model);
     view->resizeColumnsToContents();
     tableModelWindow->setCentralWidget(view);
-    // TODO: Get correct display table name from GlomDocument.
-    tableModelWindow->setWindowTitle(tableName);
-    statusBar()->showMessage(tr("%1 table opened").arg(tableName));
+    const QString tableDisplayName = index.data().toString();
+    tableModelWindow->setWindowTitle(tableDisplayName);
+    statusBar()->showMessage(tr("%1 table opened").arg(tableDisplayName));
 
     tableModelWindow->show();
     tableModelWindow->raise();
