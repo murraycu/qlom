@@ -19,13 +19,11 @@
 #ifndef QLOM_GLOM_TABLES_MODEL_H_
 #define QLOM_GLOM_TABLES_MODEL_H_
 
-#include <QAbstractListModel>
-#include <QStringList>
+#include "glom_table.h"
 
-namespace Glom
-{
-class Document;
-};
+#include <QAbstractListModel>
+#include <QList>
+#include <QStringList>
 
 namespace Qlom
 {
@@ -47,7 +45,7 @@ public:
      *  @param[in] document a Glom document to read metadata from
      *  @param[in] parent a parent QObject, that will take ownership of the
      model */
-    GlomTablesModel(const Glom::Document *document, QObject *parent = 0);
+    GlomTablesModel(const QList<GlomTable> tableList, QObject *parent = 0);
 
     /** Calculate the number of rows in the model.
      *  @param[in] parent the parent index in the heirarchy
@@ -69,7 +67,6 @@ public:
         int role = Qt::DisplayRole) const;
 
 private:
-    const Glom::Document *glomDoc; /**< the Glom document */
     QStringList tableNames; /**< the list of tables in the Glom document */
     QStringList tableDisplayNames; /**< the list of table display names in the
                                     *   Glom document. */

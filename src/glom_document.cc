@@ -42,7 +42,8 @@ GlomDocument::GlomDocument() :
     /* No document case. */
 }
 
-bool GlomDocument::loadDocument(const QString &filepath, std::auto_ptr<QlomError> &error)
+bool GlomDocument::loadDocument(const QString &filepath,
+    std::auto_ptr<QlomError> &error)
 {
     /* Load a Glom document with a given filename. */
     const std::string uri(filepathToUri(filepath, error));
@@ -108,12 +109,13 @@ bool GlomDocument::loadDocument(const QString &filepath, std::auto_ptr<QlomError
         break;
     }
 
+    fillTableList();
     return true;
 }
 
 GlomTablesModel* GlomDocument::createTablesModel()
 {
-    return new GlomTablesModel(document, qobject_cast<QObject*>(this));
+    return new GlomTablesModel(tableList, qobject_cast<QObject*>(this));
 }
 
 GlomLayoutModel* GlomDocument::createListLayoutModel(const QString &tableName)
@@ -130,7 +132,7 @@ GlomLayoutModel* GlomDocument::createDefaultTableListLayoutModel()
 }
 
 std::string GlomDocument::filepathToUri(const QString &theFilepath,
-   std::auto_ptr<QlomError> &error)
+    std::auto_ptr<QlomError> &error)
 {
     std::string filepath(theFilepath.toUtf8().constData());
     std::string uri;
@@ -226,4 +228,22 @@ bool GlomDocument::openSqlite()
     } else {
         return true;
     }
+}
+
+void GlomDocument::fillTableList()
+{
+    if (tableList.empty()) {
+        const std::vector<Glib::ustring> tables(document->get_table_names());
+        for(std::vector<Glib::ustring>::const_iterator iter(tables.begin());
+            iter != tables.end(); ++iter) {
+            tableList.push_back(GlomTable(ustringToQstring(*iter),
+                ustringToQstring(document->get_table_title(*iter))));
+        }
+    } else {
+        qCritical("Filling tableList when it it not empty");
+        tableList.clear();
+        fillTableList(); // Recurse.
+    }
+
+    return;
 }

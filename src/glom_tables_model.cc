@@ -17,22 +17,15 @@
  */
 
 #include "glom_tables_model.h"
-#include "utils.h"
 
-#include <libglom/document/document.h>
-
-GlomTablesModel::GlomTablesModel(const Glom::Document *document,
-    QObject *parent) :
-    QAbstractListModel(parent),
-    glomDoc(document)
+GlomTablesModel::GlomTablesModel(QList<GlomTable> tableList, QObject *parent) :
+    QAbstractListModel(parent)
 {
     // Read out table names from document, and add them to the model.
-    const std::vector<Glib::ustring> tables(glomDoc->get_table_names());
-    for(std::vector<Glib::ustring>::const_iterator iter(tables.begin());
-        iter != tables.end(); ++iter) {
-        tableNames.push_back(ustringToQstring(*iter));
-        tableDisplayNames.push_back(ustringToQstring(
-              glomDoc->get_table_title(*iter)));
+    for (QList<GlomTable>::const_iterator iter(tableList.begin());
+        iter != tableList.end(); ++iter) {
+        tableNames.push_back(iter->tableName());
+        tableDisplayNames.push_back(iter->displayName());
     }
 }
 

@@ -26,10 +26,12 @@ class Document;
 
 #include "glom_tables_model.h"
 #include "glom_layout_model.h"
+#include "glom_table.h"
 #include "qlom_error.h"
 
 #include <memory>
 #include <string>
+#include <QList>
 #include <QString>
 
 class GlomDocument : public QObject
@@ -71,7 +73,11 @@ private:
      *  @see ConnectionDialog */
     bool openSqlite();
 
+    /** Fill tableList with tables read from the document. */
+    void fillTableList();
+
     Glom::Document *document; /**< a Glom document */
+    QList<GlomTable> tableList; /**< a list of table in the document */
 };
 
 #endif /* QLOM_GLOM_DOCUMENT_H_ */
