@@ -53,6 +53,7 @@ MainWindow::MainWindow(const QString &filepath)
     if(error.get()) {
         QMessageBox::critical(this, tr("Critical error"), error->what(),
             QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+        return;
     }
     GlomTablesModel *model = glomDocument.createTablesModel();
     centralTreeView->setModel(model);
@@ -155,6 +156,7 @@ void MainWindow::fileOpenTriggered()
                 QMessageBox::critical(this, tr("Critical error"),
                     error->what(), QMessageBox::Ok, QMessageBox::NoButton,
                     QMessageBox::NoButton);
+                return;
             }
         }
 
