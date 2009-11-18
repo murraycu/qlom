@@ -27,7 +27,9 @@
 
 GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
     const QString& tableName, QObject *parent, QSqlDatabase db) :
-    QSqlRelationalTableModel(parent, db)
+    QSqlRelationalTableModel(parent, db),
+    theTableDisplayName(ustringToQstring(
+        document->get_table_title(qstringToUstring(tableName))))
 {
     setTable(tableName);
     queryBuilder.addRelation(tableName);
@@ -50,6 +52,11 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
     }
 
     setQuery(QSqlQuery(queryBuilder.getDistinctQuery()));
+}
+
+QString GlomLayoutModel::tableDisplayName() const
+{
+    return theTableDisplayName;
 }
 
 void GlomLayoutModel::applyRelationships(const Glom::Document *document)

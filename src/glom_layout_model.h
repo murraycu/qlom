@@ -23,6 +23,7 @@
 
 #include <QSqlDatabase>
 #include <QSqlRelationalTableModel>
+#include <QString>
 #include <libglom/document/document.h>
 
 /** A model to show rows of data from a Glom database. */
@@ -44,6 +45,10 @@ public:
         const QString &tableName, QObject *parent = 0,
         QSqlDatabase db = QSqlDatabase());
 
+    /** Get the table name used in the model.
+     *  @returns the table name */
+    QString tableDisplayName() const;
+
 private:
     /** Filters input data.
      *  @param[in] index the index to retrieve data from
@@ -62,6 +67,7 @@ private:
         const Glom::sharedptr<const Glom::LayoutItem> &layoutItem);
 
     QlomQueryBuilder queryBuilder; /**< an SQL query builder */
+    QString theTableDisplayName;
 };
 
 #endif /* QLOM_GLOM_LAYOUT_MODEL_H_ */

@@ -214,10 +214,7 @@ void MainWindow::showDefaultTable()
     view->setModel(model);
     view->resizeColumnsToContents();
     tableModelWindow->setCentralWidget(view);
-    // TODO: Get the display table name from GlomDocument.
-#if 0
-    tableModelWindow->setWindowTitle(tableName);
-#endif
+    tableModelWindow->setWindowTitle(model->tableDisplayName());
     statusBar()->showMessage(tr("Default table opened"));
 
     tableModelWindow->show();
