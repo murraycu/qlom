@@ -69,6 +69,7 @@ private:
 
     QlomQueryBuilder queryBuilder; /**< an SQL query builder */
     QString theTableDisplayName;
+    QString escapeField(QString field) const;
 };
 
 #endif /* QLOM_GLOM_LAYOUT_MODEL_H_ */

@@ -22,6 +22,7 @@
 #include <QSqlQuery>
 #include <QSqlIndex>
 #include <QSqlRecord>
+#include <QSqlDriver>
 #include <QStringList>
 #include <QRegExp>
 
@@ -44,13 +45,13 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
     if(!listLayout.empty() && "main" == listLayout[0]->get_name()) // TODO: check whether it is "main"?
     {
         createProjectionFromLayoutGroup(listLayout[0]);
-        query =  queryBuilder.getDistinctQuery();
+        query = queryBuilder.getDistinctSqlQuery();
     }
     else  // Display a warning message if the Glom document could not provide
           // us with a main layout group.
     {
         QString noDataAvailable(tr("No data available!"));
-        query = QString("SELECT '%1' as 'ERROR'").arg(noDataAvailable);
+        query = QSqlQuery(QString("SELECT '%1' as 'ERROR'").arg(noDataAvailable));
     }
     setQuery(query);
 }
@@ -87,25 +88,39 @@ void GlomLayoutModel::createProjectionFromLayoutGroup(
         for (Glom::LayoutGroup::type_list_const_items::const_iterator
             iter(items.begin()); iter != items.end(); ++iter) {
             Glom::sharedptr<const Glom::LayoutItem> layoutItem(*iter);
-            if (!layoutItem) {
-                // Skip if the layoutItem is invalid. Can this happen?
-                continue;
-            }
 
             /* The default setting for a projection is
-               "table.col AS display_name". */
+             * "table.col AS display_name", whereas display_name is used for
+             *  the column heading.
+             */
             QString currTableName(tableName());
             QString currColName(ustringToQstring(layoutItem->get_name()));
             QString currDisplayName(
                 ustringToQstring(layoutItem->get_title_or_name()));
 
-            queryBuilder.addProjection(QString("%1.%2 AS \"%3\"")
-                .arg(currTableName).arg(currColName)
-                .arg(currDisplayName));
+            // Check whether we have an static text item to display.
+            const Glom::LayoutItem_Text* staticTextItem = dynamic_cast<const Glom::LayoutItem_Text*> (layoutItem.obj());
+            if (staticTextItem)
+            {
+                queryBuilder.addProjection(QString("%1 AS %3")
+                    .arg(escapeField(ustringToQstring(staticTextItem->get_text())))
+                    .arg(escapeField(currDisplayName)));
+            }
+            else
+            {
+                queryBuilder.addProjection(QString("%1.%2 AS %3")
+                    .arg(escapeField(currTableName))
+                    .arg(escapeField(currColName))
+                    .arg(escapeField(currDisplayName)));
+            }
         }
     }
 }
 
+QString GlomLayoutModel::escapeField(QString field) const
+{
+    return database().driver()->escapeIdentifier(field, QSqlDriver::FieldName);
+}
 QVariant GlomLayoutModel::data(const QModelIndex &index, int role) const
 {
     static const QRegExp matchDouble("\\d+\\.\\d+");
