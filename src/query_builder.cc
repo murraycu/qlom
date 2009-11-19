@@ -17,6 +17,7 @@
  */
 
 #include "query_builder.h"
+#include <iostream>
 
 QlomQueryBuilder::QlomQueryBuilder()
 {}
@@ -101,4 +102,32 @@ QString QlomQueryBuilder::buildQueryWithoutSelect() const
     query.push_back(orderBy);
 
     return query;
+}
+
+QSqlQuery QlomQueryBuilder::getDistinctSqlQuery()
+{
+    return getSqlQuery(true);
+}
+
+QSqlQuery QlomQueryBuilder::getSqlQuery(bool distinct)
+{
+    QSqlQuery query;
+    query.prepare((distinct ? getDistinctQuery()
+                            : getQuery()));
+
+    for(BoundParametersMap::iterator iter = boundParameters.begin();
+        iter != boundParameters.end();
+        ++iter)
+    {
+        query.bindValue(iter.key(), iter.value());
+    }
+    std::cout << getQuery().toStdString() << std::endl;
+
+    query.exec();
+    return query;
+}
+
+void QlomQueryBuilder::bindValue(const QString &placeholder, const QVariant &val)
+{
+    boundParameters[placeholder] = val;
 }

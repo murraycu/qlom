@@ -21,6 +21,9 @@
 
 #include <QString>
 #include <QStringList>
+#include <QSqlQuery>
+#include <QMap>
+#include <QVariant>
 
 /** A simplistic SQL query builder.
  *  This class represents a very simplistic SQL query builder, to create
@@ -70,16 +73,26 @@ public:
     /** Returns the built distinct query, but does not check for validity. */
     QString getDistinctQuery() const;
 
+    /** Returns a prepared statement. */
+    QSqlQuery getDistinctSqlQuery();
+    QSqlQuery getSqlQuery(bool distinct = false);
+
+    /** Forwarding method for internal QSqlQuery. */
+    void bindValue(const QString &placeholder, const QVariant &val);
+
 private:
 
-    /** Returns the built query, wthout the SELECT statement. */
+    /** Returns the built query, without the SELECT statement. */
     QString buildQueryWithoutSelect() const;
 
     QStringList projections; /**< the list of projections */
     QStringList relations; /**< the list of relations */
-    QStringList equiJoins; /**< the list of qui-joins */
+    QStringList equiJoins; /**< the list of equi-joins */
     QString selection; /**< the selection */
     QString orderBy; /**< the order clause */
+
+    typedef QMap<QString, QVariant> BoundParametersMap;
+    BoundParametersMap boundParameters;
 };
 
 #endif /* QLOM_QUERY_BUILDER_H_ */
