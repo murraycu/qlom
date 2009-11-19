@@ -19,6 +19,7 @@
 #ifndef QLOM_GLOM_LAYOUT_MODEL_H_
 #define QLOM_GLOM_LAYOUT_MODEL_H_
 
+#include "glom_table.h"
 #include "query_builder.h"
 
 #include <QSqlDatabase>
@@ -42,7 +43,7 @@ public:
      *  @param[in] parent a parent QObject
      *  @param[in] db a database connection, or the default connection */
     explicit GlomLayoutModel(const Glom::Document *document,
-        const QString &tableName, QObject *parent = 0,
+        const GlomTable table, QObject *parent = 0,
         QSqlDatabase db = QSqlDatabase());
 
     /** Get the table name used in the model.
@@ -57,8 +58,8 @@ private:
     QVariant data(const QModelIndex &index, int role) const;
 
     /** Read relationships from the Glom document, and apply them to the model.
-     *  @param[in] document a Glom document */
-    void applyRelationships(const Glom::Document *document);
+     *  @param[in] relationships a list of relationships to apply */
+    void applyRelationships(const QList<GlomRelationship> relationships);
 
     /** Discard columns that are not mentioned in the document.
      *  @param[in] layoutItem the layout containing the columns that should not

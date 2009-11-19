@@ -120,15 +120,25 @@ GlomTablesModel* GlomDocument::createTablesModel()
 
 GlomLayoutModel* GlomDocument::createListLayoutModel(const QString &tableName)
 {
-    return new GlomLayoutModel(document, tableName,
-        qobject_cast<QObject*>(this));
+    QList<GlomTable>::const_iterator table(tableList.begin());
+    for (; table != tableList.end()
+        && table->tableName() != tableName; ++table) {
+    }
+    Q_ASSERT(table != tableList.end());
+
+    return new GlomLayoutModel(document, *table, qobject_cast<QObject*>(this));
 }
 
 GlomLayoutModel* GlomDocument::createDefaultTableListLayoutModel()
 {
-    return new GlomLayoutModel(document,
-        ustringToQstring(document->get_default_table()),
-            qobject_cast<QObject*>(this));
+    QList<GlomTable>::const_iterator table(tableList.begin());
+    for (; table != tableList.end() &&
+        table->tableName() != ustringToQstring(document->get_default_table());
+        ++table) {
+    }
+    Q_ASSERT(table != tableList.end());
+
+    return new GlomLayoutModel(document, *table, qobject_cast<QObject*>(this));
 }
 
 std::string GlomDocument::filepathToUri(const QString &theFilepath,
@@ -236,8 +246,15 @@ void GlomDocument::fillTableList()
         const std::vector<Glib::ustring> tables(document->get_table_names());
         for(std::vector<Glib::ustring>::const_iterator iter(tables.begin());
             iter != tables.end(); ++iter) {
+            Glom::Document::type_vec_relationships documentRelationships(
+                document->get_relationships(*iter));
+            // Get a list of GlomRelationship items from the document.
+            QList<GlomRelationship> relationships(
+                fillRelationships(documentRelationships));
+            // Fill the GlomDocument with a list of GlomTables.
             tableList.push_back(GlomTable(ustringToQstring(*iter),
-                ustringToQstring(document->get_table_title(*iter))));
+                ustringToQstring(document->get_table_title(*iter)),
+                relationships));
         }
     } else {
         qCritical("Filling tableList when it it not empty");
@@ -246,4 +263,22 @@ void GlomDocument::fillTableList()
     }
 
     return;
+}
+
+QList<GlomRelationship> GlomDocument::fillRelationships(
+    Glom::Document::type_vec_relationships documentRelationships)
+{
+    QList<GlomRelationship> relationships;
+    for (Glom::Document::type_vec_relationships::const_iterator iter(
+        documentRelationships.begin()); iter != documentRelationships.end();
+        ++iter) {
+        const Glom::sharedptr<const Glom::Relationship>
+            documentRelationship(*iter);
+        relationships.push_back(GlomRelationship(
+            ustringToQstring(documentRelationship->get_from_field()),
+            ustringToQstring(documentRelationship->get_to_table()),
+            ustringToQstring(documentRelationship->get_to_field())));
+    }
+
+    return relationships;
 }

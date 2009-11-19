@@ -26,17 +26,16 @@
 #include <QRegExp>
 
 GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
-    const QString& tableName, QObject *parent, QSqlDatabase db) :
+    const GlomTable table, QObject *parent, QSqlDatabase db) :
     QSqlRelationalTableModel(parent, db),
-    theTableDisplayName(ustringToQstring(
-        document->get_table_title(qstringToUstring(tableName))))
+    theTableDisplayName(table.displayName()) // TODO: Add GlomTable member.
 {
-    setTable(tableName);
-    queryBuilder.addRelation(tableName);
+    setTable(table.tableName());
+    queryBuilder.addRelation(table.tableName());
 
-    applyRelationships(document);
+    applyRelationships(table.relationships());
 
-    const Glib::ustring tableNameU(qstringToUstring(tableName));
+    const Glib::ustring tableNameU(qstringToUstring(table.tableName()));
     const Glom::Document::type_list_layout_groups listLayout(
         document->get_data_layout_groups("list", tableNameU));
     for (Glom::Document::type_list_layout_groups::const_iterator iter(
@@ -59,23 +58,15 @@ QString GlomLayoutModel::tableDisplayName() const
     return theTableDisplayName;
 }
 
-void GlomLayoutModel::applyRelationships(const Glom::Document *document)
+void GlomLayoutModel::applyRelationships(
+    const QList<GlomRelationship> relationships)
 {
-    const Glib::ustring tableNameU(qstringToUstring(tableName()));
-    Glom::Document::type_vec_relationships relationships(
-        document->get_relationships(tableNameU));
-    for (Glom::Document::type_vec_relationships::const_iterator iter(
-        relationships.begin()); iter != relationships.end(); ++iter) {
-        const Glom::sharedptr<const Glom::Relationship> relationship(*iter);
-        if (!relationship) {
-            // Skip if the relationship is invalid. Can this happen?
-            continue;
-        }
-
-        const QString from(ustringToQstring(relationship->get_from_field()));
-        const QString toTable(ustringToQstring(relationship->get_to_table()));
-        const QString toPrimaryKey(
-            ustringToQstring(relationship->get_to_field()));
+    for (QList<GlomRelationship>::const_iterator relationship(
+        relationships.begin()); relationship != relationships.end();
+        ++relationship) {
+        const QString from(relationship->fromColumn());
+        const QString toTable(relationship->toTable());
+        const QString toPrimaryKey(relationship->toPrimaryKey());
 
         queryBuilder.equiJoinWith(toTable,
             QString("%1.%2").arg(toTable).arg(toPrimaryKey),

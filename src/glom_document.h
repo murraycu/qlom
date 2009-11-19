@@ -76,6 +76,13 @@ private:
     /** Fill tableList with tables read from the document. */
     void fillTableList();
 
+    /** Fill a GlomTable with relationships from the document.
+     *  @param[in] documentRelationships a list of relationships from the
+     document
+     *  @returns a list of relationships */
+    QList<GlomRelationship> fillRelationships(
+        Glom::Document::type_vec_relationships documentRelationships);
+
     Glom::Document *document; /**< a Glom document */
     QList<GlomTable> tableList; /**< a list of table in the document */
 };

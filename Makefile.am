@@ -10,6 +10,8 @@ src_qlom_SOURCES = src/qlom.cc \
 		   src/glom_document.h \
 		   src/glom_table.cc \
 		   src/glom_table.h \
+		   src/glom_relationship.cc \
+		   src/glom_relationship.h \
 		   src/qlom_error.cc \
 		   src/qlom_error.h \
                    src/main_window.cc \

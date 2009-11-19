@@ -19,6 +19,9 @@
 #ifndef QLOM_GLOM_TABLE_H_
 #define QLOM_GLOM_TABLE_H_
 
+#include "glom_relationship.h"
+
+#include <QList>
 #include <QString>
 
 class GlomTable
@@ -27,8 +30,10 @@ class GlomTable
 public:
     /** A table in a Glom document.
      *  @param[in] tableName the name of the table in the database
-     *  @param[in] displayName the name of the table for display */
-    GlomTable(QString tableName, QString displayName);
+     *  @param[in] displayName the name of the table for display
+     *  @param[in] relationships a list of relationships */
+    GlomTable(const QString tableName, const QString displayName,
+        const QList<GlomRelationship> relationships);
 
     /** Get the table name for display.
      *  @returns the name of the table for display */
@@ -38,9 +43,14 @@ public:
      *  @returns the name of the table for use with a database */
     QString tableName() const;
 
+    /** Get the list of relationships.
+     *  @returns the list of relationships */
+    QList<GlomRelationship> relationships() const;
+
 private:
     QString theDisplayName;
     QString theTableName;
+    QList<GlomRelationship> theRelationships;
 };
 
 #endif /* QLOM_GLOM_DOCUMENT_H_ */
