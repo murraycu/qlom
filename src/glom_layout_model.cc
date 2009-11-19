@@ -35,22 +35,24 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
 
     applyRelationships(table.relationships());
 
+    // The first item in a list layout group is always a main layout group.
     const Glib::ustring tableNameU(qstringToUstring(table.tableName()));
     const Glom::Document::type_list_layout_groups listLayout(
         document->get_data_layout_groups("list", tableNameU));
-    for (Glom::Document::type_list_layout_groups::const_iterator iter(
-        listLayout.begin()); iter != listLayout.end(); ++iter) {
-        Glom::sharedptr<Glom::LayoutGroup> layoutGroup(*iter);
-        if (!layoutGroup) {
-            continue;
-        } else {
-            createProjectionFromLayoutGroup(layoutGroup);
-        }
 
-        break;
+    QSqlQuery query;
+    if(!listLayout.empty() && "main" == listLayout[0]->get_name()) // TODO: check whether it is "main"?
+    {
+        createProjectionFromLayoutGroup(listLayout[0]);
+        query =  queryBuilder.getDistinctQuery();
     }
-
-    setQuery(QSqlQuery(queryBuilder.getDistinctQuery()));
+    else  // Display a warning message if the Glom document could not provide
+          // us with a main layout group.
+    {
+        QString noDataAvailable(tr("No data available!"));
+        query = QString("SELECT '%1' as 'ERROR'").arg(noDataAvailable);
+    }
+    setQuery(query);
 }
 
 QString GlomLayoutModel::tableDisplayName() const
