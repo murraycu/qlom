@@ -82,36 +82,32 @@ void GlomLayoutModel::applyRelationships(
 void GlomLayoutModel::createProjectionFromLayoutGroup(
     const Glom::sharedptr<const Glom::LayoutItem> &layoutItem)
 {
-    Glom::sharedptr<const Glom::LayoutGroup> layoutGroup(
-        Glom::sharedptr<const Glom::LayoutGroup>::cast_dynamic(layoutItem));
-    if (layoutGroup) {
-        const Glom::LayoutGroup::type_list_const_items
-            items(layoutGroup->get_items());
-        for (Glom::LayoutGroup::type_list_const_items::const_iterator
-            iter(items.begin()); iter != items.end(); ++iter) {
-            Glom::sharedptr<const Glom::LayoutItem> layoutItem(*iter);
+    Glom::sharedptr<const Glom::LayoutGroup> layoutGroup =
+        Glom::sharedptr<const Glom::LayoutGroup>::cast_dynamic(layoutItem);
 
+    if (layoutGroup) {
+        const Glom::LayoutGroup::type_list_const_items items = layoutGroup->get_items();
+        for (Glom::LayoutGroup::type_list_const_items::const_iterator iter = items.begin();
+             iter != items.end();
+             ++iter) {
             /* The default setting for a projection is
              * "table.col AS display_name", whereas display_name is used for
              *  the column heading.
              */
-            QString currTableName(tableName());
-            QString currColName(ustringToQstring(layoutItem->get_name()));
-            QString currDisplayName(
-                ustringToQstring(layoutItem->get_title_or_name()));
+            const QString currColName = ustringToQstring((*iter)->get_name());
+            const QString currDisplayName = ustringToQstring((*iter)->get_title_or_name());
 
             // Check whether we have an static text item to display.
-            const Glom::LayoutItem_Text* staticTextItem = dynamic_cast<const Glom::LayoutItem_Text*> (layoutItem.obj());
-            if (staticTextItem)
-            {
+            Glom::sharedptr<const Glom::LayoutItem_Text> staticTextItem =
+                Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
+
+            if (staticTextItem) {
                 queryBuilder.addProjection(QString("%1 AS %3")
                     .arg(escapeFieldAsString(ustringToQstring(staticTextItem->get_text())))
                     .arg(escapeField(currDisplayName)));
-            }
-            else
-            {
+            } else {
                 queryBuilder.addProjection(QString("%1.%2 AS %3")
-                    .arg(escapeField(currTableName))
+                    .arg(escapeField(tableName()))
                     .arg(escapeField(currColName))
                     .arg(escapeField(currDisplayName)));
             }
@@ -145,7 +141,7 @@ QVariant GlomLayoutModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    const QVariant &data = QSqlTableModel::data(index, role);
+    const QVariant data = QSqlTableModel::data(index, role);
 
     if(matchDouble.exactMatch(data.toString())) {
         QStringList doubleParts = data.toString().split(".");
