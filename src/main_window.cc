@@ -39,22 +39,18 @@
 
 #include "config.h"
 
-MainWindow::MainWindow()
+MainWindow::MainWindow() :
+    glomDocument(this)
 {
   setup();
 }
 
-MainWindow::MainWindow(const QString &filepath)
+MainWindow::MainWindow(const QString &filepath) :
+    glomDocument(this)
 {
     setup();
 
-    std::auto_ptr<QlomError> error;
-    glomDocument.loadDocument(filepath, error);
-    if(error.get()) {
-        QMessageBox::critical(this, tr("Critical error"), error->what(),
-            QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
-        return;
-    }
+    glomDocument.loadDocument(filepath);
     GlomTablesModel *model = glomDocument.createTablesModel();
     centralTreeView->setModel(model);
 
@@ -63,6 +59,15 @@ MainWindow::MainWindow(const QString &filepath)
     show();
     // Open default table.
     showDefaultTable();
+}
+
+void MainWindow::receiveError(const QlomError &error)
+{
+    if(!error.what().isNull()) {
+        QMessageBox::critical(this, tr("Critical error"), error.what(),
+            QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+        return;
+    }
 }
 
 void MainWindow::setup()
@@ -149,15 +154,9 @@ void MainWindow::fileOpenTriggered()
         fileCloseTriggered();
 
         QStringList files = dialog.selectedFiles();
-        std::auto_ptr<QlomError> error;
-        glomDocument.loadDocument(files.first(), error);
-        if(error.get()) {
-            if(error->severity() == Qlom::CRITICAL_ERROR_SEVERITY) {
-                QMessageBox::critical(this, tr("Critical error"),
-                    error->what(), QMessageBox::Ok, QMessageBox::NoButton,
-                    QMessageBox::NoButton);
-                return;
-            }
+        if(!glomDocument.loadDocument(files.first()))
+        {
+            return;
         }
 
         GlomTablesModel *model = glomDocument.createTablesModel();

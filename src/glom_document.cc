@@ -36,17 +36,18 @@
 
 #include "config.h"
 
-GlomDocument::GlomDocument() :
+GlomDocument::GlomDocument(QObject *parent) :
     document(0)
 {
     /* No document case. */
+    QObject::connect(this, SIGNAL(errorRaised(const QlomError)),
+        parent, SLOT(receiveError(const QlomError)));
 }
 
-bool GlomDocument::loadDocument(const QString &filepath,
-    std::auto_ptr<QlomError> &error)
+bool GlomDocument::loadDocument(const QString &filepath)
 {
     /* Load a Glom document with a given filename. */
-    const std::string uri(filepathToUri(filepath, error));
+    const std::string uri(filepathToUri(filepath));
     if(uri.empty()) {
         return false;
     }
@@ -57,9 +58,9 @@ bool GlomDocument::loadDocument(const QString &filepath,
     const bool test = document->load(failure_code);
     if(!test) {
         qCritical("Document loading failed with uri %s", uri.c_str());
-        error = std::auto_ptr<QlomError>(
-            new QlomError(tr("libglom failed to load the Glom document"),
-                Qlom::CRITICAL_ERROR_SEVERITY));
+        const QlomError error(tr("libglom failed to load the Glom document"),
+            Qlom::CRITICAL_ERROR_SEVERITY);
+        raiseError(error);
         return false;
     }
 
@@ -67,9 +68,10 @@ bool GlomDocument::loadDocument(const QString &filepath,
      * resaved — that would be an extra feature. */
     if(document->get_is_example_file()) {
         qCritical("Document is an example file, cannot process");
-        error = std::auto_ptr<QlomError>(new QlomError(
+        const QlomError error(
             tr("Cannot open the document because it is an example file"),
-            Qlom::CRITICAL_ERROR_SEVERITY));
+            Qlom::CRITICAL_ERROR_SEVERITY);
+        raiseError(error);
         return false;
     }
 
@@ -81,9 +83,9 @@ bool GlomDocument::loadDocument(const QString &filepath,
         // TODO: request a connection dialog from MainWindow.
         ConnectionDialog *connectionDialog = new ConnectionDialog(*document);
         if(connectionDialog->exec() != QDialog::Accepted) {
-            error = std::auto_ptr<QlomError>(new QlomError(
-                tr("Failed to connect to the PostgreSQL server"),
-                Qlom::CRITICAL_ERROR_SEVERITY));
+            const QlomError error(tr("Failed to connect to the PostgreSQL server"),
+                Qlom::CRITICAL_ERROR_SEVERITY);
+            raiseError(error);
             return false;
         }
     }
@@ -91,9 +93,9 @@ bool GlomDocument::loadDocument(const QString &filepath,
     case Glom::Document::HOSTING_MODE_SQLITE:
     {
         if(!openSqlite()) {
-            error = std::auto_ptr<QlomError>(new QlomError(
-                tr("Failed to open the SQLite database"),
-                Qlom::CRITICAL_ERROR_SEVERITY));
+            const QlomError error(tr("Failed to open the SQLite database"),
+                Qlom::CRITICAL_ERROR_SEVERITY);
+            raiseError(error);
             return false;
         }
     }
@@ -102,9 +104,10 @@ bool GlomDocument::loadDocument(const QString &filepath,
     // Fall through.
     default:
         qCritical("Database type not supported, cannot process");
-        error = std::auto_ptr<QlomError>(new QlomError(
+        const QlomError error(
             tr("Database type not supported, failed to open the Glom document"),
-            Qlom::CRITICAL_ERROR_SEVERITY));
+            Qlom::CRITICAL_ERROR_SEVERITY);
+        raiseError(error);
         return false;
         break;
     }
@@ -141,8 +144,7 @@ GlomLayoutModel* GlomDocument::createDefaultTableListLayoutModel()
     return new GlomLayoutModel(document, *table, qobject_cast<QObject*>(this));
 }
 
-std::string GlomDocument::filepathToUri(const QString &theFilepath,
-    std::auto_ptr<QlomError> &error)
+std::string GlomDocument::filepathToUri(const QString &theFilepath)
 {
     std::string filepath(theFilepath.toUtf8().constData());
     std::string uri;
@@ -154,9 +156,10 @@ std::string GlomDocument::filepathToUri(const QString &theFilepath,
     catch(const Glib::ConvertError& convertException) {
         qCritical("Exception from Glib::filename_to_uri(): %s",
             convertException.what().c_str());
-        error = std::auto_ptr<QlomError>(new QlomError(
+        const QlomError error(
             tr("Failed to convert the document file name to a URI"),
-            Qlom::CRITICAL_ERROR_SEVERITY));
+            Qlom::CRITICAL_ERROR_SEVERITY);
+        raiseError(error);
     }
 #else /* !GLIBMM_EXCEPTIONS_ENABLED */
     std::auto_ptr<Glib::Error> convertError;
@@ -164,9 +167,10 @@ std::string GlomDocument::filepathToUri(const QString &theFilepath,
     if(convertError.get()) {
         qCritical("Error from Glib::filename_to_uri(): %s",
             convertError->what());
-        error = std::auto_ptr<QlomError>(new QlomError(
+        const QlomError error(
             tr("Failed to convert the document file name to a URI"),
-            Qlom::CRITICAL_ERROR_SEVERITY));
+            Qlom::CRITICAL_ERROR_SEVERITY);
+        raiseError(error);
     }
 #endif /* GLIBMM_EXCEPTIONS_ENABLED */
 
@@ -178,11 +182,17 @@ bool GlomDocument::openSqlite()
     const QString backend("QSQLITE");
     QSqlDatabase db(QSqlDatabase::addDatabase(backend));
 
-    const QSqlError error(db.lastError());
-    if (error.isValid()) {
+    const QSqlError sqlError(db.lastError());
+    if (sqlError.isValid()) {
         // TODO: Give feedback in the UI.
         qCritical("Database backend \"%s\" does not exist\nError details: %s",
-            backend.toUtf8().constData(), error.text().toUtf8().constData());
+            backend.toUtf8().constData(),
+            sqlError.text().toUtf8().constData());
+        const QlomError error(
+            tr("%1 database backend does not exist. Further details:\n%2")
+                .arg(backend).arg(sqlError.text()),
+                Qlom::CRITICAL_ERROR_SEVERITY);
+        raiseError(error);
         return false;
     }
 
@@ -257,7 +267,7 @@ void GlomDocument::fillTableList()
                 relationships));
         }
     } else {
-        qCritical("Filling tableList when it it not empty");
+        qWarning("Filling tableList when it it not empty");
         tableList.clear();
         fillTableList(); // Recurse.
     }

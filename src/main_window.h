@@ -22,9 +22,7 @@
 #include "glom_document.h"
 #include <QMainWindow>
 
-class QDialog;
 class QModelIndex;
-class QSqlRelationalTableModel;
 class QTreeView;
 
 class MainWindow : public QMainWindow
@@ -41,6 +39,11 @@ public:
     explicit MainWindow(const QString &filepath);
 
     virtual ~MainWindow();
+
+public Q_SLOTS:
+    /** Receive errors.
+     *  @param error the error */
+    void receiveError(const QlomError &error);
 
 private:
     /** General setup method. */

@@ -12,6 +12,9 @@ src_qlom_SOURCES = src/qlom.cc \
 		   src/glom_table.h \
 		   src/glom_relationship.cc \
 		   src/glom_relationship.h \
+		   src/error_reporter.cc \
+		   src/error_reporter.moc.cc \
+		   src/error_reporter.h \
 		   src/qlom_error.cc \
 		   src/qlom_error.h \
                    src/main_window.cc \
@@ -40,6 +43,7 @@ src_qlom_LDFLAGS  = $(QT_LDFLAGS)
 src_qlom_LDADD = $(QT_LIBS) $(QLOM_LIBS)
 
 BUILT_SOURCES = src/glom_document.moc.cc \
+		src/error_reporter.moc.cc \
                 src/main_window.moc.cc \
                 src/glom_tables_model.moc.cc \
                 src/glom_layout_model.moc.cc \
