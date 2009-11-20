@@ -42,7 +42,9 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
         document->get_data_layout_groups("list", tableNameU));
 
     QSqlQuery query;
-    if(!listLayout.empty() && "main" == listLayout[0]->get_name()) // TODO: check whether it is "main"?
+    // TODO: wrap in a get_list_model, so that the checks are kept together in
+    // one place.
+    if(1 == listLayout.size())
     {
         createProjectionFromLayoutGroup(listLayout[0]);
         query = queryBuilder.getDistinctSqlQuery();
@@ -50,8 +52,8 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
     else  // Display a warning message if the Glom document could not provide
           // us with a main layout group.
     {
-        QString noDataAvailable(tr("No data available!"));
-        query = QSqlQuery(QString("SELECT '%1' as 'ERROR'").arg(noDataAvailable));
+        query = QSqlQuery(QString("SELECT 'no data to show' as 'ERROR'"));
+        qDebug("GlomLayoutModel: no list model found.");
     }
     setQuery(query);
 }
@@ -103,7 +105,7 @@ void GlomLayoutModel::createProjectionFromLayoutGroup(
             if (staticTextItem)
             {
                 queryBuilder.addProjection(QString("%1 AS %3")
-                    .arg(escapeField(ustringToQstring(staticTextItem->get_text())))
+                    .arg(escapeFieldAsString(ustringToQstring(staticTextItem->get_text())))
                     .arg(escapeField(currDisplayName)));
             }
             else
@@ -117,10 +119,24 @@ void GlomLayoutModel::createProjectionFromLayoutGroup(
     }
 }
 
+QString GlomLayoutModel::escapeFieldAsString(QString field) const
+{
+    /* QtSql only knows about 2 roles for escaping in a projection:
+     * 1. QSqlDriver::FieldName,
+     * 2. QSqlDriver::TableName.
+     * In fact, there is a 3rd role, namely type primitives: "SELECT 1",
+     * "SELECT 'aString'", ... where the escapeIdentifier call, for an
+     * imaginary role "QSqlDriver::Primitive", would escape using single quotes.
+     */
+
+    return ('\'' + field.replace("'", "''") + '\'');
+}
+
 QString GlomLayoutModel::escapeField(QString field) const
 {
     return database().driver()->escapeIdentifier(field, QSqlDriver::FieldName);
 }
+
 QVariant GlomLayoutModel::data(const QModelIndex &index, int role) const
 {
     static const QRegExp matchDouble("\\d+\\.\\d+");
