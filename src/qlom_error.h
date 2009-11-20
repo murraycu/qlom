@@ -38,6 +38,10 @@ public:
     /** Creates a blank error. */
     QlomError();
 
+    /** Copy constructor.
+     *  @param other the other error to copy */
+    QlomError(const QlomError &other);
+
     /** Creates an error with a description and a severity level.
      *  @param[in] what a description of the error
      *  @param[in] severity the severity of the error */
@@ -51,9 +55,19 @@ public:
      *  @returns the severity level of the error */
     Qlom::QlomErrorSeverity severity() const;
 
+    bool operator==(const QlomError &other) const;
+
+    bool operator!=(const QlomError &other) const;
+
+    QlomError& operator=(const QlomError& other);
+
+    /** Simple swap implementation
+     *  @param[in,out] other the error to swap */
+    void swap(QlomError& other);
+
 private:
-    const QString description; /**< the description of the error */
-    const quint8 severityLevel; /**< the severity of the error */
+    QString description; /**< the description of the error */
+    quint8 severityLevel; /**< the severity of the error */
 };
 
 #endif /* QLOM_QLOM_ERROR_H_ */

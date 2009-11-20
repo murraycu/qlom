@@ -18,14 +18,22 @@
 
 #include "qlom_error.h"
 
+#include <algorithm>
+
 QlomError::QlomError() :
     severityLevel(0)
 {
 }
 
+QlomError::QlomError(const QlomError &other) :
+    description(other.what()),
+    severityLevel(other.severity())
+{
+}
+
 QlomError::QlomError(QString what, Qlom::QlomErrorSeverity severity) :
-  description(what),
-  severityLevel(severity)
+    description(what),
+    severityLevel(severity)
 {
 }
 
@@ -41,4 +49,31 @@ QString QlomError::what() const
 Qlom::QlomErrorSeverity QlomError::severity() const
 {
     return static_cast<Qlom::QlomErrorSeverity>(severityLevel);
+}
+
+bool QlomError::operator==(const QlomError &other) const
+{
+    if(what() == other.what() && severity() == other.severity()) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool QlomError::operator!=(const QlomError &other) const
+{
+    return !(*this == other);
+}
+
+QlomError& QlomError::operator=(const QlomError& other)
+{
+    QlomError temp(other);
+    swap(temp);
+    return *this;
+}
+
+void QlomError::swap(QlomError& other)
+{
+    std::swap(description, other.description);
+    std::swap(severityLevel, other.severityLevel);
 }
