@@ -19,10 +19,8 @@
 #include "main_window.h"
 
 #include <iostream>
-#include <list>
 
 #include <QApplication>
-#include <QString>
 
 #include <libglom/init.h>
 
@@ -43,7 +41,7 @@ int main(int argc, char **argv)
 
     Glom::libglom_init();
 
-    std::list<QString> options = app.arguments().toStdList();
+    const QStringList options = app.arguments();
     MainWindow *mainWindow = 0;
     switch (options.size()) {
     case 1:
