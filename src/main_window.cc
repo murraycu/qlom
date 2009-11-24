@@ -54,8 +54,8 @@ MainWindow::MainWindow(const QString &filepath) :
     GlomTablesModel *model = glomDocument.createTablesModel();
     centralTreeView->setModel(model);
 
-    connect(centralTreeView, SIGNAL(doubleClicked(const QModelIndex&)),
-        this, SLOT(treeviewDoubleclicked(const QModelIndex&)));
+    connect(centralTreeView, SIGNAL(doubleClicked(QModelIndex)),
+        this, SLOT(treeviewDoubleclicked(QModelIndex)));
     show();
     // Open default table.
     showDefaultTable();
@@ -110,14 +110,14 @@ void MainWindow::setup()
     QMenu *aboutMenu = menuBar()->addMenu(tr("&Help"));
     aboutMenu->addAction(helpAbout);
 
-    QObject::connect(
-        fileOpen, SIGNAL(triggered(bool)), this, SLOT(fileOpenTriggered()));
-    QObject::connect(
-        fileClose, SIGNAL(triggered(bool)), this, SLOT(fileCloseTriggered()));
-    QObject::connect(
-        fileQuit, SIGNAL(triggered(bool)), this, SLOT(fileQuitTriggered()));
-    QObject::connect(
-        helpAbout, SIGNAL(triggered(bool)), this, SLOT(helpAboutTriggered()));
+    connect(fileOpen, SIGNAL(triggered(bool)),
+        this, SLOT(fileOpenTriggered()));
+    connect(fileClose, SIGNAL(triggered(bool)),
+        this, SLOT(fileCloseTriggered()));
+    connect(fileQuit, SIGNAL(triggered(bool)),
+        this, SLOT(fileQuitTriggered()));
+    connect(helpAbout, SIGNAL(triggered(bool)),
+        this, SLOT(helpAboutTriggered()));
 
     centralTreeView = new QTreeView(this);
     setCentralWidget(centralTreeView);
@@ -199,8 +199,8 @@ void MainWindow::fileCloseTriggered()
     centralTreeView->deleteLater();
     centralTreeView = new QTreeView(this);
     setCentralWidget(centralTreeView);
-    connect(centralTreeView, SIGNAL(doubleClicked(const QModelIndex&)),
-        this, SLOT(treeviewDoubleclicked(const QModelIndex&)));
+    connect(centralTreeView, SIGNAL(doubleClicked(QModelIndex)),
+        this, SLOT(treeviewDoubleclicked(QModelIndex)));
 }
 
 void MainWindow::fileQuitTriggered()

@@ -40,8 +40,8 @@ GlomDocument::GlomDocument(QObject *parent) :
     document(0)
 {
     /* No document case. */
-    QObject::connect(this, SIGNAL(errorRaised(const QlomError)),
-        parent, SLOT(receiveError(const QlomError)));
+    connect(this, SIGNAL(errorRaised(QlomError)),
+        parent, SLOT(receiveError(QlomError)));
 }
 
 bool GlomDocument::loadDocument(const QString &filepath)
