@@ -64,8 +64,19 @@ MainWindow::MainWindow(const QString &filepath) :
 void MainWindow::receiveError(const QlomError &error)
 {
     if(!error.what().isNull()) {
-        QMessageBox::critical(this, tr("Critical error"), error.what(),
-            QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+        QMessageBox dialog(this);
+        dialog.setText(errorDomainLookup(error.domain()));
+        dialog.setDetailedText(error.what());
+
+        // Set icon style and dialog title according to error severity.
+        switch (error.severity()) {
+        case Qlom::CRITICAL_ERROR_SEVERITY:
+            dialog.setWindowTitle(tr("Critical error"));
+            dialog.setIcon(QMessageBox::Critical);
+            break;
+        }
+
+        dialog.exec();
         return;
     }
 }
@@ -142,6 +153,23 @@ void MainWindow::readSettings()
     QSettings settings;
     resize(settings.value("MainWindow/Size", sizeHint()).toSize());
     restoreState(settings.value("MainWindow/InternalProperties").toByteArray());
+}
+
+QString MainWindow::errorDomainLookup(
+    const Qlom::QlomErrorDomain errorDomain)
+{
+    switch (errorDomain) {
+    case Qlom::DOCUMENT_ERROR_DOMAIN:
+        return tr("An error occurred while reading the Glom Document");
+        break;
+    case Qlom::DATABASE_ERROR_DOMAIN:
+        return tr("An error occurred with the database");
+        break;
+    default:
+        qCritical("Unhandled error domain: %i", errorDomain);
+        return tr("Unhandled error domain");
+        break;
+    }
 }
 
 void MainWindow::fileOpenTriggered()

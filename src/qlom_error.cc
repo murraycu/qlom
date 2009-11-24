@@ -26,15 +26,23 @@ QlomError::QlomError() :
 }
 
 QlomError::QlomError(const QlomError &other) :
+    errorDomain(other.domain()),
     description(other.what()),
     severityLevel(other.severity())
 {
 }
 
-QlomError::QlomError(QString what, Qlom::QlomErrorSeverity severity) :
+QlomError::QlomError(const Qlom::QlomErrorDomain domain, const QString &what,
+    const Qlom::QlomErrorSeverity severity) :
+    errorDomain(domain),
     description(what),
     severityLevel(severity)
 {
+}
+
+Qlom::QlomErrorDomain QlomError::domain() const
+{
+    return static_cast<Qlom::QlomErrorDomain>(errorDomain);
 }
 
 QString QlomError::what() const
@@ -53,7 +61,8 @@ Qlom::QlomErrorSeverity QlomError::severity() const
 
 bool QlomError::operator==(const QlomError &other) const
 {
-    if(what() == other.what() && severity() == other.severity()) {
+    if(domain() == other.domain()
+        && what() == other.what() && severity() == other.severity()) {
         return true;
     } else {
         return false;
@@ -74,6 +83,7 @@ QlomError& QlomError::operator=(const QlomError& other)
 
 void QlomError::swap(QlomError& other)
 {
+    std::swap(errorDomain, other.errorDomain);
     std::swap(description, other.description);
     std::swap(severityLevel, other.severityLevel);
 }

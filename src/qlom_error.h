@@ -24,6 +24,11 @@
 namespace Qlom
 {
 
+enum QlomErrorDomain {
+    DOCUMENT_ERROR_DOMAIN, /** error in Glom document-handling */
+    DATABASE_ERROR_DOMAIN
+};
+
 enum QlomErrorSeverity {
     CRITICAL_ERROR_SEVERITY /**< critical errors which indicate that the
                                  requested action failed */
@@ -43,9 +48,15 @@ public:
     QlomError(const QlomError &other);
 
     /** Creates an error with a description and a severity level.
+     *  @param[in] domain the domain of the error
      *  @param[in] what a description of the error
      *  @param[in] severity the severity of the error */
-    explicit QlomError(QString what, Qlom::QlomErrorSeverity severity);
+    QlomError(const Qlom::QlomErrorDomain domain, const QString &what,
+        const Qlom::QlomErrorSeverity severity);
+
+    /** Requests the domain of the error.
+     *  @returns the domain of the error */
+    Qlom::QlomErrorDomain domain() const;
 
     /** Requests the description of the error.
      *  @returns a description of the error */
@@ -66,6 +77,7 @@ public:
     void swap(QlomError& other);
 
 private:
+    quint8 errorDomain; /**< the debug domain of the error */
     QString description; /**< the description of the error */
     quint8 severityLevel; /**< the severity of the error */
 };

@@ -39,6 +39,8 @@ class GlomDocument : public ErrorReporter
     Q_OBJECT
 
 public:
+    /** A Glom document.
+     *  @param[in] parent a parent object, which errors will be sent to */
     GlomDocument(QObject *parent = 0);
 
     /** Load a Glom document from a file.
@@ -51,6 +53,7 @@ public:
     GlomTablesModel* createTablesModel();
 
     /** Get a layout from the document.
+     *  @param[in] tableName the name of the table to provide a layout for
      *  @returns a model of the layout */
     GlomLayoutModel* createListLayoutModel(const QString &tableName);
 
@@ -66,8 +69,8 @@ private:
 
     /** Open an SQLite database connection.
      *  Creates and opens a default QSqlDatabase connection.
-     *
-     *  @see ConnectionDialog */
+     *  @see ConnectionDialog
+     *  @returns true on success, false on failure */
     bool openSqlite();
 
     /** Fill tableList with tables read from the document. */

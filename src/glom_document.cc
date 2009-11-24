@@ -46,19 +46,22 @@ GlomDocument::GlomDocument(QObject *parent) :
 
 bool GlomDocument::loadDocument(const QString &filepath)
 {
-    /* Load a Glom document with a given filename. */
+    // filepathToUri raises an error if it fails.
     const std::string uri(filepathToUri(filepath));
     if(uri.empty()) {
+        qCritical("Empty file URI");
         return false;
     }
 
+    // Load a Glom document with a given file URI.
     document = new Glom::Document();
     document->set_file_uri(uri);
     int failure_code = 0;
     const bool test = document->load(failure_code);
     if(!test) {
         qCritical("Document loading failed with uri %s", uri.c_str());
-        const QlomError error(tr("libglom failed to load the Glom document"),
+        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
+            tr("libglom failed to load the Glom document"),
             Qlom::CRITICAL_ERROR_SEVERITY);
         raiseError(error);
         return false;
@@ -68,7 +71,7 @@ bool GlomDocument::loadDocument(const QString &filepath)
      * resaved — that would be an extra feature. */
     if(document->get_is_example_file()) {
         qCritical("Document is an example file, cannot process");
-        const QlomError error(
+        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("Cannot open the document because it is an example file"),
             Qlom::CRITICAL_ERROR_SEVERITY);
         raiseError(error);
@@ -83,7 +86,8 @@ bool GlomDocument::loadDocument(const QString &filepath)
         // TODO: request a connection dialog from MainWindow.
         ConnectionDialog *connectionDialog = new ConnectionDialog(*document);
         if(connectionDialog->exec() != QDialog::Accepted) {
-            const QlomError error(tr("Failed to connect to the PostgreSQL server"),
+            const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
+                tr("Failed to connect to the PostgreSQL server"),
                 Qlom::CRITICAL_ERROR_SEVERITY);
             raiseError(error);
             return false;
@@ -93,7 +97,8 @@ bool GlomDocument::loadDocument(const QString &filepath)
     case Glom::Document::HOSTING_MODE_SQLITE:
     {
         if(!openSqlite()) {
-            const QlomError error(tr("Failed to open the SQLite database"),
+            const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
+                tr("Failed to open the SQLite database"),
                 Qlom::CRITICAL_ERROR_SEVERITY);
             raiseError(error);
             return false;
@@ -104,7 +109,7 @@ bool GlomDocument::loadDocument(const QString &filepath)
     // Fall through.
     default:
         qCritical("Database type not supported, cannot process");
-        const QlomError error(
+        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("Database type not supported, failed to open the Glom document"),
             Qlom::CRITICAL_ERROR_SEVERITY);
         raiseError(error);
@@ -146,7 +151,7 @@ GlomLayoutModel* GlomDocument::createDefaultTableListLayoutModel()
 
 std::string GlomDocument::filepathToUri(const QString &theFilepath)
 {
-    std::string filepath(theFilepath.toUtf8().constData());
+    const std::string filepath(theFilepath.toUtf8().constData());
     std::string uri;
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -156,7 +161,7 @@ std::string GlomDocument::filepathToUri(const QString &theFilepath)
     catch(const Glib::ConvertError& convertException) {
         qCritical("Exception from Glib::filename_to_uri(): %s",
             convertException.what().c_str());
-        const QlomError error(
+        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("Failed to convert the document file name to a URI"),
             Qlom::CRITICAL_ERROR_SEVERITY);
         raiseError(error);
@@ -167,7 +172,7 @@ std::string GlomDocument::filepathToUri(const QString &theFilepath)
     if(convertError.get()) {
         qCritical("Error from Glib::filename_to_uri(): %s",
             convertError->what());
-        const QlomError error(
+        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("Failed to convert the document file name to a URI"),
             Qlom::CRITICAL_ERROR_SEVERITY);
         raiseError(error);
@@ -188,7 +193,7 @@ bool GlomDocument::openSqlite()
         qCritical("Database backend \"%s\" does not exist\nError details: %s",
             backend.toUtf8().constData(),
             sqlError.text().toUtf8().constData());
-        const QlomError error(
+        const QlomError error(Qlom::DATABASE_ERROR_DOMAIN,
             tr("%1 database backend does not exist. Further details:\n%2")
                 .arg(backend).arg(sqlError.text()),
                 Qlom::CRITICAL_ERROR_SEVERITY);
@@ -239,6 +244,10 @@ bool GlomDocument::openSqlite()
         db.setDatabaseName(filename);
     } else {
         qCritical("Sqlite database does not exist");
+        const QlomError error(Qlom::DATABASE_ERROR_DOMAIN,
+            tr("The SQLite database listed in the Glom document does not exist"),
+            Qlom::CRITICAL_ERROR_SEVERITY);
+        raiseError(error);
         return false;
     }
 
