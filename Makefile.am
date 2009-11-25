@@ -34,7 +34,7 @@ src_qlom_SOURCES = src/qlom.cc \
                    src/query_builder.cc \
                    src/query_builder.h
 
-qlom_includes = -I$(top_builddir) -I$(top_srcdir)/src
+qlom_includes = -I$(top_builddir)
 
 src_qlom_CXXFLAGS = $(qlom_includes) $(QT_CXXFLAGS) $(QLOM_CFLAGS) \
                     $(QLOM_WARNINGS)
