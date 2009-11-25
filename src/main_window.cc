@@ -128,7 +128,7 @@ void MainWindow::setup()
     connect(helpAbout, SIGNAL(triggered(bool)),
         this, SLOT(helpAboutTriggered()));
 
-    connect(&theErrorReporter, SIGNAL(errorRaised(QlomError)),
+    connect(&glomDocument.errorReporter(), SIGNAL(errorRaised(QlomError)),
         this, SLOT(receiveError(QlomError)));
 
     centralTreeView = new QTreeView(this);
@@ -228,7 +228,8 @@ void MainWindow::helpAboutTriggered()
 void MainWindow::treeviewDoubleclicked(const QModelIndex& index)
 {
     const QString &tableName = index.data(Qlom::TableNameRole).toString();
-    GlomLayoutModel *model = glomDocument.createListLayoutModel(tableName, &theErrorReporter);
+    GlomLayoutModel *model =
+      glomDocument.createListLayoutModel(tableName);
 
     connect(model, SIGNAL(errorRaised(QlomError)),
             this,  SLOT(receiveError(QlomError)));
@@ -250,7 +251,8 @@ void MainWindow::treeviewDoubleclicked(const QModelIndex& index)
 
 void MainWindow::showDefaultTable()
 {
-    GlomLayoutModel *model = glomDocument.createDefaultTableListLayoutModel(&theErrorReporter);
+    GlomLayoutModel *model =
+      glomDocument.createDefaultTableListLayoutModel();
     QMainWindow *tableModelWindow = new QMainWindow(this);
     QTableView *view = new QTableView(tableModelWindow);
 

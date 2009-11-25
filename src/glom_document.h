@@ -24,8 +24,6 @@ namespace Glom
 class Document;
 };
 
-class MainWindow;
-
 #include "glom_tables_model.h"
 #include "glom_layout_model.h"
 #include "glom_table.h"
@@ -33,17 +31,18 @@ class MainWindow;
 
 #include <memory>
 #include <string>
+
 #include <QList>
 #include <QString>
 
-class GlomDocument : public ErrorReporter
+class GlomDocument : public QObject
 {
     Q_OBJECT
 
 public:
     /** A Glom document.
      *  @param[in] parent a parent object, which errors will be sent to */
-    GlomDocument(MainWindow *parent = 0);
+    GlomDocument(QObject *parent = 0);
 
     /** Load a Glom document from a file.
      *  @param[in] filepath the location of the Glom document
@@ -56,15 +55,16 @@ public:
 
     /** Get a layout from the document.
      *  @param[in] tableName the name of the table to provide a layout for
-     *  @param[in] error the error reporting facility to be used by the model
      *  @returns a model of the layout */
-    GlomLayoutModel* createListLayoutModel(const QString &tableName,
-        ErrorReporter* error);
+    GlomLayoutModel* createListLayoutModel(const QString &tableName);
 
     /** Get a layout of the default table from the document.
-     *  @param[in] error the error reporting facility to be used by the model
      *  @returns a model of the layout */
-    GlomLayoutModel* createDefaultTableListLayoutModel(ErrorReporter* error);
+    GlomLayoutModel* createDefaultTableListLayoutModel();
+
+    /** Get the error reporter object.
+     *  @returns a reference to the error reporter */
+    ErrorReporter & errorReporter();
 
 private:
     /** Convert a filepath to a URI.
@@ -89,6 +89,7 @@ private:
         const Glom::Document::type_vec_relationships &documentRelationships);
 
     Glom::Document *document; /**< a Glom document */
+    ErrorReporter theErrorReporter; /**< an error-reporting object */
     QList<GlomTable> tableList; /**< a list of table in the document */
 };
 

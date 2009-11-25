@@ -68,7 +68,6 @@ private:
 
     GlomDocument glomDocument; /**< a Glom document to view */
     QTreeView *centralTreeView; /**< a tree view for the table names model */
-
     ErrorReporter theErrorReporter; /** < an error reporting facility that can
                                           be used in lieu of C++ exceptions. */
 

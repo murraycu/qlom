@@ -32,7 +32,8 @@
   */
 // We don't check for nullptr in document and error?
 GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
-    const GlomTable &table, QObject *parent, QSqlDatabase db) :
+    const GlomTable &table, ErrorReporter &error,
+    QObject *parent, QSqlDatabase db) :
     QSqlRelationalTableModel(parent, db),
     theTableDisplayName(table.displayName()), // TODO: Add GlomTable member.
     theErrorReporter(error)
@@ -47,18 +48,16 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
     const Glom::Document::type_list_layout_groups listLayout(
         document->get_data_layout_groups("list", tableNameU));
 
-    // TODO: wrap in a get_list_model, so that the checks are kept together in
-    // one place.
-    if(1 == listLayout.size())
-    {
+    /* TODO: wrap in a get_list_model, so that the checks are kept together in
+     * one place. */
+    if (1 == listLayout.size()) {
         createProjectionFromLayoutGroup(listLayout[0]);
         QSqlQuery query = queryBuilder.getDistinctSqlQuery();
         setQuery(query);
-    }
-    else  // Display a warning message if the Glom document could not provide
-          // us with a main layout group.
-    {
-        theErrorReporter->raiseError(QlomError(Qlom::DATABASE_ERROR_DOMAIN,
+    } else {
+        /* Display a warning message if the Glom document could not provide
+         * us with a main layout group. */
+        error.raiseError(QlomError(Qlom::DATABASE_ERROR_DOMAIN,
             tr("GlomLayoutModel: no list model found."),
             Qlom::WARNING_ERROR_SEVERITY));
     }
@@ -92,18 +91,20 @@ void GlomLayoutModel::createProjectionFromLayoutGroup(
         Glom::sharedptr<const Glom::LayoutGroup>::cast_dynamic(layoutItem);
 
     if (layoutGroup) {
-        const Glom::LayoutGroup::type_list_const_items items = layoutGroup->get_items();
-        for (Glom::LayoutGroup::type_list_const_items::const_iterator iter = items.begin();
-             iter != items.end();
-             ++iter) {
+        const Glom::LayoutGroup::type_list_const_items items =
+          layoutGroup->get_items();
+        for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
+            items.begin();
+            iter != items.end();
+            ++iter) {
             /* The default setting for a projection is
              * "table.col AS display_name", whereas display_name is used for
-             *  the column heading.
-             */
+             *  the column heading. */
             const QString currColName = ustringToQstring((*iter)->get_name());
-            const QString currDisplayName = ustringToQstring((*iter)->get_title_or_name());
+            const QString currDisplayName =
+                ustringToQstring((*iter)->get_title_or_name());
 
-            // Check whether we have an static text item to display.
+            // Check whether we have a static text item to display.
             Glom::sharedptr<const Glom::LayoutItem_Text> staticTextItem =
                 Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
 

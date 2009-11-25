@@ -45,7 +45,7 @@ public:
      *  @param[in] parent a parent QObject
      *  @param[in] db a database connection, or the default connection */
     explicit GlomLayoutModel(const Glom::Document *document,
-        const GlomTable &table, ErrorReporter *error, QObject *parent = 0,
+        const GlomTable &table, ErrorReporter &error, QObject *parent = 0,
         QSqlDatabase db = QSqlDatabase());
 
     /** Get the table name used in the model.
@@ -72,7 +72,7 @@ private:
     QlomQueryBuilder queryBuilder; /**< an SQL query builder which is used to
                                         fill the model */
     QString theTableDisplayName; /**< the display name of the layout table */
-    ErrorReporter* theErrorReporter; /**< the facility used to report
+    ErrorReporter &theErrorReporter; /**< the facility used to report
                                           errors, a dynamic dependency */
 
     QString escapeFieldAsString(QString field) const;
