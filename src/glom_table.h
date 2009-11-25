@@ -32,8 +32,8 @@ public:
      *  @param[in] tableName the name of the table in the database
      *  @param[in] displayName the name of the table for display
      *  @param[in] relationships a list of relationships */
-    GlomTable(const QString tableName, const QString displayName,
-        const QList<GlomRelationship> relationships);
+    GlomTable(const QString &tableName, const QString &displayName,
+        const QList<GlomRelationship> &relationships);
 
     /** Get the table name for display.
      *  @returns the name of the table for display */

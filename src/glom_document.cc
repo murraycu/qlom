@@ -285,7 +285,7 @@ void GlomDocument::fillTableList()
 }
 
 QList<GlomRelationship> GlomDocument::fillRelationships(
-    Glom::Document::type_vec_relationships documentRelationships)
+    const Glom::Document::type_vec_relationships &documentRelationships)
 {
     QList<GlomRelationship> relationships;
     for (Glom::Document::type_vec_relationships::const_iterator iter(

@@ -18,8 +18,8 @@
 
 #include "glom_relationship.h"
 
-GlomRelationship::GlomRelationship(const QString fromColumn,
-    const QString toTable, const QString toPrimaryKey) :
+GlomRelationship::GlomRelationship(const QString &fromColumn,
+    const QString &toTable, const QString &toPrimaryKey) :
     theFromColumn(fromColumn),
     theToTable(toTable),
     theToPrimaryKey(toPrimaryKey)

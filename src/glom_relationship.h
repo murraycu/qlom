@@ -28,8 +28,8 @@ public:
      *  @param[in] fromColumn source column for the relationship
      *  @param[in] toTable destination table for the reationship
      *  @param[in] toPrimaryKey destination primary key of the relationship */
-    GlomRelationship(const QString fromColumn, const QString toTable,
-        const QString toPrimaryKey);
+    GlomRelationship(const QString &fromColumn, const QString &toTable,
+        const QString &toPrimaryKey);
 
     /** Get the source column of the relationship.
      *  @returns the source column. */

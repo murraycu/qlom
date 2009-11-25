@@ -27,7 +27,7 @@
 #include <QRegExp>
 
 GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
-    const GlomTable table, QObject *parent, QSqlDatabase db) :
+    const GlomTable &table, QObject *parent, QSqlDatabase db) :
     QSqlRelationalTableModel(parent, db),
     theTableDisplayName(table.displayName()) // TODO: Add GlomTable member.
 {
@@ -64,7 +64,7 @@ QString GlomLayoutModel::tableDisplayName() const
 }
 
 void GlomLayoutModel::applyRelationships(
-    const QList<GlomRelationship> relationships)
+    const QList<GlomRelationship> &relationships)
 {
     for (QList<GlomRelationship>::const_iterator relationship(
         relationships.begin()); relationship != relationships.end();

@@ -43,7 +43,7 @@ public:
      *  @param[in] parent a parent QObject
      *  @param[in] db a database connection, or the default connection */
     explicit GlomLayoutModel(const Glom::Document *document,
-        const GlomTable table, QObject *parent = 0,
+        const GlomTable &table, QObject *parent = 0,
         QSqlDatabase db = QSqlDatabase());
 
     /** Get the table name used in the model.
@@ -59,7 +59,7 @@ private:
 
     /** Read relationships from the Glom document, and apply them to the model.
      *  @param[in] relationships a list of relationships to apply */
-    void applyRelationships(const QList<GlomRelationship> relationships);
+    void applyRelationships(const QList<GlomRelationship> &relationships);
 
     /** Discard columns that are not mentioned in the document.
      *  @param[in] layoutItem the layout containing the columns that should not
@@ -67,10 +67,12 @@ private:
     void createProjectionFromLayoutGroup(
         const Glom::sharedptr<const Glom::LayoutItem> &layoutItem);
 
-    QlomQueryBuilder queryBuilder; /**< an SQL query builder */
-    QString theTableDisplayName;
     QString escapeFieldAsString(QString field) const;
+
     QString escapeField(QString field) const;
+
+    QlomQueryBuilder queryBuilder; /**< an SQL query builder */
+    QString theTableDisplayName; /**< the display name of the layout table */
 };
 
 #endif /* QLOM_GLOM_LAYOUT_MODEL_H_ */

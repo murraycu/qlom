@@ -81,7 +81,7 @@ private:
      document
      *  @returns a list of relationships */
     QList<GlomRelationship> fillRelationships(
-        Glom::Document::type_vec_relationships documentRelationships);
+        const Glom::Document::type_vec_relationships &documentRelationships);
 
     Glom::Document *document; /**< a Glom document */
     QList<GlomTable> tableList; /**< a list of table in the document */

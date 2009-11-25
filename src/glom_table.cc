@@ -18,8 +18,8 @@
 
 #include "glom_table.h"
 
-GlomTable::GlomTable(const QString tableName, const QString displayName,
-    const QList<GlomRelationship> relationships) :
+GlomTable::GlomTable(const QString &tableName, const QString &displayName,
+    const QList<GlomRelationship> &relationships) :
     theDisplayName(displayName),
     theTableName(tableName),
     theRelationships(relationships)
