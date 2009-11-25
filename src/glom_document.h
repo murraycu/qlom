@@ -24,6 +24,8 @@ namespace Glom
 class Document;
 };
 
+class MainWindow;
+
 #include "glom_tables_model.h"
 #include "glom_layout_model.h"
 #include "glom_table.h"
@@ -41,7 +43,7 @@ class GlomDocument : public ErrorReporter
 public:
     /** A Glom document.
      *  @param[in] parent a parent object, which errors will be sent to */
-    GlomDocument(QObject *parent = 0);
+    GlomDocument(MainWindow *parent = 0);
 
     /** Load a Glom document from a file.
      *  @param[in] filepath the location of the Glom document

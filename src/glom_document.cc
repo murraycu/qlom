@@ -21,6 +21,8 @@
 #include "glom_tables_model.h"
 #include "connection_dialog.h"
 #include "utils.h"
+// TODO: remove the cyclic dependency of MainWindow and GlomDocument
+#include "main_window.h"
 
 #include <QDialog>
 #include <QFile>
@@ -36,7 +38,7 @@
 
 #include "config.h"
 
-GlomDocument::GlomDocument(QObject *parent) :
+GlomDocument::GlomDocument(MainWindow *parent) :
     document(0)
 {
     /* No document case. */
