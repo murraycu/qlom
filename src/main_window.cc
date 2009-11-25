@@ -73,11 +73,16 @@ void MainWindow::receiveError(const QlomError &error)
         case Qlom::CRITICAL_ERROR_SEVERITY:
             dialog.setWindowTitle(tr("Critical error"));
             dialog.setIcon(QMessageBox::Critical);
-            break;
+            //break;
         }
 
         dialog.exec();
-        return;
+    }
+
+    // If the error message was non-empty then the error message was shown to the user, too.
+    // What's left to do is to shutdown the application.
+    if(Qlom::CRITICAL_ERROR_SEVERITY == error.severity()) {
+        exit(EXIT_FAILURE);
     }
 }
 
