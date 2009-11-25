@@ -21,6 +21,7 @@
 
 #include "glom_table.h"
 #include "query_builder.h"
+#include "error_reporter.h"
 
 #include <QSqlDatabase>
 #include <QSqlRelationalTableModel>
@@ -28,7 +29,7 @@
 #include <libglom/document/document.h>
 
 /** A model to show rows of data from a Glom database. */
-class GlomLayoutModel : public QSqlRelationalTableModel
+class GlomLayoutModel : public QSqlRelationalTableModel, public ErrorReporter
 {
     Q_OBJECT
 

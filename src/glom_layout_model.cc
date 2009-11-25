@@ -18,6 +18,7 @@
 
 #include "glom_layout_model.h"
 #include "utils.h"
+#include "qlom_error.h"
 
 #include <QSqlQuery>
 #include <QSqlIndex>
@@ -41,21 +42,21 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
     const Glom::Document::type_list_layout_groups listLayout(
         document->get_data_layout_groups("list", tableNameU));
 
-    QSqlQuery query;
     // TODO: wrap in a get_list_model, so that the checks are kept together in
     // one place.
     if(1 == listLayout.size())
     {
         createProjectionFromLayoutGroup(listLayout[0]);
-        query = queryBuilder.getDistinctSqlQuery();
+        QSqlQuery query = queryBuilder.getDistinctSqlQuery();
+        setQuery(query);
     }
     else  // Display a warning message if the Glom document could not provide
           // us with a main layout group.
     {
-        query = QSqlQuery(QString("SELECT 'no data to show' as 'ERROR'"));
-        qDebug("GlomLayoutModel: no list model found.");
+        raiseError(QlomError(Qlom::DATABASE_ERROR_DOMAIN,
+            tr("GlomLayoutModel: no list model found."),
+            Qlom::WARNING_ERROR_SEVERITY));
     }
-    setQuery(query);
 }
 
 QString GlomLayoutModel::tableDisplayName() const

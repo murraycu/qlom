@@ -30,6 +30,8 @@ enum QlomErrorDomain {
 };
 
 enum QlomErrorSeverity {
+    WARNING_ERROR_SEVERITY, /**< warnings indicate that a non-critical request
+                                 failed */
     CRITICAL_ERROR_SEVERITY /**< critical errors which indicate that the
                                  requested action failed */
 };
