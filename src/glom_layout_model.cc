@@ -27,10 +27,15 @@
 #include <QStringList>
 #include <QRegExp>
 
+/**  This class creates a model from Glom layout groups and layout items,
+  *  suitable for list and detail views.
+  */
+// We don't check for nullptr in document and error?
 GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
     const GlomTable &table, QObject *parent, QSqlDatabase db) :
     QSqlRelationalTableModel(parent, db),
-    theTableDisplayName(table.displayName()) // TODO: Add GlomTable member.
+    theTableDisplayName(table.displayName()), // TODO: Add GlomTable member.
+    theErrorReporter(error)
 {
     setTable(table.tableName());
     queryBuilder.addRelation(table.tableName());
@@ -53,7 +58,7 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
     else  // Display a warning message if the Glom document could not provide
           // us with a main layout group.
     {
-        raiseError(QlomError(Qlom::DATABASE_ERROR_DOMAIN,
+        theErrorReporter->raiseError(QlomError(Qlom::DATABASE_ERROR_DOMAIN,
             tr("GlomLayoutModel: no list model found."),
             Qlom::WARNING_ERROR_SEVERITY));
     }

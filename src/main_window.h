@@ -20,6 +20,7 @@
 #define QLOM_MAIN_WINDOW_H_
 
 #include "glom_document.h"
+#include "error_reporter.h"
 #include <QMainWindow>
 
 class QModelIndex;
@@ -68,6 +69,9 @@ private:
     GlomDocument glomDocument; /**< a Glom document to view */
     QTreeView *centralTreeView; /**< a tree view for the table names model */
 
+    ErrorReporter theErrorReporter; /** < an error reporting facility that can
+                                          be used in lieu of C++ exceptions. */
+
 private Q_SLOTS:
     /** Slot for the signal from the Open menu item. */
     void fileOpenTriggered();
@@ -84,6 +88,7 @@ private Q_SLOTS:
     /** Slot for the signal from a double-click on the table names treeview.
      *  @param[in] index the row that was double-clicked */
     void treeviewDoubleclicked(const QModelIndex &index);
+
 };
 
 #endif /* QLOM_MAIN_WINDOW_H_ */

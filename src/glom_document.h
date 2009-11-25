@@ -56,12 +56,15 @@ public:
 
     /** Get a layout from the document.
      *  @param[in] tableName the name of the table to provide a layout for
+     *  @param[in] error the error reporting facility to be used by the model
      *  @returns a model of the layout */
-    GlomLayoutModel* createListLayoutModel(const QString &tableName);
+    GlomLayoutModel* createListLayoutModel(const QString &tableName,
+        ErrorReporter* error);
 
     /** Get a layout of the default table from the document.
+     *  @param[in] error the error reporting facility to be used by the model
      *  @returns a model of the layout */
-    GlomLayoutModel* createDefaultTableListLayoutModel();
+    GlomLayoutModel* createDefaultTableListLayoutModel(ErrorReporter* error);
 
 private:
     /** Convert a filepath to a URI.

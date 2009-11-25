@@ -128,27 +128,38 @@ GlomTablesModel* GlomDocument::createTablesModel()
     return new GlomTablesModel(tableList, qobject_cast<QObject*>(this));
 }
 
-GlomLayoutModel* GlomDocument::createListLayoutModel(const QString &tableName)
+GlomLayoutModel* GlomDocument::createListLayoutModel(const QString &tableName, ErrorReporter* error)
 {
-    QList<GlomTable>::const_iterator table(tableList.begin());
-    for (; table != tableList.end()
-        && table->tableName() != tableName; ++table) {
+    for (QList<GlomTable>::const_iterator iter = tableList.begin();
+         iter != tableList.end();
+         ++iter) {
+        if ((*iter).tableName() == tableName) {
+            return new GlomLayoutModel(document, *iter, error, qobject_cast<QObject*>(this));
+        }
     }
-    Q_ASSERT(table != tableList.end());
 
-    return new GlomLayoutModel(document, *table, qobject_cast<QObject*>(this));
+    // TODO: change from critical to warning once Qlom can handle failed model initialisations.
+    error->raiseError(QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
+        tr("Cannot find requested table."), Qlom::CRITICAL_ERROR_SEVERITY));
+
+    return 0;
 }
 
-GlomLayoutModel* GlomDocument::createDefaultTableListLayoutModel()
+GlomLayoutModel* GlomDocument::createDefaultTableListLayoutModel(ErrorReporter* error)
 {
-    QList<GlomTable>::const_iterator table(tableList.begin());
-    for (; table != tableList.end() &&
-        table->tableName() != ustringToQstring(document->get_default_table());
-        ++table) {
+    for (QList<GlomTable>::const_iterator iter = tableList.begin();
+        iter != tableList.end();
+        ++iter) {
+        if ((*iter).tableName() == ustringToQstring(document->get_default_table())) {
+            return new GlomLayoutModel(document, *iter, error, qobject_cast<QObject*>(this));
+        }
     }
-    Q_ASSERT(table != tableList.end());
 
-    return new GlomLayoutModel(document, *table, qobject_cast<QObject*>(this));
+    // TODO: change from critical to warning once Qlom can handle failed model initialisations.
+    error->raiseError(QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
+        tr("Cannot find default table. Document empty?"), Qlom::CRITICAL_ERROR_SEVERITY));
+
+    return 0;
 }
 
 std::string GlomDocument::filepathToUri(const QString &theFilepath)

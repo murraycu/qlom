@@ -29,7 +29,7 @@
 #include <libglom/document/document.h>
 
 /** A model to show rows of data from a Glom database. */
-class GlomLayoutModel : public QSqlRelationalTableModel, public ErrorReporter
+class GlomLayoutModel : public QSqlRelationalTableModel
 {
     Q_OBJECT
 
@@ -41,10 +41,11 @@ public:
     /** Create a model of the layouts in a table from a Glom document.
      *  @param[in] document a Glom document
      *  @param[in] tableName the table name
+     *  @param[in] error reporting facility to be used by GlomLayoutModel
      *  @param[in] parent a parent QObject
      *  @param[in] db a database connection, or the default connection */
     explicit GlomLayoutModel(const Glom::Document *document,
-        const GlomTable &table, QObject *parent = 0,
+        const GlomTable &table, ErrorReporter *error, QObject *parent = 0,
         QSqlDatabase db = QSqlDatabase());
 
     /** Get the table name used in the model.
@@ -68,12 +69,15 @@ private:
     void createProjectionFromLayoutGroup(
         const Glom::sharedptr<const Glom::LayoutItem> &layoutItem);
 
+    QlomQueryBuilder queryBuilder; /**< an SQL query builder which is used to
+                                        fill the model */
+    QString theTableDisplayName; /**< the display name of the layout table */
+    ErrorReporter* theErrorReporter; /**< the facility used to report
+                                          errors, a dynamic dependency */
+
     QString escapeFieldAsString(QString field) const;
 
     QString escapeField(QString field) const;
-
-    QlomQueryBuilder queryBuilder; /**< an SQL query builder */
-    QString theTableDisplayName; /**< the display name of the layout table */
 };
 
 #endif /* QLOM_GLOM_LAYOUT_MODEL_H_ */

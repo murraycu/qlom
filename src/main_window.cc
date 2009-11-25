@@ -73,7 +73,11 @@ void MainWindow::receiveError(const QlomError &error)
         case Qlom::CRITICAL_ERROR_SEVERITY:
             dialog.setWindowTitle(tr("Critical error"));
             dialog.setIcon(QMessageBox::Critical);
-            //break;
+            break;
+        case Qlom::WARNING_ERROR_SEVERITY:
+            dialog.setWindowTitle(tr("Warning"));
+            dialog.setIcon(QMessageBox::Warning);
+            break;
         }
 
         dialog.exec();
@@ -123,6 +127,9 @@ void MainWindow::setup()
         this, SLOT(fileQuitTriggered()));
     connect(helpAbout, SIGNAL(triggered(bool)),
         this, SLOT(helpAboutTriggered()));
+
+    connect(&theErrorReporter, SIGNAL(errorRaised(QlomError)),
+        this, SLOT(receiveError(QlomError)));
 
     centralTreeView = new QTreeView(this);
     setCentralWidget(centralTreeView);
@@ -221,7 +228,11 @@ void MainWindow::helpAboutTriggered()
 void MainWindow::treeviewDoubleclicked(const QModelIndex& index)
 {
     const QString &tableName = index.data(Qlom::TableNameRole).toString();
-    GlomLayoutModel *model = glomDocument.createListLayoutModel(tableName);
+    GlomLayoutModel *model = glomDocument.createListLayoutModel(tableName, &theErrorReporter);
+
+    connect(model, SIGNAL(errorRaised(QlomError)),
+            this,  SLOT(receiveError(QlomError)));
+
     QMainWindow *tableModelWindow = new QMainWindow(this);
     QTableView *view = new QTableView(tableModelWindow);
 
@@ -239,7 +250,7 @@ void MainWindow::treeviewDoubleclicked(const QModelIndex& index)
 
 void MainWindow::showDefaultTable()
 {
-    GlomLayoutModel *model = glomDocument.createDefaultTableListLayoutModel();
+    GlomLayoutModel *model = glomDocument.createDefaultTableListLayoutModel(&theErrorReporter);
     QMainWindow *tableModelWindow = new QMainWindow(this);
     QTableView *view = new QTableView(tableModelWindow);
 
