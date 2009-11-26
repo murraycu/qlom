@@ -1,11 +1,9 @@
 <?xml version="1.0"?>
 <glom_document xmlns="http://glom.org/glom_document" format_version="4" translation_original_locale="de_DE" database_title="No list model">
-  <connection hosting_mode="sqlite" server="localhost" try_other_ports="true" database="glom_test"/>
+  <connection hosting_mode="sqlite" server="localhost" try_other_ports="true" database="glom_test" port="0"/>
   <table name="test" title="Test">
-    <relationships/>
+    <fields/>
     <data_layouts/>
-    <reports/>
-    <print_layouts/>
   </table>
   <groups><!--These are only used when recreating a database from an example file. The actual access-control is on the server, of course.--></groups>
   <library_modules/></glom_document>
