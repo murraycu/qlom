@@ -15,3 +15,6 @@ sqlite/invalid-db.glom:
 
 sqlite/no-list-model.glom:
     No list model found (document specifies a table, but no layout groups).
+
+sqlite/example.glom:
+    Cannot open because it's recognised as an example document.
