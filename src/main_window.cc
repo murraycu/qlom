@@ -229,10 +229,10 @@ void MainWindow::treeviewDoubleclicked(const QModelIndex& index)
 {
     const QString &tableName = index.data(Qlom::TableNameRole).toString();
     GlomLayoutModel *model =
-      glomDocument.createListLayoutModel(tableName);
+        glomDocument.createListLayoutModel(tableName);
 
-    connect(model, SIGNAL(errorRaised(QlomError)),
-            this,  SLOT(receiveError(QlomError)));
+    connect(&glomDocument.errorReporter(), SIGNAL(errorRaised(QlomError)),
+        this,  SLOT(receiveError(QlomError)));
 
     QMainWindow *tableModelWindow = new QMainWindow(this);
     QTableView *view = new QTableView(tableModelWindow);

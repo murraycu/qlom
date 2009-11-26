@@ -27,6 +27,7 @@ void ErrorReporter::raiseError(const QlomError &error)
 {
     if (error != theLastError) {
         theLastError = error;
-        Q_EMIT errorRaised(error);
     }
+
+    Q_EMIT errorRaised(error);
 }
