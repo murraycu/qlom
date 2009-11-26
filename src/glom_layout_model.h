@@ -75,9 +75,9 @@ private:
     ErrorReporter &theErrorReporter; /**< the facility used to report
                                           errors, a dynamic dependency */
 
-    QString escapeFieldAsString(QString field) const;
+    QString escapeFieldAsString(const QString &field) const;
 
-    QString escapeField(QString field) const;
+    QString escapeField(const QString &field) const;
 };
 
 #endif /* QLOM_GLOM_LAYOUT_MODEL_H_ */

@@ -122,7 +122,8 @@ void GlomLayoutModel::createProjectionFromLayoutGroup(
     }
 }
 
-QString GlomLayoutModel::escapeFieldAsString(QString field) const
+
+QString GlomLayoutModel::escapeFieldAsString(const QString &field) const
 {
     /* QtSql only knows about 2 roles for escaping in a projection:
      * 1. QSqlDriver::FieldName,
@@ -132,10 +133,10 @@ QString GlomLayoutModel::escapeFieldAsString(QString field) const
      * imaginary role "QSqlDriver::Primitive", would escape using single quotes.
      */
 
-    return ('\'' + field.replace("'", "''") + '\'');
+    return ('\'' + QString(field).replace("'", "''") + '\'');
 }
 
-QString GlomLayoutModel::escapeField(QString field) const
+QString GlomLayoutModel::escapeField(const QString &field) const
 {
     return database().driver()->escapeIdentifier(field, QSqlDriver::FieldName);
 }
