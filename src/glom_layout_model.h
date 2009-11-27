@@ -53,12 +53,6 @@ public:
     QString tableDisplayName() const;
 
 private:
-    /** Filters input data.
-     *  @param[in] index the index to retrieve data from
-     *  @param[in] role the Qt::ItemDataRole to retrieve fata for
-     *  @returns the data from the model */
-    QVariant data(const QModelIndex &index, int role) const;
-
     /** Read relationships from the Glom document, and apply them to the model.
      *  @param[in] relationships a list of relationships to apply */
     void applyRelationships(const QList<GlomRelationship> &relationships);

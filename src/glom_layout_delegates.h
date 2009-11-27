@@ -25,16 +25,26 @@
 #include <QModelIndex>
 #include <QSize>
 
-class GlomLayoutDelegate : public QStyledItemDelegate
+class GlomNumericDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
 public:
-    GlomLayoutDelegate(QObject *parent);
-    ~GlomLayoutDelegate();
+    GlomNumericDelegate(QObject *parent);
+    ~GlomNumericDelegate();
+
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const;
+};
+
+class GlomTextDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    GlomTextDelegate(QObject *parent);
+    ~GlomTextDelegate();
 
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex &index ) const;
-    virtual QString displayText(const QVariant &value, const QLocale &locale) const;
 };
 #endif // QLOM_GLOM_LAYOUT_DELEGATE_H_

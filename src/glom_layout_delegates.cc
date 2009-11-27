@@ -16,26 +16,59 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "glom_layout_delegate.h"
+#include "glom_layout_delegates.h"
 
-GlomLayoutDelegate::GlomLayoutDelegate(QObject *parent)
+#include <QRegExp>
+#include <QStringList>
+
+// begin GlomNumericDelegate impl
+GlomNumericDelegate::GlomNumericDelegate(QObject *parent)
 : QStyledItemDelegate(parent)
 {}
 
-GlomLayoutDelegate::~GlomLayoutDelegate()
+GlomNumericDelegate::~GlomNumericDelegate()
 {}
 
-void GlomLayoutDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+QString GlomNumericDelegate::displayText(const QVariant &value, const QLocale &locale) const
 {
-    QStyledItemDelegate::paint(painter, option, index);
+    Q_UNUSED(locale);
+
+    static const QRegExp matchDouble("\\d+\\.\\d+");
+
+    if(matchDouble.exactMatch(value.toString())) {
+        QStringList doubleParts = value.toString().split(".");
+        QString reduceMe = doubleParts[1];
+        while(reduceMe.endsWith("0")) {
+            reduceMe.chop(1);
+        }
+
+        if(!reduceMe.isEmpty()) {
+            return QString("%1.%2").arg(doubleParts[0], reduceMe);
+        } else {
+            return doubleParts[0];
+        }
+    }
+
+    return value.toString();
 }
 
-QSize GlomLayoutDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex &index ) const
+// begin GlomTextDelegate impl
+GlomTextDelegate::GlomTextDelegate(QObject *parent)
+: QStyledItemDelegate(parent)
+{}
+
+GlomTextDelegate::~GlomTextDelegate()
+{}
+
+void GlomTextDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QStyleOptionViewItem boldFont(option);
+    boldFont.font.setBold(true);
+
+    QStyledItemDelegate::paint(painter, boldFont, index);
+}
+
+QSize GlomTextDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex &index ) const
 {
     return QStyledItemDelegate::sizeHint(option, index);
-}
-
-QString GlomLayoutDelegate::displayText(const QVariant &value, const QLocale &locale) const
-{
-    return QStyledItemDelegate::displayText(value, locale);
 }
