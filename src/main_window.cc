@@ -21,6 +21,7 @@
 #include "qlom_error.h"
 #include "glom_tables_model.h"
 #include "glom_layout_model.h"
+#include "glom_layout_delegate.h"
 
 #include <memory>
 #include <QAction>
@@ -230,37 +231,31 @@ void MainWindow::treeviewDoubleclicked(const QModelIndex& index)
     const QString &tableName = index.data(Qlom::TableNameRole).toString();
     GlomLayoutModel *model =
         glomDocument.createListLayoutModel(tableName);
+    showTable(model);
 
-    connect(&glomDocument.errorReporter(), SIGNAL(errorRaised(QlomError)),
-        this,  SLOT(receiveError(QlomError)));
-
-    QMainWindow *tableModelWindow = new QMainWindow(this);
-    QTableView *view = new QTableView(tableModelWindow);
-
-    view->setModel(model);
-    view->resizeColumnsToContents();
-    tableModelWindow->setCentralWidget(view);
     const QString tableDisplayName = index.data().toString();
-    tableModelWindow->setWindowTitle(tableDisplayName);
     statusBar()->showMessage(tr("%1 table opened").arg(tableDisplayName));
-
-    tableModelWindow->show();
-    tableModelWindow->raise();
-    tableModelWindow->activateWindow();
 }
 
 void MainWindow::showDefaultTable()
 {
     GlomLayoutModel *model =
       glomDocument.createDefaultTableListLayoutModel();
+    showTable(model);
+    statusBar()->showMessage(tr("Default table opened"));
+}
+
+void MainWindow::showTable(GlomLayoutModel *model)
+{
     QMainWindow *tableModelWindow = new QMainWindow(this);
     QTableView *view = new QTableView(tableModelWindow);
+    model->setParent(tableModelWindow);
 
+    view->setItemDelegate(new GlomLayoutDelegate(tableModelWindow));
     view->setModel(model);
     view->resizeColumnsToContents();
     tableModelWindow->setCentralWidget(view);
     tableModelWindow->setWindowTitle(model->tableDisplayName());
-    statusBar()->showMessage(tr("Default table opened"));
 
     tableModelWindow->show();
     tableModelWindow->raise();

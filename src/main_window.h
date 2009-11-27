@@ -62,6 +62,8 @@ private:
     /** Show a list layout of the default table. */
     void showDefaultTable();
 
+    void showTable(GlomLayoutModel *model);
+
     /** Lookup the text that corresponds to an error domain.
      *  @param[in] errorDomain the error domain to provide a string for */
     QString errorDomainLookup(const Qlom::QlomErrorDomain errorDomain);
