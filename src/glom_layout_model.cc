@@ -41,7 +41,11 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
     setTable(table.tableName());
     queryBuilder.addRelation(table.tableName());
 
-    applyRelationships(table.relationships());
+    /* mikhas (2009/11/27) - Fixes faulty joins. Glom does not join tables,
+     * neither in list view nor in details view but appearantly only in portal
+     * views.
+     */
+    //applyRelationships(table.relationships());
 
     // The first item in a list layout group is always a main layout group.
     const Glib::ustring tableNameU(qstringToUstring(table.tableName()));
