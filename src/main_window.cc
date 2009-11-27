@@ -248,6 +248,8 @@ void MainWindow::showDefaultTable()
 void MainWindow::showTable(GlomLayoutModel *model)
 {
     QMainWindow *tableModelWindow = new QMainWindow(this);
+    tableModelWindow->setAttribute(Qt::WA_DeleteOnClose);
+
     QTableView *view = new QTableView(tableModelWindow);
     model->setParent(tableModelWindow);
 
