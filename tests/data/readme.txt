@@ -18,3 +18,6 @@ sqlite/no-list-model.glom:
 
 sqlite/example.glom:
     Cannot open because it's recognised as an example document.
+
+sqlite/db-not-supported.glom:
+    Qlom does not know how to interface with the given db backend.
