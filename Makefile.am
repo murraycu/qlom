@@ -29,9 +29,9 @@ src_qlom_SOURCES = src/qlom.cc \
                    src/glom_layout_model.cc \
                    src/glom_layout_model.moc.cc \
                    src/glom_layout_model.h \
-                   src/glom_layout_delegate.cc \
-                   src/glom_layout_delegate.moc.cc \
-                   src/glom_layout_delegate.h \
+                   src/glom_layout_delegates.cc \
+                   src/glom_layout_delegates.moc.cc \
+                   src/glom_layout_delegates.h \
                    src/utils.cc \
                    src/utils.h \
                    src/query_builder.cc \
@@ -50,7 +50,7 @@ BUILT_SOURCES = src/glom_document.moc.cc \
                 src/main_window.moc.cc \
                 src/glom_tables_model.moc.cc \
                 src/glom_layout_model.moc.cc \
-                src/glom_layout_delegate.moc.cc \
+                src/glom_layout_delegates.moc.cc \
                 src/connection_dialog.moc.cc
 
 mimedir = $(datadir)/mime
