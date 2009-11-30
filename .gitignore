@@ -13,7 +13,7 @@ INSTALL
 build-aux/depcomp
 build-aux/install-sh
 build-aux/missing
-src/*.moc.cc
+*.moc.cc
 # others
 .deps
 .dirstamp

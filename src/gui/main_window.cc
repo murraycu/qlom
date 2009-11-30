@@ -84,8 +84,8 @@ void MainWindow::receiveError(const QlomError &error)
         dialog.exec();
     }
 
-    // If the error message was non-empty then the error message was shown to the user, too.
-    // What's left to do is to shutdown the application.
+    /* If the error message was non-empty then the error message was shown to
+     * the user, too. All that remains is to shut down the application. */
     if(Qlom::CRITICAL_ERROR_SEVERITY == error.severity()) {
         exit(EXIT_FAILURE);
     }

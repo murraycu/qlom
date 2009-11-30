@@ -16,7 +16,7 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "main_window.h"
+#include "gui/main_window.h"
 
 #include <iostream>
 

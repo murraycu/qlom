@@ -17,9 +17,9 @@ src_qlom_SOURCES = src/qlom.cc \
 		   src/error_reporter.h \
 		   src/qlom_error.cc \
 		   src/qlom_error.h \
-                   src/main_window.cc \
-                   src/main_window.moc.cc \
-                   src/main_window.h \
+                   src/gui/main_window.cc \
+                   src/gui/main_window.moc.cc \
+                   src/gui/main_window.h \
                    src/glom_tables_model.cc \
                    src/glom_tables_model.moc.cc \
                    src/glom_tables_model.h \
@@ -37,7 +37,7 @@ src_qlom_SOURCES = src/qlom.cc \
                    src/query_builder.cc \
                    src/query_builder.h
 
-qlom_includes = -I$(top_builddir)
+qlom_includes = -I$(top_builddir) -I$(top_srcdir)/src
 
 src_qlom_CXXFLAGS = $(qlom_includes) $(QT_CXXFLAGS) $(QLOM_CFLAGS) \
                     $(QLOM_WARNINGS)
@@ -47,7 +47,7 @@ src_qlom_LDADD = $(QT_LIBS) $(QLOM_LIBS)
 
 BUILT_SOURCES = src/glom_document.moc.cc \
 		src/error_reporter.moc.cc \
-                src/main_window.moc.cc \
+                src/gui/main_window.moc.cc \
                 src/glom_tables_model.moc.cc \
                 src/glom_layout_model.moc.cc \
                 src/glom_layout_delegates.moc.cc \
