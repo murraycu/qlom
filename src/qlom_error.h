@@ -24,23 +24,33 @@
 namespace Qlom
 {
 
+/** Error domains for QlomError.
+ *  The error domain can be used to indicate which broad section of Qlom the
+ *  error occured in. */
 enum QlomErrorDomain {
-    DOCUMENT_ERROR_DOMAIN, /** error in Glom document-handling */
-    DATABASE_ERROR_DOMAIN
+    DOCUMENT_ERROR_DOMAIN, /**< error in Glom document-handling */
+    DATABASE_ERROR_DOMAIN /**< error in communication with the database */
 };
 
+/** Error severity for QlomError.
+ *  The severity of the error can be used by an error handler to determine how
+ *  the application should proceed once an error has been raised. */
 enum QlomErrorSeverity {
     WARNING_ERROR_SEVERITY, /**< warnings indicate that a non-critical request
                                  failed */
-    CRITICAL_ERROR_SEVERITY /**< critical errors which indicate that the
-                                 requested action failed */
+    CRITICAL_ERROR_SEVERITY /**< critical errors indicate that the requested
+                                 action failed */
 };
 
 } // namespace Qlom
 
+/** An error message, with an associated domain and severity.
+ *  It is possible to create a blank QlomError, but generally an error will be
+ *  created with a domain, description and severity. These properties are all
+ *  construct-time only, and can be read with the accessors domain(), what()
+ *  and severity(). */
 class QlomError
 {
-
 public:
     /** Creates a blank error. */
     QlomError();
@@ -49,7 +59,7 @@ public:
      *  @param other the other error to copy */
     QlomError(const QlomError &other);
 
-    /** Creates an error with a description and a severity level.
+    /** Creates an error with a domain, description and severity level.
      *  @param[in] domain the domain of the error
      *  @param[in] what a description of the error
      *  @param[in] severity the severity of the error */
@@ -60,7 +70,7 @@ public:
      *  @returns the domain of the error */
     Qlom::QlomErrorDomain domain() const;
 
-    /** Requests the description of the error.
+    /** Requests the human-readable description of the error.
      *  @returns a description of the error */
     QString what() const;
 
@@ -72,11 +82,11 @@ public:
 
     bool operator!=(const QlomError &other) const;
 
-    QlomError& operator=(const QlomError& other);
+    QlomError & operator=(const QlomError &other);
 
     /** Simple swap implementation
      *  @param[in,out] other the error to swap */
-    void swap(QlomError& other);
+    void swap(QlomError &other);
 
 private:
     quint8 errorDomain; /**< the debug domain of the error */
