@@ -24,6 +24,12 @@
 #include <QList>
 #include <QString>
 
+/** A table in a Glom document.
+ *  Designed for use in a GlomDocument, GlomTable has three construct-time
+ *  properties: the name, the display name and a list of relationships. The
+ *  properties cannot be changed once a GlomRelationship has been constructed,
+ *  but can be accessed with the displayName(), tableName() and relationships()
+ *  methods. */
 class GlomTable
 {
 
@@ -35,7 +41,7 @@ public:
     GlomTable(const QString &tableName, const QString &displayName,
         const QList<GlomRelationship> &relationships);
 
-    /** Get the table name for display.
+    /** Get the table name for display to the user.
      *  @returns the name of the table for display */
     QString displayName() const;
 
@@ -48,9 +54,9 @@ public:
     QList<GlomRelationship> relationships() const;
 
 private:
-    QString theDisplayName;
-    QString theTableName;
-    QList<GlomRelationship> theRelationships;
+    QString theDisplayName; /**< the table name, for display to the user */
+    QString theTableName; /**< the table name, as in the database */
+    QList<GlomRelationship> theRelationships; /**< a list of relationships */
 };
 
 #endif /* QLOM_GLOM_DOCUMENT_H_ */
