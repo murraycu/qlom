@@ -16,8 +16,8 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QLOM_QUERY_BUILDER_H_
-#define QLOM_QUERY_BUILDER_H_
+#ifndef QLOM_QLOM_QUERY_BUILDER_H_
+#define QLOM_QLOM_QUERY_BUILDER_H_
 
 #include <QString>
 #include <QStringList>
@@ -40,31 +40,31 @@ public:
     ~QlomQueryBuilder();
 
     /** Add a projection to the query.
-    *  For example, "SELECT [DISTINCT] projection".
-    *  @param[in] projection a projection string to add */
+     *  For example, "SELECT [DISTINCT] projection".
+     *  @param[in] projection a projection string to add */
     void addProjection(const QString& projection);
 
     /** Add a relation to the query.
-    *  For example, "FROM rel1 [,rel2]".
-    *  @param[in] relation the relation string to add */
+     *  For example, "FROM rel1 [,rel2]".
+     *  @param[in] relation the relation string to add */
     void addRelation(const QString& relation);
 
     /** Add an equi-join to the query.
-    *  For example, "JOIN rel ON lhs = rhs".
-    *  @param[in] relation the relation string to add
-    *  @param[in] lhs the left-hand side of the join
-    *  @param[in] rhs the right-hand side of the join */
+     *  For example, "JOIN rel ON lhs = rhs".
+     *  @param[in] relation the relation string to add
+     *  @param[in] lhs the left-hand side of the join
+     *  @param[in] rhs the right-hand side of the join */
     void equiJoinWith(const QString& relation, const QString& lhs,
         const QString& rhs);
 
     /** Set the selection of the query.
-    *  For example, "WHERE selection".
-    *  @param[in] selection the selection string to add */
+     *  For example, "WHERE selection".
+     *  @param[in] selection the selection string to add */
     void setSelection(const QString& selection);
 
     /** Set the order clause of the query.
-    *  For example, "ORDER BY order_by".
-    *  @param[in] order_by the order clause to add */
+     *  For example, "ORDER BY order_by".
+     *  @param[in] orderBy the order clause to add */
     void setOrderBy(const QString& orderBy);
 
     /** Returns the built query, but does not check for validity. */
@@ -92,7 +92,7 @@ private:
     QString orderBy; /**< the order clause */
 
     typedef QMap<QString, QVariant> BoundParametersMap;
-    BoundParametersMap boundParameters;
+    BoundParametersMap boundParameters; /**< map of the bound parameters */
 };
 
-#endif /* QLOM_QUERY_BUILDER_H_ */
+#endif /* QLOM_QLOM_QUERY_BUILDER_H_ */

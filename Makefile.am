@@ -34,8 +34,8 @@ src_qlom_SOURCES = src/qlom.cc \
                    src/glom_layout_delegates.h \
                    src/utils.cc \
                    src/utils.h \
-                   src/query_builder.cc \
-                   src/query_builder.h
+                   src/qlom_query_builder.cc \
+                   src/qlom_query_builder.h
 
 qlom_includes = -I$(top_builddir) -I$(top_srcdir)/src
 

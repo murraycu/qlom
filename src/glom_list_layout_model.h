@@ -22,7 +22,7 @@
 class ErrorReporter;
 
 #include "glom_table.h"
-#include "query_builder.h"
+#include "qlom_query_builder.h"
 
 #include <QSqlDatabase>
 #include <QSqlTableModel>

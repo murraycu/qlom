@@ -16,7 +16,7 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "query_builder.h"
+#include "qlom_query_builder.h"
 #include <iostream>
 
 QlomQueryBuilder::QlomQueryBuilder()
