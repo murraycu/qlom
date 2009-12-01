@@ -21,6 +21,13 @@
 
 #include <QString>
 
+/** A relationship from one column is a database table to another.
+ *  Designed for use in a GlomTable, GlomRelationship has three construct-time
+ *  only properties: the source column, the destination table and the
+ *  destination primary key. The properties cannot be changed once a
+ *  GlomRelationship has been constructed, but can be accessed with the
+ *  fromColumn(), toTable() and toPrimaryKey() methods. The source table is
+ *  implied by including the relationship in a GlomTable. */
 class GlomRelationship
 {
 public:
