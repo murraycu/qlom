@@ -20,7 +20,7 @@
 #include "glom_document.h"
 #include "qlom_error.h"
 #include "glom_tables_model.h"
-#include "glom_layout_model.h"
+#include "glom_list_layout_model.h"
 #include "glom_layout_delegates.h"
 
 #include <memory>
@@ -229,7 +229,7 @@ void MainWindow::helpAboutTriggered()
 void MainWindow::treeviewDoubleclicked(const QModelIndex& index)
 {
     const QString &tableName = index.data(Qlom::TableNameRole).toString();
-    GlomLayoutModel *model =
+    GlomListLayoutModel *model =
         glomDocument.createListLayoutModel(tableName);
     showTable(model);
 
@@ -239,13 +239,13 @@ void MainWindow::treeviewDoubleclicked(const QModelIndex& index)
 
 void MainWindow::showDefaultTable()
 {
-    GlomLayoutModel *model =
+    GlomListLayoutModel *model =
       glomDocument.createDefaultTableListLayoutModel();
     showTable(model);
     statusBar()->showMessage(tr("Default table opened"));
 }
 
-void MainWindow::showTable(GlomLayoutModel *model)
+void MainWindow::showTable(GlomListLayoutModel *model)
 {
     QMainWindow *tableModelWindow = new QMainWindow(this);
     tableModelWindow->setAttribute(Qt::WA_DeleteOnClose);

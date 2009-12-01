@@ -24,6 +24,7 @@
 
 #include <QMainWindow>
 
+class GlomListLayoutModel;
 class QModelIndex;
 class QTreeView;
 
@@ -81,7 +82,7 @@ private:
 
     /** Show a table from a list layout model in a new window.
      *  @param[in] model the model to show */
-    void showTable(GlomLayoutModel *model);
+    void showTable(GlomListLayoutModel *model);
 
     /** Lookup the text that corresponds to an error domain.
      *  @param[in] errorDomain the error domain to provide a string for

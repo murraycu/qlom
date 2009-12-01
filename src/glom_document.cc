@@ -19,6 +19,7 @@
 #include "glom_document.h"
 #include "qlom_error.h"
 #include "glom_tables_model.h"
+#include "glom_list_layout_model.h"
 #include "connection_dialog.h"
 #include "utils.h"
 
@@ -120,18 +121,19 @@ bool GlomDocument::loadDocument(const QString &filepath)
     return true;
 }
 
-GlomTablesModel* GlomDocument::createTablesModel()
+GlomTablesModel * GlomDocument::createTablesModel()
 {
     return new GlomTablesModel(tableList, qobject_cast<QObject*>(this));
 }
 
-GlomLayoutModel* GlomDocument::createListLayoutModel(const QString &tableName)
+GlomListLayoutModel * GlomDocument::createListLayoutModel(
+    const QString &tableName)
 {
     for (QList<GlomTable>::const_iterator iter = tableList.begin();
          iter != tableList.end();
          ++iter) {
         if ((*iter).tableName() == tableName) {
-            return new GlomLayoutModel(document, *iter, theErrorReporter,
+            return new GlomListLayoutModel(document, *iter, theErrorReporter,
                 qobject_cast<QObject*>(this));
         }
     }
@@ -144,14 +146,14 @@ GlomLayoutModel* GlomDocument::createListLayoutModel(const QString &tableName)
     return 0;
 }
 
-GlomLayoutModel* GlomDocument::createDefaultTableListLayoutModel()
+GlomListLayoutModel * GlomDocument::createDefaultTableListLayoutModel()
 {
     for (QList<GlomTable>::const_iterator iter = tableList.begin();
         iter != tableList.end();
         ++iter) {
         if ((*iter).tableName() ==
             ustringToQstring(document->get_default_table())) {
-            return new GlomLayoutModel(document, *iter, theErrorReporter,
+            return new GlomListLayoutModel(document, *iter, theErrorReporter,
                 qobject_cast<QObject*>(this));
         }
     }

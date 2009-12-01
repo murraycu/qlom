@@ -19,13 +19,10 @@
 #ifndef QLOM_GLOM_DOCUMENT_H_
 #define QLOM_GLOM_DOCUMENT_H_
 
-namespace Glom
-{
-class Document;
-};
 
-#include "glom_tables_model.h"
-#include "glom_layout_model.h"
+class GlomListLayoutModel;
+class GlomTablesModel;
+
 #include "glom_table.h"
 #include "error_reporter.h"
 
@@ -34,6 +31,8 @@ class Document;
 
 #include <QList>
 #include <QString>
+
+#include <libglom/document/document.h>
 
 /** A Glom document.
  *  A Glom document contains the information that is in a .glom file. It is
@@ -75,14 +74,14 @@ public:
      *  model must be destroyed by the caller when it is no longer needed.
      *  @param[in] tableName the name of the table to provide a layout for
      *  @returns a model of the layout */
-    GlomLayoutModel* createListLayoutModel(const QString &tableName);
+    GlomListLayoutModel* createListLayoutModel(const QString &tableName);
 
     /** Get a layout of the default table from the document.
      *  Creates a new model of the list layout of the default table specified
      *  in the Glom document. The model must be destroyed by the caller when it
      *  is no longer needed.
      *  @returns a model of the layout, or 0 if no default table was found */
-    GlomLayoutModel* createDefaultTableListLayoutModel();
+    GlomListLayoutModel* createDefaultTableListLayoutModel();
 
     /** Get the error reporter object.
      *  Gets the error reporter object, for connection of signals to a class

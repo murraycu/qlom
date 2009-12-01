@@ -26,9 +26,9 @@ src_qlom_SOURCES = src/qlom.cc \
                    src/connection_dialog.cc \
                    src/connection_dialog.moc.cc \
                    src/connection_dialog.h \
-                   src/glom_layout_model.cc \
-                   src/glom_layout_model.moc.cc \
-                   src/glom_layout_model.h \
+                   src/glom_list_layout_model.cc \
+                   src/glom_list_layout_model.moc.cc \
+                   src/glom_list_layout_model.h \
                    src/glom_layout_delegates.cc \
                    src/glom_layout_delegates.moc.cc \
                    src/glom_layout_delegates.h \
@@ -49,7 +49,7 @@ BUILT_SOURCES = src/glom_document.moc.cc \
 		src/error_reporter.moc.cc \
                 src/gui/main_window.moc.cc \
                 src/glom_tables_model.moc.cc \
-                src/glom_layout_model.moc.cc \
+                src/glom_list_layout_model.moc.cc \
                 src/glom_layout_delegates.moc.cc \
                 src/connection_dialog.moc.cc
 

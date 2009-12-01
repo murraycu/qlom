@@ -16,7 +16,8 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "glom_layout_model.h"
+#include "error_reporter.h"
+#include "glom_list_layout_model.h"
 #include "utils.h"
 #include "qlom_error.h"
 
@@ -31,10 +32,10 @@
   *  suitable for list and detail views.
   */
 // We don't check for nullptr in document and error?
-GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
+GlomListLayoutModel::GlomListLayoutModel(const Glom::Document *document,
     const GlomTable &table, ErrorReporter &error,
     QObject *parent, QSqlDatabase db) :
-    QSqlRelationalTableModel(parent, db),
+    QSqlTableModel(parent, db),
     theTableDisplayName(table.displayName()), // TODO: Add GlomTable member.
     theErrorReporter(error)
 {
@@ -67,12 +68,12 @@ GlomLayoutModel::GlomLayoutModel(const Glom::Document *document,
     }
 }
 
-QString GlomLayoutModel::tableDisplayName() const
+QString GlomListLayoutModel::tableDisplayName() const
 {
     return theTableDisplayName;
 }
 
-void GlomLayoutModel::applyRelationships(
+void GlomListLayoutModel::applyRelationships(
     const QList<GlomRelationship> &relationships)
 {
     for (QList<GlomRelationship>::const_iterator relationship(
@@ -88,7 +89,7 @@ void GlomLayoutModel::applyRelationships(
     }
 }
 
-void GlomLayoutModel::createProjectionFromLayoutGroup(
+void GlomListLayoutModel::createProjectionFromLayoutGroup(
     const Glom::sharedptr<const Glom::LayoutItem> &layoutItem)
 {
     Glom::sharedptr<const Glom::LayoutGroup> layoutGroup =
@@ -108,13 +109,15 @@ void GlomLayoutModel::createProjectionFromLayoutGroup(
             const QString currDisplayName =
                 ustringToQstring((*iter)->get_title_or_name());
 
-            // Check whether we have a static text item to display.
+            // Check whether there is a static text item to display.
             Glom::sharedptr<const Glom::LayoutItem_Text> staticTextItem =
-                Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
+                Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(
+                    *iter);
 
             if (staticTextItem) {
                 queryBuilder.addProjection(QString("%1 AS %3")
-                    .arg(escapeFieldAsString(ustringToQstring(staticTextItem->get_text())))
+                    .arg(escapeFieldAsString(ustringToQstring(
+                        staticTextItem->get_text())))
                     .arg(escapeField(currDisplayName)));
             } else {
                 queryBuilder.addProjection(QString("%1.%2 AS %3")
@@ -127,20 +130,12 @@ void GlomLayoutModel::createProjectionFromLayoutGroup(
 }
 
 
-QString GlomLayoutModel::escapeFieldAsString(const QString &field) const
+QString GlomListLayoutModel::escapeFieldAsString(const QString &field) const
 {
-    /* QtSql only knows about 2 roles for escaping in a projection:
-     * 1. QSqlDriver::FieldName,
-     * 2. QSqlDriver::TableName.
-     * In fact, there is a 3rd role, namely type primitives: "SELECT 1",
-     * "SELECT 'aString'", ... where the escapeIdentifier call, for an
-     * imaginary role "QSqlDriver::Primitive", would escape using single quotes.
-     */
-
     return ('\'' + QString(field).replace("'", "''") + '\'');
 }
 
-QString GlomLayoutModel::escapeField(const QString &field) const
+QString GlomListLayoutModel::escapeField(const QString &field) const
 {
     return database().driver()->escapeIdentifier(field, QSqlDriver::FieldName);
 }
