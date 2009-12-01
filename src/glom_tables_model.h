@@ -28,23 +28,28 @@
 namespace Qlom
 {
 
-/** Roles for GlomModel. */
+/** Data display roles for GlomTablesModel. */
 enum GlomTablesModelRoles {
     TableNameRole = 32 /**< retrieves the table name from the model */
 };
 
 } // namespace Qlom
 
-/** A model of the tables in a Glom document. */
+/** A model of the tables in a Glom document.
+ *  The model contains a list of GlomTable objects, which contain both the name
+ *  of the tables for display to the user and for accessing the database.
+ *  Currently, the GlomTable list is not stored in the model, and is only used
+ *  for populating the model with data at construction time. */
 class GlomTablesModel : public QAbstractListModel
 {
     Q_OBJECT
 
 public:
     /** Construct a new model from a Glom document.
-     *  @param[in] document a Glom document to read metadata from
+     *  @param[in] tableList a list of GlomTable objects to read information
+     *  from
      *  @param[in] parent a parent QObject, that will take ownership of the
-     model */
+     *  model */
     GlomTablesModel(const QList<GlomTable> tableList, QObject *parent = 0);
 
     /** Calculate the number of rows in the model.
