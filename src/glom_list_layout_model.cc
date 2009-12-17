@@ -132,7 +132,7 @@ void GlomListLayoutModel::createProjectionFromLayoutGroup(
 
 QString GlomListLayoutModel::escapeFieldAsString(const QString &field) const
 {
-    return ('\'' + QString(field).replace("'", "''") + '\'');
+    return ('\'' + QString(field).replace('\'', "''") + '\'');
 }
 
 QString GlomListLayoutModel::escapeField(const QString &field) const

@@ -36,9 +36,9 @@ QString GlomNumericDelegate::displayText(const QVariant &value, const QLocale &l
     static const QRegExp matchDouble("\\d+\\.\\d+");
 
     if(matchDouble.exactMatch(value.toString())) {
-        QStringList doubleParts = value.toString().split(".");
+        QStringList doubleParts = value.toString().split('.');
         QString reduceMe = doubleParts[1];
-        while(reduceMe.endsWith("0")) {
+        while(reduceMe.endsWith('0')) {
             reduceMe.chop(1);
         }
 
