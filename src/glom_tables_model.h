@@ -50,7 +50,8 @@ public:
      *  from
      *  @param[in] parent a parent QObject, that will take ownership of the
      *  model */
-    GlomTablesModel(const QList<GlomTable> tableList, QObject *parent = 0);
+    explicit GlomTablesModel(const QList<GlomTable> tableList,
+        QObject *parent = 0);
 
     /** Calculate the number of rows in the model.
      *  @param[in] parent the parent index in the heirarchy
