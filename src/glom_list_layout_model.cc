@@ -16,8 +16,8 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "error_reporter.h"
 #include "glom_list_layout_model.h"
+#include "error_reporter.h"
 #include "utils.h"
 #include "qlom_error.h"
 
