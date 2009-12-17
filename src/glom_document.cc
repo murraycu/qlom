@@ -26,6 +26,7 @@
 #include <QDialog>
 #include <QFile>
 #include <QMessageBox>
+#include <QPointer>
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QStringListModel>
@@ -84,13 +85,17 @@ bool GlomDocument::loadDocument(const QString &filepath)
     case Glom::Document::HOSTING_MODE_POSTGRES_CENTRAL:
     {
         // TODO: request a connection dialog from MainWindow.
-        ConnectionDialog *connectionDialog = new ConnectionDialog(*document);
+        QPointer<ConnectionDialog> connectionDialog =
+            new ConnectionDialog(*document);
         if(connectionDialog->exec() != QDialog::Accepted) {
+            delete connectionDialog;
             const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
                 tr("Failed to connect to the PostgreSQL server"),
                 Qlom::CRITICAL_ERROR_SEVERITY);
             theErrorReporter.raiseError(error);
             return false;
+        } else {
+        delete connectionDialog;
         }
     }
     break;

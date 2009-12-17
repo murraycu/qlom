@@ -30,6 +30,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPointer>
 #include <QSettings>
 #include <QSqlField>
 #include <QSqlIndex>
@@ -65,23 +66,24 @@ MainWindow::MainWindow(const QString &filepath) :
 void MainWindow::receiveError(const QlomError &error)
 {
     if(!error.what().isNull()) {
-        QMessageBox dialog(this);
-        dialog.setText(errorDomainLookup(error.domain()));
-        dialog.setDetailedText(error.what());
+        QPointer<QMessageBox> dialog = new QMessageBox(this);
+        dialog->setText(errorDomainLookup(error.domain()));
+        dialog->setDetailedText(error.what());
 
         // Set icon style and dialog title according to error severity.
         switch (error.severity()) {
         case Qlom::CRITICAL_ERROR_SEVERITY:
-            dialog.setWindowTitle(tr("Critical error"));
-            dialog.setIcon(QMessageBox::Critical);
+            dialog->setWindowTitle(tr("Critical error"));
+            dialog->setIcon(QMessageBox::Critical);
             break;
         case Qlom::WARNING_ERROR_SEVERITY:
-            dialog.setWindowTitle(tr("Warning"));
-            dialog.setIcon(QMessageBox::Warning);
+            dialog->setWindowTitle(tr("Warning"));
+            dialog->setIcon(QMessageBox::Warning);
             break;
         }
 
-        dialog.exec();
+        dialog->exec();
+        delete dialog;
     }
 
     /* If the error message was non-empty then the error message was shown to
@@ -187,16 +189,17 @@ QString MainWindow::errorDomainLookup(
 
 void MainWindow::fileOpenTriggered()
 {
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setNameFilter("Glom document (*.glom)");
-    if (dialog.exec()) {
+    QPointer<QFileDialog> dialog = new QFileDialog(this);
+    dialog->setFileMode(QFileDialog::ExistingFile);
+    dialog->setNameFilter("Glom document (*.glom)");
+    if (dialog->exec()) {
         // Close the document before opening a document.
         fileCloseTriggered();
 
-        QStringList files = dialog.selectedFiles();
+        QStringList files = dialog->selectedFiles();
         if(!glomDocument.loadDocument(files.first()))
         {
+            delete dialog;
             return;
         }
 
@@ -205,6 +208,7 @@ void MainWindow::fileOpenTriggered()
         // Open default table.
         showDefaultTable();
     }
+    delete dialog;
 }
 
 void MainWindow::fileCloseTriggered()
