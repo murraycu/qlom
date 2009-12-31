@@ -42,6 +42,9 @@ public:
     explicit GlomFieldFormattingDelegate(const Glom::FieldFormatting& formatting, QObject *parent = 0);
     virtual ~GlomFieldFormattingDelegate();
 
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex &index ) const;
+
 protected:
     const Glom::FieldFormatting theFormattingUsed;
 };
@@ -68,8 +71,5 @@ class GlomLayoutItemTextDelegate : public GlomFieldFormattingDelegate
 public:
     GlomLayoutItemTextDelegate(const Glom::FieldFormatting& formatting, QObject *parent = 0);
     ~GlomLayoutItemTextDelegate();
-
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex &index ) const;
 };
 #endif // QLOM_GLOM_LAYOUT_DELEGATE_H_

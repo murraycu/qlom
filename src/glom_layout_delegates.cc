@@ -17,6 +17,7 @@
  */
 
 #include "glom_layout_delegates.h"
+#include "utils.h"
 
 #include <QRegExp>
 #include <QStringList>
@@ -30,6 +31,51 @@ GlomFieldFormattingDelegate::GlomFieldFormattingDelegate(const Glom::FieldFormat
 GlomFieldFormattingDelegate::~GlomFieldFormattingDelegate()
 {}
 
+void GlomFieldFormattingDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QStyleOptionViewItemV4 opt = option;
+    initStyleOption(&opt, index);
+
+    // TODO: how to query that we are in the displayRole here?
+    // TODO: query locale
+    QString data = displayText(index.data(), QLocale());
+
+    painter->save();
+
+    // TODO: set font family + size
+    //painter->setFont(opt.font);
+
+    QColor::setAllowX11ColorNames(true);
+    QColor fgColor = painter->pen().color();
+    QString fgColorName = ustringToQstring(theFormattingUsed.get_text_format_color_foreground());
+    if (!fgColorName.isEmpty())
+    {
+        fgColor.setNamedColor(fgColorName);
+    }
+
+    QColor bgColor = Qt::transparent; //painter->brush().color();
+    QString bgColorName = ustringToQstring(theFormattingUsed.get_text_format_color_background());
+    if (!bgColorName.isEmpty())
+    {
+        bgColor.setNamedColor(bgColorName);
+    }
+
+    // funny how the bold font overrides the pen width, no?
+    painter->setPen(QPen(fgColor));
+    painter->setBrush(bgColor);
+
+    painter->drawRect(opt.rect);
+
+    // TODO: query alignment + painter's origin (margin? padding?)
+    painter->drawText(opt.rect, Qt::AlignLeft, data);
+
+    painter->restore();
+}
+
+QSize GlomFieldFormattingDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex &index ) const
+{
+    return QStyledItemDelegate::sizeHint(option, index);
+}
 
 // begin GlomLayoutItemFieldDelegate impl
 GlomLayoutItemFieldDelegate::GlomLayoutItemFieldDelegate(const Glom::FieldFormatting& formatting, QObject *parent)
@@ -79,16 +125,3 @@ GlomLayoutItemTextDelegate::GlomLayoutItemTextDelegate(const Glom::FieldFormatti
 
 GlomLayoutItemTextDelegate::~GlomLayoutItemTextDelegate()
 {}
-
-void GlomLayoutItemTextDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
-    QStyleOptionViewItem boldFont(option);
-    boldFont.font.setBold(true);
-
-    QStyledItemDelegate::paint(painter, boldFont, index);
-}
-
-QSize GlomLayoutItemTextDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex &index ) const
-{
-    return QStyledItemDelegate::sizeHint(option, index);
-}
