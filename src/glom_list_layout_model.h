@@ -23,12 +23,14 @@ class ErrorReporter;
 
 #include "glom_table.h"
 #include "qlom_query_builder.h"
+#include "glom_layout_delegates.h"
 
 #include <QSqlDatabase>
 #include <QSqlTableModel>
 #include <QString>
 
 #include <libglom/document/document.h>
+#include <libglom/data_structure/layout/layoutgroup.h>
 
 /** A model to show a list layout from a Glom document.
  *  The list layout model obtains all the information that is required at
@@ -58,6 +60,14 @@ public:
      *  @returns the table name */
     QString tableDisplayName() const;
 
+    /** Applies Glom's FieldFormatting to a QStyledItemDelegate. Since the view
+     *  only knows about columns (during setup) we need to map columns to
+     *  LayoutItems, as it is already done in the query builder, even if not stated
+     *  explicitly.
+     *  @returns the style delegate to be managed by a view, or 0 if the
+     *  specified column cannot be formatted customly. */
+    QStyledItemDelegate * createDelegateFromColumn(int column) const;
+
 private:
     /** Read relationships from the document, and apply them to the model.
      *  Takes a list of relationships from the GlomTable as a parameter, and
@@ -77,6 +87,7 @@ private:
     QlomQueryBuilder queryBuilder; /**< an SQL query builder which is used to
                                         fill the model */
     QString theTableDisplayName; /**< the display name of the layout table */
+    Glom::sharedptr<const Glom::LayoutGroup> theLayoutGroup; /**< the layout group used for the list layout */
     ErrorReporter &theErrorReporter; /**< the facility used to report errors, a
                                           dynamic dependency */
 

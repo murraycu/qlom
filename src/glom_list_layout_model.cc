@@ -56,6 +56,7 @@ GlomListLayoutModel::GlomListLayoutModel(const Glom::Document *document,
     /* TODO: wrap in a get_list_model, so that the checks are kept together in
      * one place. */
     if (1 == listLayout.size()) {
+        theLayoutGroup = listLayout[0];
         createProjectionFromLayoutGroup(listLayout[0]);
         QSqlQuery query = queryBuilder.getDistinctSqlQuery();
         setQuery(query);
@@ -63,7 +64,7 @@ GlomListLayoutModel::GlomListLayoutModel(const Glom::Document *document,
         /* Display a warning message if the Glom document could not provide
          * us with a main layout group. */
         error.raiseError(QlomError(Qlom::DATABASE_ERROR_DOMAIN,
-            tr("GlomLayoutModel: no list model found."),
+            tr("%1: no list model found").arg("GlomLayoutModel"),
             Qlom::WARNING_ERROR_SEVERITY));
     }
 }
@@ -71,6 +72,38 @@ GlomListLayoutModel::GlomListLayoutModel(const Glom::Document *document,
 QString GlomListLayoutModel::tableDisplayName() const
 {
     return theTableDisplayName;
+}
+
+QStyledItemDelegate * GlomListLayoutModel::createDelegateFromColumn(int column) const
+{
+    // Need to respect the following constraint: The layout item in
+    // theLayoutGroup that can be found at the position column points to has to
+    // be a LayoutItem_Text or a LayoutItem_Field.
+    // However, this method is not used efficiently, considering how most items
+    // in a list view are field items. If LayoutItem_Text and LayoutItem_Field
+    // had a common base clase featuring the get_formatting_used() API we could
+    // get rid of the most annoying part at least: the dynamic casts.
+    const Glom::LayoutGroup::type_list_const_items items = theLayoutGroup->get_items();
+    for (Glom::LayoutGroup::type_list_const_items::const_iterator iter = items.begin();
+        iter != items.end();
+        ++iter) {
+        if (column == std::distance(items.begin(), iter))
+        {
+            Glom::sharedptr<const Glom::LayoutItem_Text> textItem = Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
+            if(textItem)
+            {
+                return new GlomLayoutItemTextDelegate(textItem->get_formatting_used());
+            }
+
+            Glom::sharedptr<const Glom::LayoutItem_Field> fieldItem = Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
+            if(fieldItem)
+            {
+                return new GlomLayoutItemFieldDelegate(fieldItem->get_formatting_used());
+            }
+        }
+    }
+
+    return 0;
 }
 
 void GlomListLayoutModel::applyRelationships(
