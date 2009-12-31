@@ -21,46 +21,66 @@
 #include <QRegExp>
 #include <QStringList>
 
-// begin GlomNumericDelegate impl
-GlomNumericDelegate::GlomNumericDelegate(QObject *parent)
-: QStyledItemDelegate(parent)
+// begin GlomFieldFormattingDelegate impl
+GlomFieldFormattingDelegate::GlomFieldFormattingDelegate(const Glom::FieldFormatting& formatting, QObject *parent)
+: QStyledItemDelegate(parent),
+  theFormattingUsed(formatting)
 {}
 
-GlomNumericDelegate::~GlomNumericDelegate()
+GlomFieldFormattingDelegate::~GlomFieldFormattingDelegate()
 {}
 
-QString GlomNumericDelegate::displayText(const QVariant &value, const QLocale &locale) const
+
+// begin GlomLayoutItemFieldDelegate impl
+GlomLayoutItemFieldDelegate::GlomLayoutItemFieldDelegate(const Glom::FieldFormatting& formatting, QObject *parent)
+: GlomFieldFormattingDelegate(formatting, parent)
+{}
+
+GlomLayoutItemFieldDelegate::~GlomLayoutItemFieldDelegate()
+{}
+
+QString GlomLayoutItemFieldDelegate::displayText(const QVariant &value, const QLocale &locale) const
 {
     Q_UNUSED(locale);
 
+    // Check whether the display text was a double in its previous life (hence
+    // the strict check over the whole string) and remove trailing zeroes if
+    // true (this is a Glom convention used for its numeric type).
     static const QRegExp matchDouble("\\d+\\.\\d+");
-
     if(matchDouble.exactMatch(value.toString())) {
-        QStringList doubleParts = value.toString().split('.');
-        QString reduceMe = doubleParts[1];
-        while(reduceMe.endsWith('0')) {
-            reduceMe.chop(1);
-        }
-
-        if(!reduceMe.isEmpty()) {
-            return QString("%1.%2").arg(doubleParts[0], reduceMe);
-        } else {
-            return doubleParts[0];
-        }
+        return removeTrailingZeroes(value.toString());
     }
 
     return value.toString();
 }
 
-// begin GlomTextDelegate impl
-GlomTextDelegate::GlomTextDelegate(QObject *parent)
-: QStyledItemDelegate(parent)
+QString GlomLayoutItemFieldDelegate::removeTrailingZeroes(const QString& str) const
+{
+    QStringList doubleParts = str.split('.');
+    QString reduceMe = doubleParts[1];
+
+    // This loop probably doesn't scale very well, but then again we don't
+    // expect a lot of iterations anyway.
+    while(reduceMe.endsWith('0')) {
+        reduceMe.chop(1);
+    }
+
+    if(!reduceMe.isEmpty()) {
+        return QString("%1.%2").arg(doubleParts[0], reduceMe);
+    } else {
+        return doubleParts[0];
+    }
+}
+
+// begin GlomLayoutItemTextDelegate impl
+GlomLayoutItemTextDelegate::GlomLayoutItemTextDelegate(const Glom::FieldFormatting& formatting, QObject *parent)
+: GlomFieldFormattingDelegate(formatting, parent)
 {}
 
-GlomTextDelegate::~GlomTextDelegate()
+GlomLayoutItemTextDelegate::~GlomLayoutItemTextDelegate()
 {}
 
-void GlomTextDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void GlomLayoutItemTextDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QStyleOptionViewItem boldFont(option);
     boldFont.font.setBold(true);
@@ -68,7 +88,7 @@ void GlomTextDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     QStyledItemDelegate::paint(painter, boldFont, index);
 }
 
-QSize GlomTextDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex &index ) const
+QSize GlomLayoutItemTextDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex &index ) const
 {
     return QStyledItemDelegate::sizeHint(option, index);
 }

@@ -25,24 +25,49 @@
 #include <QModelIndex>
 #include <QSize>
 
-class GlomNumericDelegate : public QStyledItemDelegate
+#include <libglom/data_structure/layout/fieldformatting.h>
+
+/** This is the base class for Glom::FieldFormatting-specific delegates used to
+  * format the style of Glom::LayoutItems in the view. In principle, each
+  * Glom::LayoutItem implementing get_formatting_used() (which is not part of
+  * the interface, though) gets its own delegate class derived from
+  * GlomFieldFormattingDelegate.
+  */
+class GlomFieldFormattingDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
 public:
-    GlomNumericDelegate(QObject *parent);
-    ~GlomNumericDelegate();
+    // Explicit ctor, although it might have been useful for implicit type conversions.
+    explicit GlomFieldFormattingDelegate(const Glom::FieldFormatting& formatting, QObject *parent = 0);
+    virtual ~GlomFieldFormattingDelegate();
 
-    virtual QString displayText(const QVariant &value, const QLocale &locale) const;
+protected:
+    const Glom::FieldFormatting theFormattingUsed;
 };
 
-class GlomTextDelegate : public QStyledItemDelegate
+
+class GlomLayoutItemFieldDelegate : public GlomFieldFormattingDelegate
 {
     Q_OBJECT
 
 public:
-    GlomTextDelegate(QObject *parent);
-    ~GlomTextDelegate();
+    explicit GlomLayoutItemFieldDelegate(const Glom::FieldFormatting& formatting, QObject *parent = 0);
+    virtual ~GlomLayoutItemFieldDelegate();
+
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const;
+
+private:
+    QString removeTrailingZeroes(const QString& str) const;
+};
+
+class GlomLayoutItemTextDelegate : public GlomFieldFormattingDelegate
+{
+    Q_OBJECT
+
+public:
+    GlomLayoutItemTextDelegate(const Glom::FieldFormatting& formatting, QObject *parent = 0);
+    ~GlomLayoutItemTextDelegate();
 
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex &index ) const;
