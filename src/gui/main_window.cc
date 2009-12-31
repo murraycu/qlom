@@ -257,18 +257,10 @@ void MainWindow::showTable(GlomListLayoutModel *model)
     QTableView *view = new QTableView(tableModelWindow);
     model->setParent(tableModelWindow);
 
-    // experimental code to see whether we can use delegates much the same way
-    // as we would use cell renderers.
-    // TODO: have a setupDelegates method that looks up the columns in a model
-    // and installs the correct delegates for a table view.
-
-    // tests trailing zeroes with the id column (usually 1st).
-    view->setItemDelegateForColumn(0, new GlomNumericDelegate(tableModelWindow));
-
-    // tests font formating with the 2nd & 3rd column.
-    GlomTextDelegate *textDelegate = new GlomTextDelegate(tableModelWindow);
-    view->setItemDelegateForColumn(1, textDelegate);
-    view->setItemDelegateForColumn(2, textDelegate);
+    for(int idx = 0; idx < model->columnCount(); ++idx)
+    {
+        view->setItemDelegateForColumn(idx, model->createDelegateFromColumn(idx));
+    }
 
     view->setModel(model);
     view->resizeColumnsToContents();
