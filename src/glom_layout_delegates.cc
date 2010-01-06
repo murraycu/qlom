@@ -23,9 +23,10 @@
 #include <QStringList>
 
 // begin GlomFieldFormattingDelegate impl
-GlomFieldFormattingDelegate::GlomFieldFormattingDelegate(const Glom::FieldFormatting& formatting, QObject *parent)
+GlomFieldFormattingDelegate::GlomFieldFormattingDelegate(const Glom::FieldFormatting& formatting, const GlomSharedField details, QObject *parent)
 : QStyledItemDelegate(parent),
-  theFormattingUsed(formatting)
+  theFormattingUsed(formatting),
+  theFieldDetails(details)
 {}
 
 GlomFieldFormattingDelegate::~GlomFieldFormattingDelegate()
@@ -76,8 +77,8 @@ QSize GlomFieldFormattingDelegate::sizeHint(const QStyleOptionViewItem& option, 
 }
 
 // begin GlomLayoutItemFieldDelegate impl
-GlomLayoutItemFieldDelegate::GlomLayoutItemFieldDelegate(const Glom::FieldFormatting& formatting, QObject *parent)
-: GlomFieldFormattingDelegate(formatting, parent)
+GlomLayoutItemFieldDelegate::GlomLayoutItemFieldDelegate(const Glom::FieldFormatting& formatting, const GlomSharedField details, QObject *parent)
+: GlomFieldFormattingDelegate(formatting, details, parent)
 {}
 
 GlomLayoutItemFieldDelegate::~GlomLayoutItemFieldDelegate()
@@ -85,30 +86,40 @@ GlomLayoutItemFieldDelegate::~GlomLayoutItemFieldDelegate()
 
 QString GlomLayoutItemFieldDelegate::displayText(const QVariant &value, const QLocale &locale) const
 {
-    Q_UNUSED(locale);
+    switch(theFieldDetails->get_glom_type())
+    {
+        case Glom::Field::TYPE_NUMERIC:
+        {
+            // Check whether the display text was a double in its previous life. If
+            // true, remove trailing zeroes and add thousand separators (if requested).
+            // The Glom numeric type is treated as doubles by the Sqlite backend.
+            bool conversionSucceeded = false;
+            double numeric = value.toString().toDouble(&conversionSucceeded);
 
-    // Check whether the display text was a double in its previous life. If
-    // true, remove trailing zeroes and add thousand separators (if requested).
-    // The Glom numeric type is treated as doubles by the Sqlite backend.
-    bool conversionSucceeded = false;
-    double numeric = value.toString().toDouble(&conversionSucceeded);
+            if(conversionSucceeded)
+                return applyNumericFormatting(numeric, locale);
+        } break;
 
-    // TODO: restrict conversion to Glom's numeric type, somehow.
-    if(conversionSucceeded)
-        return applyNumericFormatting(numeric);
+        case Glom::Field::TYPE_INVALID:
+        case Glom::Field::TYPE_TEXT:
+        case Glom::Field::TYPE_DATE:
+        case Glom::Field::TYPE_TIME:
+        case Glom::Field::TYPE_BOOLEAN:
+        case Glom::Field::TYPE_IMAGE:
+        default: break;
+    }
 
     return value.toString();
 }
 
-QString GlomLayoutItemFieldDelegate::applyNumericFormatting(double numeric) const
+QString GlomLayoutItemFieldDelegate::applyNumericFormatting(double numeric, const QLocale &locale) const
 {
     // This already removes trailing zeroes and also adds thousand separators.
-    // TODO: precision.
-    QLocale locale = QLocale::system();
+    QLocale myLocale = QLocale(locale);
     Glom::NumericFormat numFormat = theFormattingUsed.m_numeric_format;
 
     if(!numFormat.m_use_thousands_separator)
-        locale.setNumberOptions(QLocale::OmitGroupSeparator);
+        myLocale.setNumberOptions(QLocale::OmitGroupSeparator);
 
     // TODO: check max precision in Glom source.
     int precision = (numFormat.m_decimal_places_restricted ? numFormat.m_decimal_places : 12);
@@ -117,12 +128,12 @@ QString GlomLayoutItemFieldDelegate::applyNumericFormatting(double numeric) cons
     // [1] http://doc.trolltech.com/4.6/qstring.html#argument-formats
     char format = (numFormat.m_decimal_places_restricted ? 'f' : 'g');
 
-    return locale.toString(numeric, format, precision);
+    return myLocale.toString(numeric, format, precision);
 }
 
 // begin GlomLayoutItemTextDelegate impl
-GlomLayoutItemTextDelegate::GlomLayoutItemTextDelegate(const Glom::FieldFormatting& formatting, QObject *parent)
-: GlomFieldFormattingDelegate(formatting, parent)
+GlomLayoutItemTextDelegate::GlomLayoutItemTextDelegate(const Glom::FieldFormatting& formatting, const GlomSharedField details, QObject *parent)
+: GlomFieldFormattingDelegate(formatting, details, parent)
 {}
 
 GlomLayoutItemTextDelegate::~GlomLayoutItemTextDelegate()

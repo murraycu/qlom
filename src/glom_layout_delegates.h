@@ -26,6 +26,7 @@
 #include <QSize>
 
 #include <libglom/data_structure/layout/fieldformatting.h>
+#include <libglom/data_structure/field.h>
 
 /** This is the base class for Glom::FieldFormatting-specific delegates used to
   * format the style of Glom::LayoutItems in the view. In principle, each
@@ -38,8 +39,12 @@ class GlomFieldFormattingDelegate : public QStyledItemDelegate
     Q_OBJECT
 
 public:
+    typedef Glom::sharedptr<const Glom::Field> GlomSharedField;
+
     // Explicit ctor, although it might have been useful for implicit type conversions.
-    explicit GlomFieldFormattingDelegate(const Glom::FieldFormatting& formatting, QObject *parent = 0);
+    explicit GlomFieldFormattingDelegate(const Glom::FieldFormatting& formatting,
+                                         const GlomSharedField details,
+                                         QObject *parent = 0);
     virtual ~GlomFieldFormattingDelegate();
 
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
@@ -47,6 +52,7 @@ public:
 
 protected:
     const Glom::FieldFormatting theFormattingUsed;
+    const GlomSharedField theFieldDetails;
 };
 
 
@@ -55,13 +61,15 @@ class GlomLayoutItemFieldDelegate : public GlomFieldFormattingDelegate
     Q_OBJECT
 
 public:
-    explicit GlomLayoutItemFieldDelegate(const Glom::FieldFormatting& formatting, QObject *parent = 0);
+    explicit GlomLayoutItemFieldDelegate(const Glom::FieldFormatting& formatting,
+                                         const GlomSharedField details,
+                                         QObject *parent = 0);
     virtual ~GlomLayoutItemFieldDelegate();
 
     virtual QString displayText(const QVariant &value, const QLocale &locale) const;
 
 private:
-    QString applyNumericFormatting(double numeric) const;
+    QString applyNumericFormatting(double numeric, const QLocale& locale) const;
 };
 
 class GlomLayoutItemTextDelegate : public GlomFieldFormattingDelegate
@@ -69,7 +77,9 @@ class GlomLayoutItemTextDelegate : public GlomFieldFormattingDelegate
     Q_OBJECT
 
 public:
-    GlomLayoutItemTextDelegate(const Glom::FieldFormatting& formatting, QObject *parent = 0);
-    ~GlomLayoutItemTextDelegate();
+    GlomLayoutItemTextDelegate(const Glom::FieldFormatting& formatting,
+                               const GlomSharedField details,
+                               QObject *parent = 0);
+    virtual ~GlomLayoutItemTextDelegate();
 };
 #endif // QLOM_GLOM_LAYOUT_DELEGATE_H_

@@ -87,19 +87,15 @@ QStyledItemDelegate * GlomListLayoutModel::createDelegateFromColumn(int column) 
     for (Glom::LayoutGroup::type_list_const_items::const_iterator iter = items.begin();
         iter != items.end();
         ++iter) {
-        if (column == std::distance(items.begin(), iter))
-        {
+        if (column == std::distance(items.begin(), iter)) {
             Glom::sharedptr<const Glom::LayoutItem_Text> textItem = Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
             if(textItem)
-            {
-                return new GlomLayoutItemTextDelegate(textItem->get_formatting_used());
-            }
+                return new GlomLayoutItemTextDelegate(textItem->get_formatting_used(), GlomLayoutItemTextDelegate::GlomSharedField());
 
             Glom::sharedptr<const Glom::LayoutItem_Field> fieldItem = Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
             if(fieldItem)
-            {
-                return new GlomLayoutItemFieldDelegate(fieldItem->get_formatting_used());
-            }
+                return new GlomLayoutItemFieldDelegate(fieldItem->get_formatting_used(),
+                                                       fieldItem->get_full_field_details());
         }
     }
 
