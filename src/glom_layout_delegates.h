@@ -61,7 +61,7 @@ public:
     virtual QString displayText(const QVariant &value, const QLocale &locale) const;
 
 private:
-    QString removeTrailingZeroes(const QString& str) const;
+    QString applyNumericFormatting(double numeric) const;
 };
 
 class GlomLayoutItemTextDelegate : public GlomFieldFormattingDelegate

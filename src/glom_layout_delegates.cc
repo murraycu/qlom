@@ -48,17 +48,15 @@ void GlomFieldFormattingDelegate::paint(QPainter *painter, const QStyleOptionVie
     QColor::setAllowX11ColorNames(true);
     QColor fgColor = painter->pen().color();
     QString fgColorName = ustringToQstring(theFormattingUsed.get_text_format_color_foreground());
+
     if (!fgColorName.isEmpty())
-    {
         fgColor.setNamedColor(fgColorName);
-    }
 
     QColor bgColor = Qt::transparent; //painter->brush().color();
     QString bgColorName = ustringToQstring(theFormattingUsed.get_text_format_color_background());
+
     if (!bgColorName.isEmpty())
-    {
         bgColor.setNamedColor(bgColorName);
-    }
 
     // funny how the bold font overrides the pen width, no?
     painter->setPen(QPen(fgColor));
@@ -89,33 +87,37 @@ QString GlomLayoutItemFieldDelegate::displayText(const QVariant &value, const QL
 {
     Q_UNUSED(locale);
 
-    // Check whether the display text was a double in its previous life (hence
-    // the strict check over the whole string) and remove trailing zeroes if
-    // true (this is a Glom convention used for its numeric type).
-    static const QRegExp matchDouble("\\d+\\.\\d+");
-    if(matchDouble.exactMatch(value.toString())) {
-        return removeTrailingZeroes(value.toString());
-    }
+    // Check whether the display text was a double in its previous life. If
+    // true, remove trailing zeroes and add thousand separators (if requested).
+    // The Glom numeric type is treated as doubles by the Sqlite backend.
+    bool conversionSucceeded = false;
+    double numeric = value.toString().toDouble(&conversionSucceeded);
+
+    // TODO: restrict conversion to Glom's numeric type, somehow.
+    if(conversionSucceeded)
+        return applyNumericFormatting(numeric);
 
     return value.toString();
 }
 
-QString GlomLayoutItemFieldDelegate::removeTrailingZeroes(const QString& str) const
+QString GlomLayoutItemFieldDelegate::applyNumericFormatting(double numeric) const
 {
-    QStringList doubleParts = str.split('.');
-    QString reduceMe = doubleParts[1];
+    // This already removes trailing zeroes and also adds thousand separators.
+    // TODO: precision.
+    QLocale locale = QLocale::system();
+    Glom::NumericFormat numFormat = theFormattingUsed.m_numeric_format;
 
-    // This loop probably doesn't scale very well, but then again we don't
-    // expect a lot of iterations anyway.
-    while(reduceMe.endsWith('0')) {
-        reduceMe.chop(1);
-    }
+    if(!numFormat.m_use_thousands_separator)
+        locale.setNumberOptions(QLocale::OmitGroupSeparator);
 
-    if(!reduceMe.isEmpty()) {
-        return QString("%1.%2").arg(doubleParts[0], reduceMe);
-    } else {
-        return doubleParts[0];
-    }
+    // TODO: check max precision in Glom source.
+    int precision = (numFormat.m_decimal_places_restricted ? numFormat.m_decimal_places : 12);
+    // 'g' trims trailing zeroes, although not documented in [1], whereas 'f'
+    // prints the decimal places instead of using mantisse + exponent.
+    // [1] http://doc.trolltech.com/4.6/qstring.html#argument-formats
+    char format = (numFormat.m_decimal_places_restricted ? 'f' : 'g');
+
+    return locale.toString(numeric, format, precision);
 }
 
 // begin GlomLayoutItemTextDelegate impl
