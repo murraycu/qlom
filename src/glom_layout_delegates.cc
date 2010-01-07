@@ -100,23 +100,35 @@ QString GlomLayoutItemFieldDelegate::displayText(const QVariant &value, const QL
                 return applyNumericFormatting(numeric, locale);
         } break;
 
-        case Glom::Field::TYPE_INVALID:
         case Glom::Field::TYPE_TEXT:
+            return value.toString();
+
+        // TODO: handle other display roles correctly.
+        case Glom::Field::TYPE_INVALID:
         case Glom::Field::TYPE_DATE:
         case Glom::Field::TYPE_TIME:
         case Glom::Field::TYPE_BOOLEAN:
         case Glom::Field::TYPE_IMAGE:
+            return value.toString();
+
         default: break;
     }
 
-    return value.toString();
+    return QString("(not implemented)");
 }
 
 QString GlomLayoutItemFieldDelegate::applyNumericFormatting(double numeric, const QLocale &locale) const
 {
-    // This already removes trailing zeroes and also adds thousand separators.
-    QLocale myLocale = QLocale(locale);
     Glom::NumericFormat numFormat = theFormattingUsed.m_numeric_format;
+
+    QString currencyPrefix = QString();
+    if (!numFormat.m_currency_symbol.empty())
+    {
+        // Add a whitespace for the currency prefix.
+        currencyPrefix = QString("%1 ").arg(ustringToQstring(numFormat.m_currency_symbol));
+    }
+
+    QLocale myLocale = QLocale(locale);
 
     if(!numFormat.m_use_thousands_separator)
         myLocale.setNumberOptions(QLocale::OmitGroupSeparator);
@@ -128,7 +140,9 @@ QString GlomLayoutItemFieldDelegate::applyNumericFormatting(double numeric, cons
     // [1] http://doc.trolltech.com/4.6/qstring.html#argument-formats
     char format = (numFormat.m_decimal_places_restricted ? 'f' : 'g');
 
-    return myLocale.toString(numeric, format, precision);
+    // This already removes trailing zeroes and also adds thousand separators.
+    return QString("%1%2").arg(currencyPrefix)
+                          .arg(myLocale.toString(numeric, format, precision));
 }
 
 // begin GlomLayoutItemTextDelegate impl
