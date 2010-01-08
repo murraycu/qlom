@@ -37,15 +37,6 @@ void GlomFieldFormattingDelegate::paint(QPainter *painter, const QStyleOptionVie
     QStyleOptionViewItemV4 opt = option;
     initStyleOption(&opt, index);
 
-    // TODO: how to query that we are in the displayRole here?
-    // TODO: query locale
-    QString data = displayText(index.data(), QLocale());
-
-    painter->save();
-
-    // TODO: set font family + size
-    //painter->setFont(opt.font);
-
     QColor::setAllowX11ColorNames(true);
     QColor fgColor = painter->pen().color();
     QString fgColorName = ustringToQstring(theFormattingUsed.get_text_format_color_foreground());
@@ -53,22 +44,28 @@ void GlomFieldFormattingDelegate::paint(QPainter *painter, const QStyleOptionVie
     if (!fgColorName.isEmpty())
         fgColor.setNamedColor(fgColorName);
 
-    QColor bgColor = Qt::transparent; //painter->brush().color();
+    QColor bgColor = Qt::transparent;
     QString bgColorName = ustringToQstring(theFormattingUsed.get_text_format_color_background());
 
     if (!bgColorName.isEmpty())
         bgColor.setNamedColor(bgColorName);
 
-    // funny how the bold font overrides the pen width, no?
-    painter->setPen(QPen(fgColor));
+    // Tried to set fore- and background via setColor/setBrush and all roles
+    // listed http://qt.nokia.com/doc/4.6/qpalette.html#ColorRole-enum,
+    // highlight and text seem to be honored but not backround/base/window. I
+    // am not too surprised though - we probably need to extend our model to
+    // return the correct color per index using ItemDataRoles:
+    // http://doc.trolltech.com/4.6/qt.html#ItemDataRole-enum
+    opt.palette.setColor(QPalette::Text, fgColor);
+
+    // Still draw the background manually.
+    painter->save();
     painter->setBrush(bgColor);
-
     painter->drawRect(opt.rect);
-
-    // TODO: query alignment + painter's origin (margin? padding?)
-    painter->drawText(opt.rect, Qt::AlignLeft, data);
-
     painter->restore();
+
+    // Forward the modified QStyleOptionViewItem to the parent.
+    QStyledItemDelegate::paint(painter, opt, index);
 }
 
 QSize GlomFieldFormattingDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex &index ) const
