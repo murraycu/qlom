@@ -84,8 +84,8 @@ private:
     void createProjectionFromLayoutGroup(
         const Glom::sharedptr<const Glom::LayoutItem> &layoutItem);
 
-    QlomQueryBuilder queryBuilder; /**< an SQL query builder which is used to
-                                        fill the model */
+    QlomQueryBuilder theQueryBuilder; /**< an SQL query builder which is used to
+                                           fill the model */
     QString theTableDisplayName; /**< the display name of the layout table */
     Glom::sharedptr<const Glom::LayoutGroup> theLayoutGroup; /**< the layout group used for the list layout */
     ErrorReporter &theErrorReporter; /**< the facility used to report errors, a

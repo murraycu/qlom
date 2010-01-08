@@ -53,9 +53,10 @@ public:
      *  For example, "JOIN rel ON lhs = rhs".
      *  @param[in] relation the relation string to add
      *  @param[in] lhs the left-hand side of the join
-     *  @param[in] rhs the right-hand side of the join */
+     *  @param[in] rhs the right-hand side of the join
+     *  @param[in] enableLeftJoin defaults to enable left joins */
     void equiJoinWith(const QString& relation, const QString& lhs,
-        const QString& rhs);
+        const QString& rhs, bool enableLeftJoin = true);
 
     /** Set the selection of the query.
      *  For example, "WHERE selection".

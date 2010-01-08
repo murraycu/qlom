@@ -40,13 +40,13 @@ GlomListLayoutModel::GlomListLayoutModel(const Glom::Document *document,
     theErrorReporter(error)
 {
     setTable(table.tableName());
-    queryBuilder.addRelation(table.tableName());
+    theQueryBuilder.addRelation(table.tableName());
 
     /* mikhas (2009/11/27) - Fixes faulty joins. Glom does not join tables,
      * neither in list view nor in details view but appearantly only in portal
      * views.
      */
-    //applyRelationships(table.relationships());
+    applyRelationships(table.relationships());
 
     // The first item in a list layout group is always a main layout group.
     const Glib::ustring tableNameU(qstringToUstring(table.tableName()));
@@ -58,7 +58,7 @@ GlomListLayoutModel::GlomListLayoutModel(const Glom::Document *document,
     if (1 == listLayout.size()) {
         theLayoutGroup = listLayout[0];
         createProjectionFromLayoutGroup(listLayout[0]);
-        QSqlQuery query = queryBuilder.getDistinctSqlQuery();
+        QSqlQuery query = theQueryBuilder.getDistinctSqlQuery();
         setQuery(query);
     } else {
         /* Display a warning message if the Glom document could not provide
@@ -112,7 +112,7 @@ void GlomListLayoutModel::applyRelationships(
         const QString toTable(relationship->toTable());
         const QString toPrimaryKey(relationship->toPrimaryKey());
 
-        queryBuilder.equiJoinWith(toTable,
+        theQueryBuilder.equiJoinWith(toTable,
             QString("%1.%2").arg(toTable).arg(toPrimaryKey),
             QString("%1.%2").arg(tableName()).arg(from));
     }
@@ -144,12 +144,12 @@ void GlomListLayoutModel::createProjectionFromLayoutGroup(
                     *iter);
 
             if (staticTextItem) {
-                queryBuilder.addProjection(QString("%1 AS %3")
+                theQueryBuilder.addProjection(QString("%1 AS %3")
                     .arg(escapeFieldAsString(ustringToQstring(
                         staticTextItem->get_text())))
                     .arg(escapeField(currDisplayName)));
             } else {
-                queryBuilder.addProjection(QString("%1.%2 AS %3")
+                theQueryBuilder.addProjection(QString("%1.%2 AS %3")
                     .arg(escapeField(tableName()))
                     .arg(escapeField(currColName))
                     .arg(escapeField(currDisplayName)));

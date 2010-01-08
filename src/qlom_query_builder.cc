@@ -40,13 +40,16 @@ void QlomQueryBuilder::addRelation(const QString& relation)
 }
 
 void QlomQueryBuilder::equiJoinWith(const QString& relation,
-    const QString& lhs, const QString& rhs)
+    const QString& lhs, const QString& rhs, bool enableLeftJoin)
 {
     Q_ASSERT(relation != 0 && !relation.isEmpty() && lhs != 0 && !lhs.isEmpty()
         && rhs != 0 && !rhs.isEmpty());
 
-    QString builder =
-        QString("JOIN %1 ON (%2 = %3) ").arg(relation).arg(lhs).arg(rhs);
+    QString builder = QString("%1 JOIN %2 ON (%3 = %4) ")
+        .arg(enableLeftJoin ? "LEFT" : "")
+        .arg(relation)
+        .arg(lhs)
+        .arg(rhs);
 
     equiJoins.push_back(builder);
 }
