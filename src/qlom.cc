@@ -21,6 +21,9 @@
 #include <iostream>
 
 #include <QApplication>
+#include <QSqlDatabase>
+#include <QDebug>
+#include <QMessageBox>
 
 #include <libglom/init.h>
 
@@ -29,6 +32,30 @@
 void printUsage()
 {
     std::cout << "Usage: qlom [absolute_file_path]" << std::endl;
+}
+
+/** Check that the necessary database drivers are installed,
+ * and warn the user if they are not.
+ * @result Whether the installation is OK to continue.
+ */ 
+bool checkInstallation()
+{
+    //Check that the PostgreSQL QSQL driver is installed, 
+    //because qlom will not be useful without it:
+    QStringList drivers = QSqlDatabase::drivers();
+    QStringList::const_iterator end = drivers.end();
+    for(QStringList::const_iterator iter = drivers.begin(); iter != end; ++iter) {
+        const QString name = *iter;
+        if(name == "QPSQL")
+            return true;
+       //else if(name == "QSQLITE")
+       //   return true;
+    }
+
+    QMessageBox::critical(0, QObject::tr("Incomplete Qlom Installation"),
+        QObject::tr("Your installation of Glom is not complete, because the QtSQL PostgreSQL database driver (QPSQL) is not available on your system.\n\nPlease report this bug to your vendor or your system administrator so it can be corrected."));
+
+    return false;
 }
 
 int main(int argc, char **argv)
@@ -40,6 +67,9 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationName(PACKAGE_NAME);
 
     Glom::libglom_init();
+
+    if(!checkInstallation())
+      return 1;
 
     const QStringList options = app.arguments();
     MainWindow *mainWindow = 0;
