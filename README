@@ -3,9 +3,8 @@ Qlom
 A Qt application to view Glom databases, using libglom, the non-UI component
 of Glom.
 
-Qlom uses Autotroll.
-
 See also:
-
 http://www.glom.org/
+
+Qlom uses Autotroll in its build system:
 http://www.tsunanet.net/autotroll/
