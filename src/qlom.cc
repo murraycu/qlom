@@ -100,6 +100,5 @@ int main(int argc, char **argv)
     if(result != EXIT_SUCCESS)
       printUsage();
 
-    qDebug() << "Debug:" << result;
     return result;
 }

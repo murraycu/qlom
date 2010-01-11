@@ -42,7 +42,8 @@
 #include "config.h"
 
 MainWindow::MainWindow() :
-    glomDocument(this)
+    glomDocument(this),
+    valid(true)
 {
   setup();
 }
