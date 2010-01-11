@@ -97,8 +97,8 @@ void MainWindow::setup()
 {
     setWindowTitle(qApp->applicationName());
 
-    // The statusBar shows tooltips for menuitems.
-    statusBar()->showMessage(tr("Qlom started successfully"));
+    // Cause a status bar to be created and shown:
+    statusBar();
 
     // Create the menu.
     QAction *fileOpen = new QAction(tr("&Open"), this);
