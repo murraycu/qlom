@@ -30,6 +30,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QStringListModel>
+#include <QFileInfo>
 
 #include <iostream>
 
@@ -47,6 +48,18 @@ GlomDocument::GlomDocument(QObject *parent) :
 
 bool GlomDocument::loadDocument(const QString &filepath)
 {
+    QFileInfo info(filepath);
+    if(!info.exists()) {
+        qCritical("The file does not exist with filepath %s", 
+            qPrintable(filepath));
+
+        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
+            tr("The file does not exist"),
+            Qlom::CRITICAL_ERROR_SEVERITY);
+        theErrorReporter.raiseError(error);
+        return false;
+    }
+
     // filepathToUri raises an error if it fails.
     const std::string uri(filepathToUri(filepath));
     if(uri.empty()) {
@@ -60,9 +73,19 @@ bool GlomDocument::loadDocument(const QString &filepath)
     int failure_code = 0;
     const bool test = document->load(failure_code);
     if(!test) {
-        qCritical("Document loading failed with uri %s", uri.c_str());
+        qCritical("Document loading failed with uri %s (failure_code=%d)", 
+            uri.c_str(), failure_code);
+
+        QString message;
+        if(failure_code == Glom::Document::LOAD_FAILURE_CODE_FILE_VERSION_TOO_NEW) {
+           message = tr("The document's format is too new.");
+        }
+        else {
+           message = tr("libglom failed to load the Glom document");
+        }
+       
         const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
-            tr("libglom failed to load the Glom document"),
+            message,
             Qlom::CRITICAL_ERROR_SEVERITY);
         theErrorReporter.raiseError(error);
         return false;
