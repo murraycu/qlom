@@ -58,7 +58,7 @@ public:
     /** Load a Glom document from a file.
      *  Loads a Glom document from a file. This method can be called on a
      *  GlomDocument safely, even if a document has already been loaded.
-     *  @param[in] filepath the location of the Glom document
+     *  @param[in] filepath the location of the Glom document as an absolute filepath.
      *  @returns true on success, false on failure */
     bool loadDocument(const QString &filepath);
 

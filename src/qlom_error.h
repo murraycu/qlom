@@ -32,6 +32,9 @@ enum QlomErrorDomain {
     DATABASE_ERROR_DOMAIN /**< error in communication with the database */
 };
 
+//TODO: It doesn't make sense for the raiser of the error to decide how 
+//important the error is to the caller. murrayc.
+
 /** Error severity for QlomError.
  *  The severity of the error can be used by an error handler to determine how
  *  the application should proceed once an error has been raised. */

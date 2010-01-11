@@ -48,19 +48,30 @@ MainWindow::MainWindow() :
 }
 
 MainWindow::MainWindow(const QString &filepath) :
-    glomDocument(this)
+    glomDocument(this),
+    valid(true)
 {
     setup();
 
-    glomDocument.loadDocument(filepath);
+    if(!glomDocument.loadDocument(filepath)) {
+        valid = false;
+        return;
+    }
+
     GlomTablesModel *model = glomDocument.createTablesModel();
     centralTreeView->setModel(model);
 
     connect(centralTreeView, SIGNAL(doubleClicked(QModelIndex)),
         this, SLOT(treeviewDoubleclicked(QModelIndex)));
     show();
+
     // Open default table.
     showDefaultTable();
+}
+
+bool MainWindow::isValid() const
+{
+    return valid;
 }
 
 void MainWindow::receiveError(const QlomError &error)
@@ -86,10 +97,13 @@ void MainWindow::receiveError(const QlomError &error)
         delete dialog;
     }
 
+    // TODO: Whether to shut down the application should be for the caller to 
+    // decide. murrayc.
     /* If the error message was non-empty then the error message was shown to
-     * the user, too. All that remains is to shut down the application. */
+     * the user too. All that remains is to shut down the application. */
     if(Qlom::CRITICAL_ERROR_SEVERITY == error.severity()) {
-        exit(EXIT_FAILURE);
+        // TODO: This should cause app.exec() in main() to return, but it doesn't. murrayc.
+        QApplication::exit(EXIT_FAILURE);
     }
 }
 

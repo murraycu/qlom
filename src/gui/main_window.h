@@ -48,10 +48,18 @@ public:
     /** Application main window.
      *  Creates a main window with a Glom document found at the filepath
      *  parameter.
-     *  @param[in] filepath a path to a Glom document */
+     *  @param[in] filepath an absolute file path to a Glom document */
     explicit MainWindow(const QString &filepath);
 
     virtual ~MainWindow();
+
+    // TODO: Should/Can the ErrorReporter system be used instead to tell 
+    // the caller that MainWindow() failed? 
+    /** Discover whether the constructor was successful.
+     * This method exists because we do not want to use exceptions.
+     * @returns true if the constructor was successful.
+     */
+    bool isValid() const;
 
 public Q_SLOTS:
     /** Receive errors from ErrorReporter.
@@ -93,6 +101,7 @@ private:
     QTreeView *centralTreeView; /**< a tree view for the table names model */
     ErrorReporter theErrorReporter; /**< an error reporting facility that can
                                           be used in lieu of C++ exceptions. */
+    bool valid; /**< See isValid(). */
 
 private Q_SLOTS:
     /** Slot for the signal from the Open menu item. */
@@ -110,6 +119,7 @@ private Q_SLOTS:
     /** Slot for the signal from a double-click on the table names treeview.
      *  @param[in] index the row that was double-clicked */
     void treeviewDoubleclicked(const QModelIndex &index);
+
 
 };
 

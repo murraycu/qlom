@@ -69,7 +69,7 @@ int main(int argc, char **argv)
     Glom::libglom_init();
 
     if(!checkInstallation())
-      return 1;
+      return EXIT_FAILURE;
 
     const QStringList options = app.arguments();
     MainWindow *mainWindow = 0;
@@ -86,14 +86,20 @@ int main(int argc, char **argv)
         break;
     }
 
-    if (mainWindow) {
+    if (mainWindow && mainWindow->isValid()) {
         mainWindow->show();
     }
     else {
-        return 1;
+        printUsage();
+        return EXIT_FAILURE;
     }
+
     const int result = app.exec();
     delete mainWindow;
 
+    if(result != EXIT_SUCCESS)
+      printUsage();
+
+    qDebug() << "Debug:" << result;
     return result;
 }
