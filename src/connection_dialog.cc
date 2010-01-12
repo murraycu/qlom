@@ -36,10 +36,11 @@ ConnectionDialog::ConnectionDialog(const Glom::Document& document,
     setWindowTitle(tr("Connection details"));
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    QGridLayout *gridLayout = new QGridLayout();
     QLabel *description = new QLabel(
         tr("Please enter the connection details for the database server"));
     mainLayout->addWidget(description);
+
+    QGridLayout *gridLayout = new QGridLayout();
     mainLayout->addLayout(gridLayout);
 
     // Display the connection details, allowing some to be changed:
@@ -57,6 +58,7 @@ ConnectionDialog::ConnectionDialog(const Glom::Document& document,
         ustringToQstring(glomDoc.get_connection_database()));
     gridLayout->addWidget(database, 1, 2);
     database->setReadOnly(true);
+
     QLabel *userLabel = new QLabel(tr("Username:"));
     gridLayout->addWidget(userLabel, 2, 0);
     user = new QLineEdit();
@@ -110,18 +112,45 @@ void ConnectionDialog::openPostgresql()
 
     db.setHostName(host->text());
     db.setDatabaseName( ustringToQstring(glomDoc.get_connection_database()) );
-
-    // TODO: Try a range of ports, starting with this one:
-    db.setPort( glomDoc.get_connection_port() );
     db.setUserName(user->text());
     db.setPassword(password->text());
 
-    if (!db.open()) {
-        //TODO: Show this detailed error in the UI.
-        const QSqlError error = db.lastError();
-        qCritical("Database connection could not be opened. Error: %s", qPrintable(error.text()));
-        done(QDialog::Rejected);
-    } else {
-        done(QDialog::Accepted);
+    // Try to connect on each port, starting with the one specified in the 
+    // document.
+    // TODO: Maybe libglom should tell us this list of ports to try, 
+    // to avoid duplicating it here.
+    typedef std::list<int> typeListPorts;
+    typeListPorts listPorts;
+    listPorts.push_back( glomDoc.get_connection_port() );
+    listPorts.push_back(5432);
+    listPorts.push_back(5433);
+    listPorts.push_back(5434);
+    listPorts.push_back(5435);
+    listPorts.push_back(5436);
+
+
+    typeListPorts listPortsTried; 
+    for (typeListPorts::const_iterator iter = listPorts.begin(); 
+        iter != listPorts.end(); ++iter) {
+        const int port = *iter;
+        typeListPorts::const_iterator iterTried = 
+            std::find(listPortsTried.begin(), listPortsTried.end(), port);
+        if (iterTried == listPortsTried.end()) {
+            //Try this port. We haven't tried it before:
+            db.setPort(port);
+            if (db.open()) {
+              done(QDialog::Accepted);
+              return;
+            } else {
+               //TODO: Show this detailed error in the UI.
+               const QSqlError error = db.lastError();
+               qCritical("Database connection (port %d) could not be opened.\n  Error: %s", port, qPrintable(error.text()));
+
+               listPortsTried.push_back(port);
+            }
+        }
     }
+
+    // The connection failed even after trying all network ports.
+    done(QDialog::Rejected);
 }
