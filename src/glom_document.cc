@@ -107,18 +107,40 @@ bool GlomDocument::loadDocument(const QString &filepath)
     switch (document->get_hosting_mode()) {
     case Glom::Document::HOSTING_MODE_POSTGRES_CENTRAL:
     {
-        // TODO: request a connection dialog from MainWindow.
+        //TODO: Why use a QPointer here?
         QPointer<ConnectionDialog> connectionDialog =
-            new ConnectionDialog(*document);
-        if(connectionDialog->exec() != QDialog::Accepted) {
-            delete connectionDialog;
+                new ConnectionDialog(*document);
+        bool keepOffering = true;
+        bool connected = false;
+        while (keepOffering) {
+            // TODO: request a connection dialog from MainWindow.
+            const int result = connectionDialog->exec();
+            if(result == QDialog::Accepted) {
+                if (connectionDialog->connectionWasSuccessful()) {
+                    // The connection worked with these settings.
+                    connected = true;
+                    keepOffering = false;
+                } else {
+                    // Let the user try again, until he clicks Cancel.
+                    keepOffering = true;
+                }
+            } else if(result == QDialog::Rejected) {
+                // The user cancelled the dialog.
+                keepOffering = false;
+            } else {
+              qCritical("GlomDocument::loadDocument() Unexpected exec() result."); 
+            }
+        }
+            
+        delete connectionDialog;
+        connectionDialog = 0;
+
+        if (!connected) {
             const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
                 tr("Failed to connect to the PostgreSQL server"),
                 Qlom::CRITICAL_ERROR_SEVERITY);
             theErrorReporter.raiseError(error);
             return false;
-        } else {
-        delete connectionDialog;
         }
     }
     break;
@@ -157,7 +179,7 @@ GlomTablesModel * GlomDocument::createTablesModel()
 GlomListLayoutModel * GlomDocument::createListLayoutModel(
     const QString &tableName)
 {
-    for (QList<GlomTable>::const_iterator iter = tableList.begin();
+    for (typeTableList::const_iterator iter = tableList.begin();
          iter != tableList.end();
          ++iter) {
         if ((*iter).tableName() == tableName) {
@@ -176,21 +198,44 @@ GlomListLayoutModel * GlomDocument::createListLayoutModel(
 
 GlomListLayoutModel * GlomDocument::createDefaultTableListLayoutModel()
 {
-    for (QList<GlomTable>::const_iterator iter = tableList.begin();
-        iter != tableList.end();
-        ++iter) {
-        if ((*iter).tableName() ==
-            ustringToQstring(document->get_default_table())) {
-            return new GlomListLayoutModel(document, *iter, theErrorReporter,
+    Q_ASSERT(document);
+
+    QString defaultTable = ustringToQstring(document->get_default_table());
+
+    // Don't try to show a non-hidden table even if it is specified as the 
+    // default table.
+    if (document->get_table_is_hidden(qstringToUstring(defaultTable)))
+        defaultTable.clear();
+
+    //Use the first non-hidden table if a default table is not specified.
+    if (defaultTable.isEmpty()) {
+        for (typeTableList::const_iterator iter = tableList.begin();
+            iter != tableList.end(); ++iter) {
+            const GlomTable& table = *iter;
+            const QString tableName = table.tableName();
+            if(!(document->get_table_is_hidden(qstringToUstring(tableName)))) {
+                defaultTable = tableName;
+                break;
+            }
+       }
+    }
+
+    if(defaultTable.isEmpty()) {
+        theErrorReporter.raiseError(QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
+            tr("The document contains no non-hidden tables."),
+            Qlom::CRITICAL_ERROR_SEVERITY));
+        return 0; //There were no non-hidden tables.
+    }
+
+    // Create the model for the table:
+    for (typeTableList::const_iterator iter = tableList.begin();
+        iter != tableList.end(); ++iter) {
+        const GlomTable& table = *iter;
+        if (table.tableName() == defaultTable) {
+            return new GlomListLayoutModel(document, table, theErrorReporter,
                 qobject_cast<QObject*>(this));
         }
     }
-
-    /* TODO: change from critical to warning once Qlom can handle failed model
-     * initialisations. */
-    theErrorReporter.raiseError(QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
-        tr("Cannot find default table. Document empty?"),
-        Qlom::CRITICAL_ERROR_SEVERITY));
 
     return 0;
 }

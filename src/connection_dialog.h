@@ -44,12 +44,20 @@ public:
     explicit ConnectionDialog(const Glom::Document &document,
         QWidget *parent = 0);
 
+    /** Whether the entered settings allowed a connection to 
+     * be made when the user accepted the dialog (clicked Connect).
+     * This is only meaningful if exec() returned Accepted.
+     */
+    bool connectionWasSuccessful() const;
+
 private:
     const Glom::Document &glomDoc;
     QLineEdit *host;
     QLineEdit *database;
     QLineEdit *user;
     QLineEdit *password;
+
+    bool theConnectionWasSuccessful;
 
     void openPostgresql();
 

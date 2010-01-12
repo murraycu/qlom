@@ -125,7 +125,9 @@ private:
 
     Glom::Document *document; /**< libglom's representaton of a Glom document */
     ErrorReporter theErrorReporter; /**< an error-reporting object */
-    QList<GlomTable> tableList; /**< a list of tables in the document */
+
+    typedef QList<GlomTable> typeTableList;
+    typeTableList tableList; /**< a list of tables in the document */
 };
 
 #endif /* QLOM_GLOM_DOCUMENT_H_ */

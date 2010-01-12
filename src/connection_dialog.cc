@@ -31,7 +31,8 @@
 ConnectionDialog::ConnectionDialog(const Glom::Document& document,
     QWidget *parent) :
     QDialog(parent),
-    glomDoc(document)
+    glomDoc(document),
+    theConnectionWasSuccessful(false)
 {
     setWindowTitle(tr("Connection details"));
 
@@ -61,8 +62,11 @@ ConnectionDialog::ConnectionDialog(const Glom::Document& document,
 
     QLabel *userLabel = new QLabel(tr("Username:"));
     gridLayout->addWidget(userLabel, 2, 0);
-    user = new QLineEdit();
+    // Default to the UNIX user name, which is often the same as the Postgres user name:
+    const char* systemUser = getenv("USER"); 
+    user = new QLineEdit(systemUser);
     gridLayout->addWidget(user, 2, 2);
+
     QLabel *passwordLabel = new QLabel(tr("Password:"));
     gridLayout->addWidget(passwordLabel, 3, 0);
     password = new QLineEdit();
@@ -79,6 +83,8 @@ ConnectionDialog::ConnectionDialog(const Glom::Document& document,
 
 void ConnectionDialog::databaseConnect()
 {
+    theConnectionWasSuccessful = false;
+
     // Try to open a database connection, with the details from the dialog.
     switch (glomDoc.get_hosting_mode()) {
     case Glom::Document::HOSTING_MODE_POSTGRES_CENTRAL:
@@ -86,10 +92,14 @@ void ConnectionDialog::databaseConnect()
         break;
     default:
         qCritical("Unexpected database hosting mode");
-        done(QDialog::Rejected);
+
+        // Note that we don't use done(QDialog::Rejected) to tell the caller 
+        // that the connection failed, because then there would be no way to 
+        // distinguish between a failed connection and the user clicking Cancel.
+        theConnectionWasSuccessful = false;
+        done(QDialog::Accepted);
         break;
     }
-
 }
 
 // Open a central-server PostgreSQL connection.
@@ -105,9 +115,14 @@ void ConnectionDialog::openPostgresql()
     const QSqlError error(db.lastError());
     if (error.isValid()) {
         // TODO: Give feedback in the UI.
-        qCritical("Database backend \"%s\" does not exist\nErrot details: %s",
+        qCritical("Database backend \"%s\" does not exist\nError details: %s",
             backend.toUtf8().constData(), error.text().toUtf8().constData());
-        done(QDialog::Rejected);
+
+        // Note that we don't use done(QDialog::Rejected) to tell the caller 
+        // that the connection failed, because then there would be no way to 
+        // distinguish between a failed connection and the user clicking Cancel.
+        done(QDialog::Accepted);
+        return;
     }
 
     db.setHostName(host->text());
@@ -139,6 +154,7 @@ void ConnectionDialog::openPostgresql()
             //Try this port. We haven't tried it before:
             db.setPort(port);
             if (db.open()) {
+              theConnectionWasSuccessful = true;
               done(QDialog::Accepted);
               return;
             } else {
@@ -152,5 +168,14 @@ void ConnectionDialog::openPostgresql()
     }
 
     // The connection failed even after trying all network ports.
-    done(QDialog::Rejected);
+    // Note that we don't use done(QDialog::Rejected) to tell the caller 
+    // that the connection failed, because then there would be no way to 
+    // distinguish between a failed connection and the user clicking Cancel.
+    theConnectionWasSuccessful = false;
+    done(QDialog::Accepted);
+}
+
+bool ConnectionDialog::connectionWasSuccessful() const
+{
+  return theConnectionWasSuccessful;
 }

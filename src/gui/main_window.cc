@@ -258,14 +258,24 @@ void MainWindow::treeviewDoubleclicked(const QModelIndex& index)
 
 void MainWindow::showDefaultTable()
 {
+    // Show the default table, or the first non-hidden table,
+    // if there is one:
     GlomListLayoutModel *model =
       glomDocument.createDefaultTableListLayoutModel();
-    showTable(model);
-    statusBar()->showMessage(tr("Default table opened"));
+
+    if (model) {
+        showTable(model);
+        statusBar()->showMessage(tr("Default table opened"));
+    }
 }
 
 void MainWindow::showTable(GlomListLayoutModel *model)
 {
+    if(!model) {
+        qCritical("MainWindow::showTable(): model is null.");
+        return;
+    }
+
     QMainWindow *tableModelWindow = new QMainWindow(this);
     tableModelWindow->setAttribute(Qt::WA_DeleteOnClose);
 
