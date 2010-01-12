@@ -42,10 +42,15 @@ ConnectionDialog::ConnectionDialog(const Glom::Document& document,
     mainLayout->addWidget(description);
     mainLayout->addLayout(gridLayout);
 
+    // Display the connection details, allowing some to be changed:
     QLabel *hostLabel = new QLabel(tr("Hostname:"));
     gridLayout->addWidget(hostLabel, 0, 0);
     host = new QLineEdit(ustringToQstring(glomDoc.get_connection_server()));
     gridLayout->addWidget(host, 0, 2);
+
+    // The database name is shown as read-only, just to give people a clue 
+    // about what username and password they should use, in case it is not 
+    // the same for the whole server.
     QLabel *database_label = new QLabel(tr("Database:"));
     gridLayout->addWidget(database_label, 1, 0);
     database = new QLineEdit(
@@ -104,13 +109,17 @@ void ConnectionDialog::openPostgresql()
     }
 
     db.setHostName(host->text());
-    db.setDatabaseName(database->text());
+    db.setDatabaseName( ustringToQstring(glomDoc.get_connection_database()) );
+
+    // TODO: Try a range of ports, starting with this one:
+    db.setPort( glomDoc.get_connection_port() );
     db.setUserName(user->text());
     db.setPassword(password->text());
 
     if (!db.open()) {
-        //TODO: Tell the user in the UI.
-        qCritical("Database connection could not be opened");
+        //TODO: Show this detailed error in the UI.
+        const QSqlError error = db.lastError();
+        qCritical("Database connection could not be opened. Error: %s", qPrintable(error.text()));
         done(QDialog::Rejected);
     } else {
         done(QDialog::Accepted);
