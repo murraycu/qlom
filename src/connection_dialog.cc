@@ -116,7 +116,7 @@ void ConnectionDialog::openPostgresql()
     if (error.isValid()) {
         // TODO: Give feedback in the UI.
         qCritical("Database backend \"%s\" does not exist\nError details: %s",
-            backend.toUtf8().constData(), error.text().toUtf8().constData());
+            qPrintable(backend), qPrintable(error.text()));
 
         // Note that we don't use done(QDialog::Rejected) to tell the caller 
         // that the connection failed, because then there would be no way to 

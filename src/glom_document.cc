@@ -287,8 +287,8 @@ bool GlomDocument::openSqlite()
     if (sqlError.isValid()) {
         // TODO: Give feedback in the UI.
         qCritical("Database backend \"%s\" does not exist\nError details: %s",
-            backend.toUtf8().constData(),
-            sqlError.text().toUtf8().constData());
+            qPrintable(backend),
+            qPrintable(sqlError.text()));
         const QlomError error(Qlom::DATABASE_ERROR_DOMAIN,
             tr("%1 database backend does not exist. Further details:\n%2")
                 .arg(backend).arg(sqlError.text()),
