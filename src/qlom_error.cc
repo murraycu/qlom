@@ -21,6 +21,7 @@
 #include <algorithm>
 
 QlomError::QlomError() :
+    errorDomain(0),
     severityLevel(0)
 {
 }
