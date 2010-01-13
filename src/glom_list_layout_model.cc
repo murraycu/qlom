@@ -42,10 +42,6 @@ GlomListLayoutModel::GlomListLayoutModel(const Glom::Document *document,
     setTable(table.tableName());
     theQueryBuilder.addRelation(table.tableName());
 
-    /* mikhas (2009/11/27) - Fixes faulty joins. Glom does not join tables,
-     * neither in list view nor in details view but appearantly only in portal
-     * views.
-     */
     applyRelationships(table.relationships());
 
     // The first item in a list layout group is always a main layout group.
@@ -134,6 +130,12 @@ void GlomListLayoutModel::createProjectionFromLayoutGroup(
             /* The default setting for a projection is
              * "table.col AS display_name", whereas display_name is used for
              *  the column heading. */
+            QString currTableName = tableName();
+            Glom::sharedptr<const Glom::LayoutItem_Field> field = Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
+            if (field) {
+                currTableName = ustringToQstring(field->get_table_used(qstringToUstring(tableName())));
+            }
+
             const QString currColName = ustringToQstring((*iter)->get_name());
             const QString currDisplayName =
                 ustringToQstring((*iter)->get_title_or_name());
@@ -150,7 +152,7 @@ void GlomListLayoutModel::createProjectionFromLayoutGroup(
                     .arg(escapeField(currDisplayName)));
             } else {
                 theQueryBuilder.addProjection(QString("%1.%2 AS %3")
-                    .arg(escapeField(tableName()))
+                    .arg(escapeField(currTableName))
                     .arg(escapeField(currColName))
                     .arg(escapeField(currDisplayName)));
             }
