@@ -21,6 +21,7 @@
 
 #include <QRegExp>
 #include <QStringList>
+#include <libglom/data_structure/glomconversions.h>
 
 // begin GlomFieldFormattingDelegate impl
 GlomFieldFormattingDelegate::GlomFieldFormattingDelegate(const Glom::FieldFormatting& formatting, const GlomSharedField details, QObject *parent)
@@ -131,7 +132,8 @@ QString GlomLayoutItemFieldDelegate::applyNumericFormatting(double numeric, cons
         myLocale.setNumberOptions(QLocale::OmitGroupSeparator);
 
     // TODO: check max precision in Glom source.
-    int precision = (numFormat.m_decimal_places_restricted ? numFormat.m_decimal_places : 12);
+    int precision = (numFormat.m_decimal_places_restricted ? numFormat.m_decimal_places
+                                                           : Glom::Conversions::get_stringstream_precision_default());
     // 'g' trims trailing zeroes, although not documented in [1], whereas 'f'
     // prints the decimal places instead of using mantisse + exponent.
     // [1] http://doc.trolltech.com/4.6/qstring.html#argument-formats
