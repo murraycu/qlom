@@ -37,10 +37,10 @@ void printUsage()
 /** Check that the necessary database drivers are installed,
  * and warn the user if they are not.
  * @result Whether the installation is OK to continue.
- */ 
+ */
 bool checkInstallation()
 {
-    //Check that the PostgreSQL QSQL driver is installed, 
+    //Check that the PostgreSQL QSQL driver is installed,
     //because qlom will not be useful without it:
     QStringList drivers = QSqlDatabase::drivers();
     QStringList::const_iterator end = drivers.end();
