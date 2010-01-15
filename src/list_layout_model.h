@@ -70,6 +70,14 @@ public:
     QStyledItemDelegate * createDelegateFromColumn(int column) const;
 
 private:
+    /** A wrapper for Glom::Utils::build_sql_select_with_where_clause()
+      * @param[in] table the name of the table
+      * @param[in] layoutGroup a shared pointer to a Glom LayoutGroup that is
+      *            suitable for a list view (i.e., contains LayoutItem_Fields).
+      * @returns the SQL query as string.
+      */
+    QString buildQuery(const Glib::ustring& table,
+                       const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup);
     /** Read relationships from the document, and apply them to the model.
      *  Takes a list of relationships from the Table as a parameter, and
      *  applies the relationships to the SQL query for the list layout model.
