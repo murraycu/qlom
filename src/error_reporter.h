@@ -32,7 +32,6 @@ public:
      *  @returns the last error */
     QlomError lastError() const;
 
-public Q_SLOTS:
     /** Raise a new error on the object.
      *  @param[in] error the error to raise */
     void raiseError(const QlomError &error);
