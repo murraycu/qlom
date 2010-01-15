@@ -32,8 +32,6 @@ src_qlom_SOURCES = src/qlom.cc \
 		   src/document.cc \
 		   src/document.moc.cc \
 		   src/document.h \
-                   src/query_builder.cc \
-                   src/query_builder.h \
                    src/utils.cc \
                    src/utils.h
 

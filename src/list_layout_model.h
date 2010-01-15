@@ -22,7 +22,6 @@
 class QlomErrorReporter;
 
 #include "table.h"
-#include "query_builder.h"
 #include "layout_delegates.h"
 
 #include <QSqlDatabase>
@@ -78,44 +77,12 @@ private:
       */
     QString buildQuery(const Glib::ustring& table,
                        const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup);
-    /** Read relationships from the document, and apply them to the model.
-     *  Takes a list of relationships from the Table as a parameter, and
-     *  applies the relationships to the SQL query for the list layout model.
-     *  @param[in] relationships a list of relationships to apply */
-    void applyRelationships(const QList<QlomRelationship> &relationships);
 
-    /** Discard columns that are not mentioned in the Glom document.
-     *  Builds an SQL query from the layout group, hiding columns that should
-     *  not be shown and displaying static text items that are described in the
-     *  document.
-     *  @param[in] layoutItem the layout containing the columns that should not
-     be discarded */
-    void createProjectionFromLayoutGroup(
-        const Glom::sharedptr<const Glom::LayoutItem> &layoutItem);
-
-    QlomQueryBuilder theQueryBuilder; /**< an SQL query builder which is used to
-                                           fill the model */
     QString theTableDisplayName; /**< the display name of the layout table */
     Glom::sharedptr<const Glom::LayoutGroup> theLayoutGroup; /**< the layout group used for the list layout */
     QlomErrorReporter &theErrorReporter; /**< the facility used to report
                                            errors, a dynamic dependency */
 
-    /** Escape the SQL primitive.
-     *  QtSql only has two roles for escaping in a projection:
-     *  1. QSqlDriver::FieldName,
-     *  2. QSqlDriver::TableName.
-     *  In fact, there is a third role, namely type primitives: "SELECT 1",
-     *  "SELECT 'aString'", etc. where the escapeIdentifier call, for an
-     *  imaginary role "QSqlDriver::Primitive", would escape using single
-     *  quotes.
-     *  @param[in] field the SQL primitive to escape
-     *  @returns the escaped string */
-    QString escapeFieldAsString(const QString &field) const;
-
-    /** Escape the field name according to the current database escaping rules.
-     *  @param[in] field the field name to escape
-     *  @returns the escaped string */
-    QString escapeField(const QString &field) const;
 };
 
 #endif /* QLOM_LIST_LAYOUT_MODEL_H_ */
