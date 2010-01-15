@@ -339,7 +339,6 @@ bool GlomDocument::openSqlite()
     if (sqliteDb.exists()) {
         db.setDatabaseName(filename);
     } else {
-        qCritical("Sqlite database does not exist");
         const QlomError error(Qlom::DATABASE_ERROR_DOMAIN,
             tr("The SQLite database listed in the Glom document does not exist"),
             Qlom::CRITICAL_ERROR_SEVERITY);
@@ -357,27 +356,27 @@ bool GlomDocument::openSqlite()
 
 void GlomDocument::fillTableList()
 {
-    if (tableList.empty()) {
-        const std::vector<Glib::ustring> tables(document->get_table_names());
-        for(std::vector<Glib::ustring>::const_iterator iter(tables.begin());
-            iter != tables.end(); ++iter) {
-            Glom::Document::type_vec_relationships documentRelationships(
-                document->get_relationships(*iter));
-            // Get a list of GlomRelationship items from the document.
-            QList<GlomRelationship> relationships(
-                fillRelationships(documentRelationships));
-            // Fill the GlomDocument with a list of GlomTables.
-            tableList.push_back(GlomTable(ustringToQstring(*iter),
-                ustringToQstring(document->get_table_title(*iter)),
-                relationships));
-        }
-    } else {
-        qWarning("Filling tableList when it it not empty");
+    if (!tableList.empty()) {
+        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
+            tr("Filling non-empty table list, the Glom document might be corrupted."),
+            Qlom::WARNING_ERROR_SEVERITY);
+        theErrorReporter.raiseError(error);
         tableList.clear();
-        fillTableList(); // Recurse.
     }
 
-    return;
+    const std::vector<Glib::ustring> tables(document->get_table_names());
+    for(std::vector<Glib::ustring>::const_iterator iter(tables.begin());
+        iter != tables.end(); ++iter) {
+        Glom::Document::type_vec_relationships documentRelationships(
+            document->get_relationships(*iter));
+        // Get a list of GlomRelationship items from the document.
+        QList<GlomRelationship> relationships(
+            fillRelationships(documentRelationships));
+        // Fill the GlomDocument with a list of GlomTables.
+        tableList.push_back(GlomTable(ustringToQstring(*iter),
+            ustringToQstring(document->get_table_title(*iter)),
+            relationships));
+    }
 }
 
 QList<GlomRelationship> GlomDocument::fillRelationships(
