@@ -150,6 +150,7 @@ void QlomMainWindow::setup()
         this, SLOT(receiveError(QlomError)));
 
     centralTreeView = new QTreeView(this);
+    centralTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     setCentralWidget(centralTreeView);
 
     readSettings();
@@ -278,6 +279,7 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
     tableModelWindow->setAttribute(Qt::WA_DeleteOnClose);
 
     QTableView *view = new QTableView(tableModelWindow);
+    view->setEditTriggers(QAbstractItemView::NoEditTriggers);
     model->setParent(tableModelWindow);
 
     for(int idx = 0; idx < model->columnCount(); ++idx) {
