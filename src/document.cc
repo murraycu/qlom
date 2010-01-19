@@ -16,10 +16,10 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "glom_document.h"
-#include "qlom_error.h"
-#include "glom_tables_model.h"
-#include "glom_list_layout_model.h"
+#include "document.h"
+#include "error.h"
+#include "tables_model.h"
+#include "list_layout_model.h"
 #include "connection_dialog.h"
 #include "utils.h"
 
@@ -39,14 +39,14 @@
 
 #include "config.h"
 
-GlomDocument::GlomDocument(QObject *parent) :
+QlomDocument::QlomDocument(QObject *parent) :
     QObject(parent),
     document(0)
 {
     /* No document case. */
 }
 
-bool GlomDocument::loadDocument(const QString &filepath)
+bool QlomDocument::loadDocument(const QString &filepath)
 {
     QFileInfo info(filepath);
     if(!info.exists()) {
@@ -84,8 +84,7 @@ bool GlomDocument::loadDocument(const QString &filepath)
            message = tr("libglom failed to load the Glom document");
         }
        
-        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
-            message,
+        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN, message,
             Qlom::CRITICAL_ERROR_SEVERITY);
         theErrorReporter.raiseError(error);
         return false;
@@ -171,19 +170,19 @@ bool GlomDocument::loadDocument(const QString &filepath)
     return true;
 }
 
-GlomTablesModel * GlomDocument::createTablesModel()
+QlomTablesModel * QlomDocument::createTablesModel()
 {
-    return new GlomTablesModel(tableList, qobject_cast<QObject*>(this));
+    return new QlomTablesModel(tableList, qobject_cast<QObject*>(this));
 }
 
-GlomListLayoutModel * GlomDocument::createListLayoutModel(
+QlomListLayoutModel * QlomDocument::createListLayoutModel(
     const QString &tableName)
 {
     for (typeTableList::const_iterator iter = tableList.begin();
          iter != tableList.end();
          ++iter) {
         if ((*iter).tableName() == tableName) {
-            return new GlomListLayoutModel(document, *iter, theErrorReporter,
+            return new QlomListLayoutModel(document, *iter, theErrorReporter,
                 qobject_cast<QObject*>(this));
         }
     }
@@ -196,7 +195,7 @@ GlomListLayoutModel * GlomDocument::createListLayoutModel(
     return 0;
 }
 
-GlomListLayoutModel * GlomDocument::createDefaultTableListLayoutModel()
+QlomListLayoutModel * QlomDocument::createDefaultTableListLayoutModel()
 {
     Q_ASSERT(document);
 
@@ -211,7 +210,7 @@ GlomListLayoutModel * GlomDocument::createDefaultTableListLayoutModel()
     if (defaultTable.isEmpty()) {
         for (typeTableList::const_iterator iter = tableList.begin();
             iter != tableList.end(); ++iter) {
-            const GlomTable& table = *iter;
+            const QlomTable& table = *iter;
             const QString tableName = table.tableName();
             if(!(document->get_table_is_hidden(qstringToUstring(tableName)))) {
                 defaultTable = tableName;
@@ -230,9 +229,9 @@ GlomListLayoutModel * GlomDocument::createDefaultTableListLayoutModel()
     // Create the model for the table:
     for (typeTableList::const_iterator iter = tableList.begin();
         iter != tableList.end(); ++iter) {
-        const GlomTable& table = *iter;
+        const QlomTable& table = *iter;
         if (table.tableName() == defaultTable) {
-            return new GlomListLayoutModel(document, table, theErrorReporter,
+            return new QlomListLayoutModel(document, table, theErrorReporter,
                 qobject_cast<QObject*>(this));
         }
     }
@@ -240,12 +239,12 @@ GlomListLayoutModel * GlomDocument::createDefaultTableListLayoutModel()
     return 0;
 }
 
-ErrorReporter & GlomDocument::errorReporter()
+QlomErrorReporter & QlomDocument::errorReporter()
 {
     return theErrorReporter;
 }
 
-std::string GlomDocument::filepathToUri(const QString &theFilepath)
+std::string QlomDocument::filepathToUri(const QString &theFilepath)
 {
     const std::string filepath(theFilepath.toUtf8().constData());
     std::string uri;
@@ -278,7 +277,7 @@ std::string GlomDocument::filepathToUri(const QString &theFilepath)
     return uri;
 }
 
-bool GlomDocument::openSqlite()
+bool QlomDocument::openSqlite()
 {
     const QString backend("QSQLITE");
     QSqlDatabase db(QSqlDatabase::addDatabase(backend));
@@ -354,7 +353,7 @@ bool GlomDocument::openSqlite()
     }
 }
 
-void GlomDocument::fillTableList()
+void QlomDocument::fillTableList()
 {
     if (!tableList.empty()) {
         const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
@@ -370,25 +369,25 @@ void GlomDocument::fillTableList()
         Glom::Document::type_vec_relationships documentRelationships(
             document->get_relationships(*iter));
         // Get a list of GlomRelationship items from the document.
-        QList<GlomRelationship> relationships(
+        QList<QlomRelationship> relationships(
             fillRelationships(documentRelationships));
         // Fill the GlomDocument with a list of GlomTables.
-        tableList.push_back(GlomTable(ustringToQstring(*iter),
+        tableList.push_back(QlomTable(ustringToQstring(*iter),
             ustringToQstring(document->get_table_title(*iter)),
             relationships));
     }
 }
 
-QList<GlomRelationship> GlomDocument::fillRelationships(
+QList<QlomRelationship> QlomDocument::fillRelationships(
     const Glom::Document::type_vec_relationships &documentRelationships)
 {
-    QList<GlomRelationship> relationships;
+    QList<QlomRelationship> relationships;
     for (Glom::Document::type_vec_relationships::const_iterator iter(
         documentRelationships.begin()); iter != documentRelationships.end();
         ++iter) {
         const Glom::sharedptr<const Glom::Relationship>
             documentRelationship(*iter);
-        relationships.push_back(GlomRelationship(
+        relationships.push_back(QlomRelationship(
             ustringToQstring(documentRelationship->get_from_field()),
             ustringToQstring(documentRelationship->get_to_table()),
             ustringToQstring(documentRelationship->get_to_field())));

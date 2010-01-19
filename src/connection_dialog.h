@@ -41,27 +41,35 @@ class ConnectionDialog : public QDialog
     Q_OBJECT
 
 public:
+    /** A dialog to ask the user for connection details.
+     *  @param[in] document a Glom document containing connection details
+     *  @param[in] parent a parent widget, to take ownership of the dialog */
     explicit ConnectionDialog(const Glom::Document &document,
         QWidget *parent = 0);
 
-    /** Whether the entered settings allowed a connection to 
-     * be made when the user accepted the dialog (clicked Connect).
-     * This is only meaningful if exec() returned Accepted.
+    /** Whether the entered settings allowed a connection to be made when the
+     *  user accepted the dialog (clicked Connect). This is only meaningful if
+     *  exec() returned Accepted.
+     *  @returns true if the connection attempt was successful, false otherwise
      */
     bool connectionWasSuccessful() const;
 
 private:
-    const Glom::Document &glomDoc;
-    QLineEdit *host;
-    QLineEdit *database;
-    QLineEdit *user;
-    QLineEdit *password;
+    const Glom::Document &glomDoc; /**< Glom document to open a connection for
+                                    */
+    QLineEdit *host; /**< hostname text entry */
+    QLineEdit *database; /**< database name text entry */
+    QLineEdit *user; /**< username text entry */
+    QLineEdit *password; /**< password text entry */
 
-    bool theConnectionWasSuccessful;
+    bool theConnectionWasSuccessful; /** whether the database connection
+                                       attempt was successful */
 
+    /** Open a central-server PostgreSQL connection */
     void openPostgresql();
 
 private Q_SLOTS:
+    /** Slot to call when clicking the ‘Accept’ button */
     void databaseConnect();
 };
 

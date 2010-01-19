@@ -16,10 +16,10 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "glom_list_layout_model.h"
+#include "list_layout_model.h"
 #include "error_reporter.h"
 #include "utils.h"
-#include "qlom_error.h"
+#include "error.h"
 
 #include <QSqlQuery>
 #include <QSqlIndex>
@@ -32,8 +32,8 @@
   *  suitable for list and detail views.
   */
 // We don't check for nullptr in document and error?
-GlomListLayoutModel::GlomListLayoutModel(const Glom::Document *document,
-    const GlomTable &table, ErrorReporter &error,
+QlomListLayoutModel::QlomListLayoutModel(const Glom::Document *document,
+    const QlomTable &table, QlomErrorReporter &error,
     QObject *parent, QSqlDatabase db) :
     QSqlTableModel(parent, db),
     theTableDisplayName(table.displayName()), // TODO: Add GlomTable member.
@@ -65,43 +65,49 @@ GlomListLayoutModel::GlomListLayoutModel(const Glom::Document *document,
     }
 }
 
-QString GlomListLayoutModel::tableDisplayName() const
+QString QlomListLayoutModel::tableDisplayName() const
 {
     return theTableDisplayName;
 }
 
-QStyledItemDelegate * GlomListLayoutModel::createDelegateFromColumn(int column) const
+QStyledItemDelegate * QlomListLayoutModel::createDelegateFromColumn(int column)
+    const
 {
-    // Need to respect the following constraint: The layout item in
-    // theLayoutGroup that can be found at the position column points to has to
-    // be a LayoutItem_Text or a LayoutItem_Field.
-    // However, this method is not used efficiently, considering how most items
-    // in a list view are field items. If LayoutItem_Text and LayoutItem_Field
-    // had a common base clase featuring the get_formatting_used() API we could
-    // get rid of the most annoying part at least: the dynamic casts.
-    const Glom::LayoutGroup::type_list_const_items items = theLayoutGroup->get_items();
-    for (Glom::LayoutGroup::type_list_const_items::const_iterator iter = items.begin();
-        iter != items.end();
-        ++iter) {
+    /* Need to respect the following constraint: The layout item in
+     * theLayoutGroup that can be found at the position column points to has to
+     * be a LayoutItem_Text or a LayoutItem_Field.
+     * However, this method is not used efficiently, considering how most items
+     * in a list view are field items. If LayoutItem_Text and LayoutItem_Field
+     * had a common base clase featuring the get_formatting_used() API we could
+     * get rid of the most annoying part at least: the dynamic casts. */
+    const Glom::LayoutGroup::type_list_const_items items =
+      theLayoutGroup->get_items();
+    for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
+        items.begin(); iter != items.end(); ++iter) {
         if (column == std::distance(items.begin(), iter)) {
-            Glom::sharedptr<const Glom::LayoutItem_Text> textItem = Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
+            Glom::sharedptr<const Glom::LayoutItem_Text> textItem =
+                Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
             if(textItem)
-                return new GlomLayoutItemTextDelegate(textItem->get_formatting_used(), GlomLayoutItemTextDelegate::GlomSharedField());
+                return new QlomLayoutItemTextDelegate(
+                    textItem->get_formatting_used(),
+                    QlomLayoutItemTextDelegate::GlomSharedField());
 
-            Glom::sharedptr<const Glom::LayoutItem_Field> fieldItem = Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
+            Glom::sharedptr<const Glom::LayoutItem_Field> fieldItem =
+                Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
             if(fieldItem)
-                return new GlomLayoutItemFieldDelegate(fieldItem->get_formatting_used(),
-                                                       fieldItem->get_full_field_details());
+                return new QlomLayoutItemFieldDelegate(
+                    fieldItem->get_formatting_used(),
+                    fieldItem->get_full_field_details());
         }
     }
 
     return 0;
 }
 
-void GlomListLayoutModel::applyRelationships(
-    const QList<GlomRelationship> &relationships)
+void QlomListLayoutModel::applyRelationships(
+    const QList<QlomRelationship> &relationships)
 {
-    for (QList<GlomRelationship>::const_iterator relationship(
+    for (QList<QlomRelationship>::const_iterator relationship(
         relationships.begin()); relationship != relationships.end();
         ++relationship) {
         const QString from(relationship->fromColumn());
@@ -114,7 +120,7 @@ void GlomListLayoutModel::applyRelationships(
     }
 }
 
-void GlomListLayoutModel::createProjectionFromLayoutGroup(
+void QlomListLayoutModel::createProjectionFromLayoutGroup(
     const Glom::sharedptr<const Glom::LayoutItem> &layoutItem)
 {
     Glom::sharedptr<const Glom::LayoutGroup> layoutGroup =
@@ -124,16 +130,17 @@ void GlomListLayoutModel::createProjectionFromLayoutGroup(
         const Glom::LayoutGroup::type_list_const_items items =
           layoutGroup->get_items();
         for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
-            items.begin();
-            iter != items.end();
-            ++iter) {
+            items.begin(); iter != items.end(); ++iter) {
             /* The default setting for a projection is
              * "table.col AS display_name", whereas display_name is used for
              *  the column heading. */
             QString currTableName = tableName();
-            Glom::sharedptr<const Glom::LayoutItem_Field> field = Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
+            Glom::sharedptr<const Glom::LayoutItem_Field> field =
+                Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
             if (field) {
-                currTableName = ustringToQstring(field->get_table_used(qstringToUstring(tableName())));
+                currTableName =
+                    ustringToQstring(
+                        field->get_table_used(qstringToUstring(tableName())));
             }
 
             const QString currColName = ustringToQstring((*iter)->get_name());
@@ -161,12 +168,12 @@ void GlomListLayoutModel::createProjectionFromLayoutGroup(
 }
 
 
-QString GlomListLayoutModel::escapeFieldAsString(const QString &field) const
+QString QlomListLayoutModel::escapeFieldAsString(const QString &field) const
 {
     return ('\'' + QString(field).replace('\'', "''") + '\'');
 }
 
-QString GlomListLayoutModel::escapeField(const QString &field) const
+QString QlomListLayoutModel::escapeField(const QString &field) const
 {
     return database().driver()->escapeIdentifier(field, QSqlDriver::FieldName);
 }

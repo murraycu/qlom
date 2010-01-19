@@ -18,12 +18,12 @@
 
 #include "error_reporter.h"
 
-QlomError ErrorReporter::lastError() const
+QlomError QlomErrorReporter::lastError() const
 {
     return theLastError;
 }
 
-void ErrorReporter::raiseError(const QlomError &error)
+void QlomErrorReporter::raiseError(const QlomError &error)
 {
     if (error != theLastError) {
         theLastError = error;

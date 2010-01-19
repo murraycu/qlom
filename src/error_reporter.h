@@ -19,11 +19,11 @@
 #ifndef QLOM_ERROR_REPORTER_H_
 #define QLOM_ERROR_REPORTER_H_
 
-#include "qlom_error.h"
+#include "error.h"
 
 #include <QObject>
 
-class ErrorReporter : public QObject
+class QlomErrorReporter : public QObject
 {
     Q_OBJECT
 

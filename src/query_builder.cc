@@ -16,7 +16,7 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "qlom_query_builder.h"
+#include "query_builder.h"
 #include <iostream>
 
 QlomQueryBuilder::QlomQueryBuilder()
@@ -115,8 +115,7 @@ QSqlQuery QlomQueryBuilder::getDistinctSqlQuery()
 QSqlQuery QlomQueryBuilder::getSqlQuery(bool distinct)
 {
     QSqlQuery query;
-    query.prepare((distinct ? getDistinctQuery()
-                            : getQuery()));
+    query.prepare((distinct ? getDistinctQuery() : getQuery()));
 
     for(BoundParametersMap::iterator iter = boundParameters.begin();
         iter != boundParameters.end();

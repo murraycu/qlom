@@ -16,27 +16,27 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "glom_table.h"
+#include "table.h"
 
-GlomTable::GlomTable(const QString &tableName, const QString &displayName,
-    const QList<GlomRelationship> &relationships) :
+QlomTable::QlomTable(const QString &tableName, const QString &displayName,
+    const QList<QlomRelationship> &relationships) :
     theDisplayName(displayName),
     theTableName(tableName),
     theRelationships(relationships)
 {
 }
 
-QString GlomTable::displayName() const
+QString QlomTable::displayName() const
 {
     return theDisplayName;
 }
 
-QString GlomTable::tableName() const
+QString QlomTable::tableName() const
 {
     return theTableName;
 }
 
-QList<GlomRelationship> GlomTable::relationships() const
+QList<QlomRelationship> QlomTable::relationships() const
 {
     return theRelationships;
 }

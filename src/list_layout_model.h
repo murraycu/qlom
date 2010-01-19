@@ -16,14 +16,14 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QLOM_GLOM_LIST_LAYOUT_MODEL_H_
-#define QLOM_GLOM_LIST_LAYOUT_MODEL_H_
+#ifndef QLOM_LIST_LAYOUT_MODEL_H_
+#define QLOM_LIST_LAYOUT_MODEL_H_
 
-class ErrorReporter;
+class QlomErrorReporter;
 
-#include "glom_table.h"
-#include "qlom_query_builder.h"
-#include "glom_layout_delegates.h"
+#include "table.h"
+#include "query_builder.h"
+#include "layout_delegates.h"
 
 #include <QSqlDatabase>
 #include <QSqlTableModel>
@@ -35,7 +35,7 @@ class ErrorReporter;
 /** A model to show a list layout from a Glom document.
  *  The list layout model obtains all the information that is required at
  *  construction time, and is then treated as read-only. */
-class GlomListLayoutModel : public QSqlTableModel
+class QlomListLayoutModel : public QSqlTableModel
 {
     Q_OBJECT
 
@@ -44,7 +44,7 @@ public:
        class makes the same mistake.
        TODO: File a bug when there is a public Qt bug tracker. */
 
-    /** Create a model of a list layout from a Glom document and a GlomTable.
+    /** Create a model of a list layout from a Glom document and a table.
      *  The parameters are construct-time only, and thereafter the object is
      *  read-only.
      *  @param[in] document a Glom document
@@ -52,8 +52,8 @@ public:
      *  @param[in] error error-reporting facility
      *  @param[in] parent a parent QObject
      *  @param[in] db a database connection, or the default connection */
-    explicit GlomListLayoutModel(const Glom::Document *document,
-        const GlomTable &table, ErrorReporter &error, QObject *parent = 0,
+    explicit QlomListLayoutModel(const Glom::Document *document,
+        const QlomTable &table, QlomErrorReporter &error, QObject *parent = 0,
         QSqlDatabase db = QSqlDatabase());
 
     /** Get the table name used in the model, for display to the user.
@@ -62,18 +62,19 @@ public:
 
     /** Applies Glom's FieldFormatting to a QStyledItemDelegate. Since the view
      *  only knows about columns (during setup) we need to map columns to
-     *  LayoutItems, as it is already done in the query builder, even if not stated
-     *  explicitly.
+     *  LayoutItems, as it is already done in the query builder, even if not
+     *  stated explicitly.
+     *  @param[in] column the column to create a delegate for
      *  @returns the style delegate to be managed by a view, or 0 if the
      *  specified column cannot be formatted customly. */
     QStyledItemDelegate * createDelegateFromColumn(int column) const;
 
 private:
     /** Read relationships from the document, and apply them to the model.
-     *  Takes a list of relationships from the GlomTable as a parameter, and
+     *  Takes a list of relationships from the Table as a parameter, and
      *  applies the relationships to the SQL query for the list layout model.
      *  @param[in] relationships a list of relationships to apply */
-    void applyRelationships(const QList<GlomRelationship> &relationships);
+    void applyRelationships(const QList<QlomRelationship> &relationships);
 
     /** Discard columns that are not mentioned in the Glom document.
      *  Builds an SQL query from the layout group, hiding columns that should
@@ -88,8 +89,8 @@ private:
                                            fill the model */
     QString theTableDisplayName; /**< the display name of the layout table */
     Glom::sharedptr<const Glom::LayoutGroup> theLayoutGroup; /**< the layout group used for the list layout */
-    ErrorReporter &theErrorReporter; /**< the facility used to report errors, a
-                                          dynamic dependency */
+    QlomErrorReporter &theErrorReporter; /**< the facility used to report
+                                           errors, a dynamic dependency */
 
     /** Escape the SQL primitive.
      *  QtSql only has two roles for escaping in a projection:
@@ -109,4 +110,4 @@ private:
     QString escapeField(const QString &field) const;
 };
 
-#endif /* QLOM_GLOM_LIST_LAYOUT_MODEL_H_ */
+#endif /* QLOM_LIST_LAYOUT_MODEL_H_ */

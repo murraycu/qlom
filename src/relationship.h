@@ -16,26 +16,26 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QLOM_GLOM_RELATIONSHIP_H_
-#define QLOM_GLOM_RELATIONSHIP_H_
+#ifndef QLOM_RELATIONSHIP_H_
+#define QLOM_RELATIONSHIP_H_
 
 #include <QString>
 
-/** A relationship from one column is a database table to another.
- *  Designed for use in a GlomTable, GlomRelationship has three construct-time
+/** A relationship from one column in a database table to another.
+ *  Designed for use in a QlomTable, QlomRelationship has three construct-time
  *  only properties: the source column, the destination table and the
  *  destination primary key. The properties cannot be changed once a
- *  GlomRelationship has been constructed, but can be accessed with the
+ *  relationship has been constructed, but can be accessed with the
  *  fromColumn(), toTable() and toPrimaryKey() methods. The source table is
- *  implied by including the relationship in a GlomTable. */
-class GlomRelationship
+ *  implied by including the relationship in a QlomTable. */
+class QlomRelationship
 {
 public:
     /** Create a relationship to a column in another table.
      *  @param[in] fromColumn source column for the relationship
      *  @param[in] toTable destination table for the reationship
      *  @param[in] toPrimaryKey destination primary key of the relationship */
-    GlomRelationship(const QString &fromColumn, const QString &toTable,
+    QlomRelationship(const QString &fromColumn, const QString &toTable,
         const QString &toPrimaryKey);
 
     /** Get the source column of the relationship.
@@ -56,4 +56,4 @@ private:
     QString theToPrimaryKey; /**< primary key in destination table */
 };
 
-#endif /* QLOM_GLOM_RELATIONSHIP_H_ */
+#endif /* QLOM_RELATIONSHIP_H_ */

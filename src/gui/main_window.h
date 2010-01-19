@@ -19,23 +19,23 @@
 #ifndef QLOM_MAIN_WINDOW_H_
 #define QLOM_MAIN_WINDOW_H_
 
-#include "glom_document.h"
+#include "document.h"
 #include "error_reporter.h"
 
 #include <QMainWindow>
 
-class GlomListLayoutModel;
+class QlomListLayoutModel;
 class QModelIndex;
 class QTreeView;
 
 /** The main window is the central controller and view for Qlom.
  *  The main window both shows the main window and manages the Glom document,
- *  through the glomDocument member. Errors from GlomDocument are reported as a
- *  QlomError to the receiveError slot. From there, the error domain is looked
- *  up in the errorDomainLookup() method and a dialog is shown to the user.
- *  glomDocument has an ErrorReporter member, which is the only source of
- *  QlomError signals in Qlom. */
-class MainWindow : public QMainWindow
+ *  through the glomDocument member. Errors from QlomDocument are reported as
+ *  a QlomError to the receiveError slot. From there, the error domain is
+ *  looked up in the errorDomainLookup() method and a dialog is shown to the
+ *  user. glomDocument has a QlomErrorReporter member, which is the only source
+ *  of QlomError signals in Qlom. */
+class QlomMainWindow : public QMainWindow
 {
     Q_OBJECT
 
@@ -43,15 +43,15 @@ public:
 
     /** Application main window.
      *  Creates a main window with no Glom document loaded. */
-    MainWindow();
+    QlomMainWindow();
 
     /** Application main window.
      *  Creates a main window with a Glom document found at the filepath
      *  parameter.
      *  @param[in] filepath an absolute file path to a Glom document */
-    explicit MainWindow(const QString &filepath);
+    explicit QlomMainWindow(const QString &filepath);
 
-    virtual ~MainWindow();
+    virtual ~QlomMainWindow();
 
     // TODO: Should/Can the ErrorReporter system be used instead to tell 
     // the caller that MainWindow() failed? 
@@ -63,7 +63,7 @@ public:
 
 public Q_SLOTS:
     /** Receive errors from ErrorReporter.
-     *  GlomDocument, via the member glomDocument, is the only reporter of
+     *  QlomDocument, via the member glomDocument, is the only reporter of
      *  errors to the main window. The error is checked for content, with the
      *  error domain being looked up by the errorDomainLookup() method. A
      *  generic error message for the error domain is shown in a dialog, and
@@ -90,17 +90,18 @@ private:
 
     /** Show a table from a list layout model in a new window.
      *  @param[in] model the model to show */
-    void showTable(GlomListLayoutModel *model);
+    void showTable(QlomListLayoutModel *model);
 
     /** Lookup the text that corresponds to an error domain.
      *  @param[in] errorDomain the error domain to provide a string for
      *  @returns a human-readable description of the error domain */
     QString errorDomainLookup(const Qlom::QlomErrorDomain errorDomain);
 
-    GlomDocument glomDocument; /**< a Glom document to view */
+    QlomDocument glomDocument; /**< a Glom document to view */
     QTreeView *centralTreeView; /**< a tree view for the table names model */
-    ErrorReporter theErrorReporter; /**< an error reporting facility that can
-                                          be used in lieu of C++ exceptions. */
+    QlomErrorReporter theErrorReporter; /**< an error reporting facility that
+                                          can be used in lieu of C++
+                                          exceptions. */
     bool valid; /**< See isValid(). */
 
 private Q_SLOTS:
@@ -119,8 +120,6 @@ private Q_SLOTS:
     /** Slot for the signal from a double-click on the table names treeview.
      *  @param[in] index the row that was double-clicked */
     void treeviewDoubleclicked(const QModelIndex &index);
-
-
 };
 
 #endif /* QLOM_MAIN_WINDOW_H_ */

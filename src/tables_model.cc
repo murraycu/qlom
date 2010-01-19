@@ -16,26 +16,26 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "glom_tables_model.h"
+#include "tables_model.h"
 
-GlomTablesModel::GlomTablesModel(QList<GlomTable> tableList, QObject *parent) :
+QlomTablesModel::QlomTablesModel(QList<QlomTable> tableList, QObject *parent) :
     QAbstractListModel(parent)
 {
     // Read out table names from document, and add them to the model.
-    for (QList<GlomTable>::const_iterator iter(tableList.begin());
+    for (QList<QlomTable>::const_iterator iter(tableList.begin());
         iter != tableList.end(); ++iter) {
         tableNames.push_back(iter->tableName());
         tableDisplayNames.push_back(iter->displayName());
     }
 }
 
-int GlomTablesModel::rowCount(const QModelIndex &parent) const
+int QlomTablesModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return tableNames.length();
 }
 
-QVariant GlomTablesModel::data(const QModelIndex &index, int role) const
+QVariant QlomTablesModel::data(const QModelIndex &index, int role) const
 {
     if(!index.isValid()) {
         return QVariant();
@@ -56,7 +56,7 @@ QVariant GlomTablesModel::data(const QModelIndex &index, int role) const
     }
 }
 
-QVariant GlomTablesModel::headerData(int section, Qt::Orientation orientation,
+QVariant QlomTablesModel::headerData(int section, Qt::Orientation orientation,
     int role) const
 {
     if(orientation == Qt::Horizontal)

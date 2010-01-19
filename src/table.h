@@ -16,21 +16,20 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QLOM_GLOM_TABLE_H_
-#define QLOM_GLOM_TABLE_H_
+#ifndef QLOM_TABLE_H_
+#define QLOM_TABLE_H_
 
-#include "glom_relationship.h"
+#include "relationship.h"
 
 #include <QList>
 #include <QString>
 
 /** A table in a Glom document.
- *  Designed for use in a GlomDocument, GlomTable has three construct-time
+ *  Designed for use in a QlomDocument, QlomTable has three construct-time
  *  properties: the name, the display name and a list of relationships. The
- *  properties cannot be changed once a GlomRelationship has been constructed,
- *  but can be accessed with the displayName(), tableName() and relationships()
- *  methods. */
-class GlomTable
+ *  properties cannot be changed once a table has been constructed, but can be
+ *  accessed with the displayName(), tableName() and relationships() methods. */
+class QlomTable
 {
 
 public:
@@ -38,8 +37,8 @@ public:
      *  @param[in] tableName the name of the table in the database
      *  @param[in] displayName the name of the table for display
      *  @param[in] relationships a list of relationships */
-    GlomTable(const QString &tableName, const QString &displayName,
-        const QList<GlomRelationship> &relationships);
+    QlomTable(const QString &tableName, const QString &displayName,
+        const QList<QlomRelationship> &relationships);
 
     /** Get the table name for display to the user.
      *  @returns the name of the table for display */
@@ -51,12 +50,12 @@ public:
 
     /** Get the list of relationships.
      *  @returns the list of relationships */
-    QList<GlomRelationship> relationships() const;
+    QList<QlomRelationship> relationships() const;
 
 private:
     QString theDisplayName; /**< the table name, for display to the user */
     QString theTableName; /**< the table name, as in the database */
-    QList<GlomRelationship> theRelationships; /**< a list of relationships */
+    QList<QlomRelationship> theRelationships; /**< a list of relationships */
 };
 
-#endif /* QLOM_GLOM_DOCUMENT_H_ */
+#endif /* QLOM_DOCUMENT_H_ */

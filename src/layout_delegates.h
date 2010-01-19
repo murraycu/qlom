@@ -16,8 +16,8 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QLOM_GLOM_LAYOUT_DELEGATE_H_
-#define QLOM_GLOM_LAYOUT_DELEGATE_H_
+#ifndef QLOM_LAYOUT_DELEGATE_H_
+#define QLOM_LAYOUT_DELEGATE_H_
 
 #include <QStyledItemDelegate>
 #include <QPainter>
@@ -34,21 +34,24 @@
   * the interface, though) gets its own delegate class derived from
   * GlomFieldFormattingDelegate.
   */
-class GlomFieldFormattingDelegate : public QStyledItemDelegate
+class QlomFieldFormattingDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
 public:
     typedef Glom::sharedptr<const Glom::Field> GlomSharedField;
 
-    // Explicit ctor, although it might have been useful for implicit type conversions.
-    explicit GlomFieldFormattingDelegate(const Glom::FieldFormatting& formatting,
-                                         const GlomSharedField details,
-                                         QObject *parent = 0);
-    virtual ~GlomFieldFormattingDelegate();
+    /* Explicit ctor, although it might have been useful for implicit type
+       conversions. */
+    explicit QlomFieldFormattingDelegate(
+        const Glom::FieldFormatting &formatting, const GlomSharedField details,
+        QObject *parent = 0);
+    virtual ~QlomFieldFormattingDelegate();
 
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex &index ) const;
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option,
+        const QModelIndex &index) const;
+    virtual QSize sizeHint(const QStyleOptionViewItem &option,
+        const QModelIndex &index) const;
 
 protected:
     const Glom::FieldFormatting theFormattingUsed;
@@ -56,30 +59,30 @@ protected:
 };
 
 
-class GlomLayoutItemFieldDelegate : public GlomFieldFormattingDelegate
+class QlomLayoutItemFieldDelegate : public QlomFieldFormattingDelegate
 {
     Q_OBJECT
 
 public:
-    explicit GlomLayoutItemFieldDelegate(const Glom::FieldFormatting& formatting,
-                                         const GlomSharedField details,
-                                         QObject *parent = 0);
-    virtual ~GlomLayoutItemFieldDelegate();
+    explicit QlomLayoutItemFieldDelegate(
+        const Glom::FieldFormatting &formatting, const GlomSharedField details,
+        QObject *parent = 0);
+    virtual ~QlomLayoutItemFieldDelegate();
 
-    virtual QString displayText(const QVariant &value, const QLocale &locale) const;
+    virtual QString displayText(const QVariant &value, const QLocale &locale)
+        const;
 
 private:
-    QString applyNumericFormatting(double numeric, const QLocale& locale) const;
+    QString applyNumericFormatting(double numeric, const QLocale &locale) const;
 };
 
-class GlomLayoutItemTextDelegate : public GlomFieldFormattingDelegate
+class QlomLayoutItemTextDelegate : public QlomFieldFormattingDelegate
 {
     Q_OBJECT
 
 public:
-    GlomLayoutItemTextDelegate(const Glom::FieldFormatting& formatting,
-                               const GlomSharedField details,
-                               QObject *parent = 0);
-    virtual ~GlomLayoutItemTextDelegate();
+    QlomLayoutItemTextDelegate(const Glom::FieldFormatting &formatting,
+        const GlomSharedField details, QObject *parent = 0);
+    virtual ~QlomLayoutItemTextDelegate();
 };
-#endif // QLOM_GLOM_LAYOUT_DELEGATE_H_
+#endif // QLOM_LAYOUT_DELEGATE_H_

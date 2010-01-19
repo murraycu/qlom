@@ -72,13 +72,13 @@ int main(int argc, char **argv)
       return EXIT_FAILURE;
 
     const QStringList options = app.arguments();
-    MainWindow *mainWindow = 0;
+    QlomMainWindow *mainWindow = 0;
     switch (options.size()) {
     case 1:
-        mainWindow = new MainWindow();
+        mainWindow = new QlomMainWindow();
         break;
     case 2:
-        mainWindow = new MainWindow(*(++options.begin()));
+        mainWindow = new QlomMainWindow(*(++options.begin()));
         break;
     default:
         printUsage();

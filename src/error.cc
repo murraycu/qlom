@@ -16,7 +16,7 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "qlom_error.h"
+#include "error.h"
 
 #include <algorithm>
 

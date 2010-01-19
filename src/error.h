@@ -16,8 +16,8 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QLOM_QLOM_ERROR_H_
-#define QLOM_QLOM_ERROR_H_
+#ifndef QLOM_ERROR_H_
+#define QLOM_ERROR_H_
 
 #include <QString>
 
@@ -97,4 +97,4 @@ private:
     quint8 severityLevel; /**< the severity of the error */
 };
 
-#endif /* QLOM_QLOM_ERROR_H_ */
+#endif /* QLOM_ERROR_H_ */

@@ -17,11 +17,11 @@
  */
 
 #include "main_window.h"
-#include "glom_document.h"
-#include "qlom_error.h"
-#include "glom_tables_model.h"
-#include "glom_list_layout_model.h"
-#include "glom_layout_delegates.h"
+#include "document.h"
+#include "error.h"
+#include "tables_model.h"
+#include "list_layout_model.h"
+#include "layout_delegates.h"
 
 #include <memory>
 #include <QAction>
@@ -41,14 +41,14 @@
 
 #include "config.h"
 
-MainWindow::MainWindow() :
+QlomMainWindow::QlomMainWindow() :
     glomDocument(this),
     valid(true)
 {
   setup();
 }
 
-MainWindow::MainWindow(const QString &filepath) :
+QlomMainWindow::QlomMainWindow(const QString &filepath) :
     glomDocument(this),
     valid(true)
 {
@@ -59,7 +59,7 @@ MainWindow::MainWindow(const QString &filepath) :
         return;
     }
 
-    GlomTablesModel *model = glomDocument.createTablesModel();
+    QlomTablesModel *model = glomDocument.createTablesModel();
     centralTreeView->setModel(model);
 
     connect(centralTreeView, SIGNAL(doubleClicked(QModelIndex)),
@@ -70,12 +70,12 @@ MainWindow::MainWindow(const QString &filepath) :
     showDefaultTable();
 }
 
-bool MainWindow::isValid() const
+bool QlomMainWindow::isValid() const
 {
     return valid;
 }
 
-void MainWindow::receiveError(const QlomError &error)
+void QlomMainWindow::receiveError(const QlomError &error)
 {
     if(!error.what().isNull()) {
         QPointer<QMessageBox> dialog = new QMessageBox(this);
@@ -108,7 +108,7 @@ void MainWindow::receiveError(const QlomError &error)
     }
 }
 
-void MainWindow::setup()
+void QlomMainWindow::setup()
 {
     setWindowTitle(qApp->applicationName());
 
@@ -155,13 +155,13 @@ void MainWindow::setup()
     readSettings();
 }
 
-MainWindow::~MainWindow()
+QlomMainWindow::~QlomMainWindow()
 {
     writeSettings();
     QSqlDatabase::database().close();
 }
 
-void MainWindow::showAboutDialog()
+void QlomMainWindow::showAboutDialog()
 {
     // About dialogs are window-modal in Qt, except on Mac OS X.
     QMessageBox::about(this, tr("About Qlom"), tr(PACKAGE_NAME "\n"
@@ -171,21 +171,21 @@ void MainWindow::showAboutDialog()
      * manually concatenated then it works fine. TODO: File bug. */
 }
 
-void MainWindow::writeSettings()
+void QlomMainWindow::writeSettings()
 {
     QSettings settings;
     settings.setValue("MainWindow/Size", size());
     settings.setValue("MainWindow/InternalProperties", saveState());
 }
 
-void MainWindow::readSettings()
+void QlomMainWindow::readSettings()
 {
     QSettings settings;
     resize(settings.value("MainWindow/Size", sizeHint()).toSize());
     restoreState(settings.value("MainWindow/InternalProperties").toByteArray());
 }
 
-QString MainWindow::errorDomainLookup(
+QString QlomMainWindow::errorDomainLookup(
     const Qlom::QlomErrorDomain errorDomain)
 {
     switch (errorDomain) {
@@ -202,7 +202,7 @@ QString MainWindow::errorDomainLookup(
     }
 }
 
-void MainWindow::fileOpenTriggered()
+void QlomMainWindow::fileOpenTriggered()
 {
     QPointer<QFileDialog> dialog = new QFileDialog(this);
     dialog->setFileMode(QFileDialog::ExistingFile);
@@ -218,7 +218,7 @@ void MainWindow::fileOpenTriggered()
             return;
         }
 
-        GlomTablesModel *model = glomDocument.createTablesModel();
+        QlomTablesModel *model = glomDocument.createTablesModel();
         centralTreeView->setModel(model);
         // Open default table.
         showDefaultTable();
@@ -226,7 +226,7 @@ void MainWindow::fileOpenTriggered()
     delete dialog;
 }
 
-void MainWindow::fileCloseTriggered()
+void QlomMainWindow::fileCloseTriggered()
 {
     centralTreeView->deleteLater();
     centralTreeView = new QTreeView(this);
@@ -235,32 +235,30 @@ void MainWindow::fileCloseTriggered()
         this, SLOT(treeviewDoubleclicked(QModelIndex)));
 }
 
-void MainWindow::fileQuitTriggered()
+void QlomMainWindow::fileQuitTriggered()
 {
     qApp->quit();
 }
 
-void MainWindow::helpAboutTriggered()
+void QlomMainWindow::helpAboutTriggered()
 {
     showAboutDialog();
 }
 
-void MainWindow::treeviewDoubleclicked(const QModelIndex& index)
+void QlomMainWindow::treeviewDoubleclicked(const QModelIndex& index)
 {
     const QString &tableName = index.data(Qlom::TableNameRole).toString();
-    GlomListLayoutModel *model =
-        glomDocument.createListLayoutModel(tableName);
+    QlomListLayoutModel *model = glomDocument.createListLayoutModel(tableName);
     showTable(model);
 
     const QString tableDisplayName = index.data().toString();
     statusBar()->showMessage(tr("%1 table opened").arg(tableDisplayName));
 }
 
-void MainWindow::showDefaultTable()
+void QlomMainWindow::showDefaultTable()
 {
-    // Show the default table, or the first non-hidden table,
-    // if there is one:
-    GlomListLayoutModel *model =
+    // Show the default table, or the first non-hidden table, if there is one.
+    QlomListLayoutModel *model =
       glomDocument.createDefaultTableListLayoutModel();
 
     if (model) {
@@ -269,10 +267,10 @@ void MainWindow::showDefaultTable()
     }
 }
 
-void MainWindow::showTable(GlomListLayoutModel *model)
+void QlomMainWindow::showTable(QlomListLayoutModel *model)
 {
     if(!model) {
-        qCritical("MainWindow::showTable(): model is null.");
+        qCritical("QlomMainWindow::showTable(): model is null.");
         return;
     }
 
@@ -282,8 +280,7 @@ void MainWindow::showTable(GlomListLayoutModel *model)
     QTableView *view = new QTableView(tableModelWindow);
     model->setParent(tableModelWindow);
 
-    for(int idx = 0; idx < model->columnCount(); ++idx)
-    {
+    for(int idx = 0; idx < model->columnCount(); ++idx) {
         view->setItemDelegateForColumn(idx, model->createDelegateFromColumn(idx));
     }
 

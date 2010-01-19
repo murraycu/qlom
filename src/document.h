@@ -16,14 +16,14 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QLOM_GLOM_DOCUMENT_H_
-#define QLOM_GLOM_DOCUMENT_H_
+#ifndef QLOM_DOCUMENT_H_
+#define QLOM_DOCUMENT_H_
 
 
-class GlomListLayoutModel;
-class GlomTablesModel;
+class QlomListLayoutModel;
+class QlomTablesModel;
 
-#include "glom_table.h"
+#include "table.h"
 #include "error_reporter.h"
 
 #include <memory>
@@ -44,21 +44,22 @@ class GlomTablesModel;
  *  list layout for the default table of the document. As the create prefix
  *  suggests, the responsibility of destroying the models once they are no
  *  longer needed is placed on the caller. */
-class GlomDocument : public QObject
+class QlomDocument : public QObject
 {
     Q_OBJECT
 
 public:
     /** A Glom document.
-     *  Constructor for a blank GlomDocument. Before the object is any use,
+     *  Constructor for a blank QlomDocument. Before the object is any use,
      *  loadDocument() should be called.
      *  @param[in] parent a parent object, which errors will be sent to */
-    GlomDocument(QObject *parent = 0);
+    QlomDocument(QObject *parent = 0);
 
     /** Load a Glom document from a file.
      *  Loads a Glom document from a file. This method can be called on a
-     *  GlomDocument safely, even if a document has already been loaded.
-     *  @param[in] filepath the location of the Glom document as an absolute filepath.
+     *  QlomDocument safely, even if a document has already been loaded.
+     *  @param[in] filepath the location of the Glom document as an absolute
+     *  filepath.
      *  @returns true on success, false on failure */
     bool loadDocument(const QString &filepath);
 
@@ -66,7 +67,7 @@ public:
      *  Creates a new model of the list of tables in the Glom document. The
      *  model must be destroyed by the caller when it is no longer needed.
      *  @returns a model of the tables in the document */
-    GlomTablesModel* createTablesModel();
+    QlomTablesModel* createTablesModel();
 
     /** Get a layout from the document.
      *  Creates a new model of the list layout of the table given in the
@@ -74,21 +75,21 @@ public:
      *  model must be destroyed by the caller when it is no longer needed.
      *  @param[in] tableName the name of the table to provide a layout for
      *  @returns a model of the layout */
-    GlomListLayoutModel* createListLayoutModel(const QString &tableName);
+    QlomListLayoutModel* createListLayoutModel(const QString &tableName);
 
     /** Get a layout of the default table from the document.
      *  Creates a new model of the list layout of the default table specified
      *  in the Glom document. The model must be destroyed by the caller when it
      *  is no longer needed.
      *  @returns a model of the layout, or 0 if no default table was found */
-    GlomListLayoutModel* createDefaultTableListLayoutModel();
+    QlomListLayoutModel* createDefaultTableListLayoutModel();
 
     /** Get the error reporter object.
      *  Gets the error reporter object, for connection of signals to a class
-     *  with a slot for receiving signals containing a QlomError. MainWindow
+     *  with a slot for receiving signals containing a Error. MainWindow
      *  has this functionality.
      *  @returns a reference to the error reporter */
-    ErrorReporter & errorReporter();
+    QlomErrorReporter & errorReporter();
 
 private:
     /** Convert a filepath to a URI.
@@ -108,7 +109,7 @@ private:
     bool openSqlite();
 
     /** Fill tableList with tables read from the document.
-     *  Fills the tableList member with a list of GlomTables read from the Glom
+     *  Fills the tableList member with a list of QlomTables read from the Glom
      *  document. In turn, calls fillRelationships() to fill each table with a
      *  list of relationships.
      *  @see fillRelationships() */
@@ -120,14 +121,14 @@ private:
      *  @param[in] documentRelationships a list of relationships from the
      document, for a single table
      *  @returns a list of relationships */
-    QList<GlomRelationship> fillRelationships(
+    QList<QlomRelationship> fillRelationships(
         const Glom::Document::type_vec_relationships &documentRelationships);
 
     Glom::Document *document; /**< libglom's representaton of a Glom document */
-    ErrorReporter theErrorReporter; /**< an error-reporting object */
+    QlomErrorReporter theErrorReporter; /**< an error-reporting object */
 
-    typedef QList<GlomTable> typeTableList;
+    typedef QList<QlomTable> typeTableList;
     typeTableList tableList; /**< a list of tables in the document */
 };
 
-#endif /* QLOM_GLOM_DOCUMENT_H_ */
+#endif /* QLOM_DOCUMENT_H_ */

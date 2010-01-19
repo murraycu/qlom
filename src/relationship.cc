@@ -16,9 +16,9 @@
  * along with Qlom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "glom_relationship.h"
+#include "relationship.h"
 
-GlomRelationship::GlomRelationship(const QString &fromColumn,
+QlomRelationship::QlomRelationship(const QString &fromColumn,
     const QString &toTable, const QString &toPrimaryKey) :
     theFromColumn(fromColumn),
     theToTable(toTable),
@@ -26,17 +26,17 @@ GlomRelationship::GlomRelationship(const QString &fromColumn,
 {
 }
 
-QString GlomRelationship::fromColumn() const
+QString QlomRelationship::fromColumn() const
 {
     return theFromColumn;
 }
 
-QString GlomRelationship::toTable() const
+QString QlomRelationship::toTable() const
 {
     return theToTable;
 }
 
-QString GlomRelationship::toPrimaryKey() const
+QString QlomRelationship::toPrimaryKey() const
 {
     return theToPrimaryKey;
 }
