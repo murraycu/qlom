@@ -101,10 +101,10 @@ private:
 
     /** Open an SQLite database connection.
      *  Creates and opens a default QSqlDatabase connection. If authentication
-     *  details are required, opens a connection dialog via ConnectionDialog
+     *  details are required, opens a connection dialog via QlomConnectionDialog
      *  that requests them from the user. Any errors that occur are signalled
      *  via the errorRaised signal.
-     *  @see ConnectionDialog
+     *  @see QlomConnectionDialog
      *  @returns true on success, false on failure */
     bool openSqlite();
 

@@ -107,8 +107,8 @@ bool QlomDocument::loadDocument(const QString &filepath)
     case Glom::Document::HOSTING_MODE_POSTGRES_CENTRAL:
     {
         //TODO: Why use a QPointer here?
-        QPointer<ConnectionDialog> connectionDialog =
-                new ConnectionDialog(*document);
+        QPointer<QlomConnectionDialog> connectionDialog =
+                new QlomConnectionDialog(*document);
         bool keepOffering = true;
         bool connected = false;
         while (keepOffering) {

@@ -28,7 +28,7 @@
 #include <QSqlError>
 #include <QVBoxLayout>
 
-ConnectionDialog::ConnectionDialog(const Glom::Document& document,
+QlomConnectionDialog::QlomConnectionDialog(const Glom::Document& document,
     QWidget *parent) :
     QDialog(parent),
     glomDoc(document),
@@ -81,7 +81,7 @@ ConnectionDialog::ConnectionDialog(const Glom::Document& document,
     connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
-void ConnectionDialog::databaseConnect()
+void QlomConnectionDialog::databaseConnect()
 {
     theConnectionWasSuccessful = false;
 
@@ -103,7 +103,7 @@ void ConnectionDialog::databaseConnect()
 }
 
 // Open a central-server PostgreSQL connection.
-void ConnectionDialog::openPostgresql()
+void QlomConnectionDialog::openPostgresql()
 {
     /* Create and open the default connection for QSqlDatabase,
        so other code can use QSqlDatabase::database() to get that open
@@ -175,7 +175,7 @@ void ConnectionDialog::openPostgresql()
     done(QDialog::Accepted);
 }
 
-bool ConnectionDialog::connectionWasSuccessful() const
+bool QlomConnectionDialog::connectionWasSuccessful() const
 {
   return theConnectionWasSuccessful;
 }

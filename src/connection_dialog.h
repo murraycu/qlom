@@ -30,13 +30,13 @@ class Document;
 
 /** A dialog to ask the user for connection details.
  *  Some database backends require authentication details, which can be
- *  requested with a ConnectionDialog.
+ *  requested with a QlomConnectionDialog.
  *
  *  The default connection for QSqlDatabase is created and opened by the dialog.
  *
  *  @see openSqlite()
  */
-class ConnectionDialog : public QDialog
+class QlomConnectionDialog : public QDialog
 {
     Q_OBJECT
 
@@ -44,7 +44,7 @@ public:
     /** A dialog to ask the user for connection details.
      *  @param[in] document a Glom document containing connection details
      *  @param[in] parent a parent widget, to take ownership of the dialog */
-    explicit ConnectionDialog(const Glom::Document &document,
+    explicit QlomConnectionDialog(const Glom::Document &document,
         QWidget *parent = 0);
 
     /** Whether the entered settings allowed a connection to be made when the
