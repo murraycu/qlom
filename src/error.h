@@ -29,7 +29,10 @@ namespace Qlom
  *  error occured in. */
 enum QlomErrorDomain {
     DOCUMENT_ERROR_DOMAIN, /**< error in Glom document-handling */
-    DATABASE_ERROR_DOMAIN /**< error in communication with the database */
+    DATABASE_ERROR_DOMAIN, /**< error in communication with the database */
+    LOGIC_ERROR_DOMAIN     /**< programming errors that if unhandled would
+                                cause crashes. Similar to where you'd
+                                use g_return_if_fail */
 };
 
 //TODO: It doesn't make sense for the raiser of the error to decide how 

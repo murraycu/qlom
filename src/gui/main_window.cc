@@ -100,11 +100,13 @@ void QlomMainWindow::receiveError(const QlomError &error)
 
     // TODO: Whether to shut down the application should be for the caller to 
     // decide. murrayc.
+    // QApplication::exit() does not work for us because libglom eats up the
+    // important signals:
+    // http://git.gnome.org/browse/glom/tree/glom/libglom/connectionpool.cc#n538
     /* If the error message was non-empty then the error message was shown to
      * the user too. All that remains is to shut down the application. */
     if(Qlom::CRITICAL_ERROR_SEVERITY == error.severity()) {
-        // TODO: This should cause app.exec() in main() to return, but it doesn't. murrayc.
-        QApplication::exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -195,6 +197,9 @@ QString QlomMainWindow::errorDomainLookup(
         break;
     case Qlom::DATABASE_ERROR_DOMAIN:
         return tr("An error occurred with the database");
+        break;
+    case Qlom::LOGIC_ERROR_DOMAIN:
+        return tr("The programmmer had a logic error.");
         break;
     default:
         qCritical("Unhandled error domain: %i", errorDomain);
