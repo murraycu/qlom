@@ -82,7 +82,17 @@ class QlomLayoutItemTextDelegate : public QlomFieldFormattingDelegate
 
 public:
     QlomLayoutItemTextDelegate(const Glom::FieldFormatting &formatting,
-        const GlomSharedField details, QObject *parent = 0);
+        const GlomSharedField details, const QString &displayText, QObject *parent = 0);
     virtual ~QlomLayoutItemTextDelegate();
+
+    /** Ignore the value from the model for static text item and return the
+     * stored value - theDisplayText - instead.
+     *  @param[in] unused
+     *  @param[in] unused
+     */
+    virtual QString displayText(const QVariant &, const QLocale &) const;
+
+private:
+    QString theDisplayText;
 };
 #endif // QLOM_LAYOUT_DELEGATE_H_
