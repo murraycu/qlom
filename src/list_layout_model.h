@@ -33,7 +33,9 @@ class QlomErrorReporter;
 
 /** A model to show a list layout from a Glom document.
  *  The list layout model obtains all the information that is required at
- *  construction time, and is then treated as read-only. */
+ *  construction time, and is then treated as read-only.
+ *  A class-wide assumption is that the n-th layout item in a layout group is
+ *  displayed as the n-th column in the table model (and view). */
 class QlomListLayoutModel : public QSqlTableModel
 {
     Q_OBJECT
@@ -68,8 +70,18 @@ public:
      *  specified column cannot be formatted customly. */
     QStyledItemDelegate * createDelegateFromColumn(int column) const;
 
+protected:
+    /** Overridden from QSqlTableModel. Necessary because appending columns for
+      * static text items leaves them without actual content. For those columns
+      * we want to return an empty QString (rather than a "isNull" QString). The
+      * reason is that for valid QVariants containing null values, the style
+      * delegate's displayText() method is not called. */
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
 private:
-    /** A wrapper for Glom::Utils::build_sql_select_with_where_clause()
+    /** A wrapper for Glom::Utils::build_sql_select_with_where_clause() which
+      * also handles column headers and static text (TODO: need to rename this
+      * method).
       * @param[in] table the name of the table
       * @param[in] layoutGroup a shared pointer to a Glom LayoutGroup that is
       *            suitable for a list view (i.e., contains LayoutItem_Fields).
@@ -78,11 +90,23 @@ private:
     QString buildQuery(const Glib::ustring& table,
                        const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup);
 
+    /** Iterates over the layout group to find static text items so that it can
+      * insert columns into the table. */
+    void addStaticTextColumns(const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup);
+
+    /** Iterates over the layout group to set each column header to the display
+      * title specified by the matching layout item. */
+    void adjustColumnHeaders(const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup);
+
     QString theTableDisplayName; /**< the display name of the layout table */
     Glom::sharedptr<const Glom::LayoutGroup> theLayoutGroup; /**< the layout group used for the list layout */
     QlomErrorReporter &theErrorReporter; /**< the facility used to report
                                            errors, a dynamic dependency */
-
+    QVector<bool> theStaticTextColumnIndices; /**< the list of columns that
+                                                   would return empty QVariants
+                                                   because we display their
+                                                   column-static contents with a
+                                                   delegate. */
 };
 
 #endif /* QLOM_LIST_LAYOUT_MODEL_H_ */

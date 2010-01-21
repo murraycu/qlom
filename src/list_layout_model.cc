@@ -56,6 +56,8 @@ QlomListLayoutModel::QlomListLayoutModel(const Glom::Document *document,
         if (group) {
             QSqlQuery query = buildQuery(tableNameU, group);
             setQuery(query);
+            addStaticTextColumns(group);
+            adjustColumnHeaders(group);
         }
     } else {
         /* Display a warning message if the Glom document could not provide
@@ -63,6 +65,42 @@ QlomListLayoutModel::QlomListLayoutModel(const Glom::Document *document,
         error.raiseError(QlomError(Qlom::DATABASE_ERROR_DOMAIN,
             tr("%1: no list model found").arg("GlomLayoutModel"),
             Qlom::WARNING_ERROR_SEVERITY));
+    }
+}
+
+void QlomListLayoutModel::addStaticTextColumns(const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup)
+{
+    const Glom::LayoutGroup::type_list_const_items items = layoutGroup->get_items();
+
+    int colsIdx = 0;
+    for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
+         items.begin();
+         iter != items.end();
+         ++iter) {
+         bool flag = false;
+
+         Glom::sharedptr<const Glom::LayoutItem_Text> text = Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
+         if (text) {
+             insertColumn(colsIdx); // inserts before, and it is allowed to fail!
+             flag = true;
+         }
+
+         theStaticTextColumnIndices.push_back(flag);
+         ++colsIdx;
+    }
+}
+
+void QlomListLayoutModel::adjustColumnHeaders(const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup)
+{
+    const Glom::LayoutGroup::type_list_const_items items = layoutGroup->get_items();
+
+    int colsIdx = 0;
+    for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
+         items.begin();
+         iter != items.end();
+         ++iter) {
+         setHeaderData(colsIdx, Qt::Horizontal, QVariant(ustringToQstring((*iter)->get_title_or_name())));
+         ++colsIdx;
     }
 }
 
@@ -92,6 +130,12 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
              setHeaderData(idx, Qt::Horizontal, QVariant(ustringToQstring(field->get_title_or_name())));
              ++idx;
          }
+
+         Glom::sharedptr<const Glom::LayoutItem_Text> text = Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
+         if (text) {
+             ++idx;
+             insertColumn(idx); // inserts before
+         }
     }
 
     Glib::ustring query = Glom::Utils::build_sql_select_with_where_clause(table, fields, where_clause, extra_join, sort_clause, group_by);
@@ -117,7 +161,8 @@ QStyledItemDelegate * QlomListLayoutModel::createDelegateFromColumn(int column) 
             if(textItem)
                 return new QlomLayoutItemTextDelegate(
                     textItem->get_formatting_used(),
-                    QlomLayoutItemTextDelegate::GlomSharedField());
+                    QlomLayoutItemTextDelegate::GlomSharedField(),
+                    ustringToQstring(textItem->get_text()));
 
             Glom::sharedptr<const Glom::LayoutItem_Field> fieldItem =
                 Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
@@ -130,3 +175,21 @@ QStyledItemDelegate * QlomListLayoutModel::createDelegateFromColumn(int column) 
 
     return 0;
 }
+
+QVariant QlomListLayoutModel::data(const QModelIndex &index, int role) const
+{
+    const int colsIdx = index.column();
+    if (colsIdx >= theStaticTextColumnIndices.size())
+        theErrorReporter.raiseError(QlomError(Qlom::LOGIC_ERROR_DOMAIN,
+                                              QString("Invalid model column requested."),
+                                              Qlom::CRITICAL_ERROR_SEVERITY));
+
+    // Return the empty string which creates a "non-null" QString for the
+    // QVariants. For valid QVariants containing null values, the style
+    // delegate's displayText() is not called.
+    if (theStaticTextColumnIndices[colsIdx] && Qt::DisplayRole == role)
+        return QVariant(QString(""));
+
+   return QSqlTableModel::data(index, role);
+}
+
