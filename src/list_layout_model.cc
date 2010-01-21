@@ -81,6 +81,7 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
     Glom::Utils::type_vecConstLayoutFields fields;
     const Glom::LayoutGroup::type_list_const_items items = layoutGroup->get_items();
 
+    int idx = 0;
     for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
          items.begin();
          iter != items.end();
@@ -88,6 +89,8 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
          Glom::sharedptr<const Glom::LayoutItem_Field> field = Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
          if (field) {
              fields.push_back(field);
+             setHeaderData(idx, Qt::Horizontal, QVariant(ustringToQstring(field->get_title_or_name())));
+             ++idx;
          }
     }
 
