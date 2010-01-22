@@ -24,8 +24,10 @@ QlomTablesModel::QlomTablesModel(QList<QlomTable> tableList, QObject *parent) :
     // Read out table names from document, and add them to the model.
     for (QList<QlomTable>::const_iterator iter(tableList.begin());
         iter != tableList.end(); ++iter) {
-        tableNames.push_back(iter->tableName());
-        tableDisplayNames.push_back(iter->displayName());
+        if (!iter->isHidden()) {
+            tableNames.push_back(iter->tableName());
+            tableDisplayNames.push_back(iter->displayName());
+        }
     }
 }
 
