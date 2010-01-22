@@ -19,12 +19,12 @@
 #include "table.h"
 
 QlomTable::QlomTable(const QString &tableName, const QString &displayName,
-    const QList<QlomRelationship> &relationships) :
+    const QList<QlomRelationship> &relationships, const QFlags<QlomTableFlags>& flags) :
     theDisplayName(displayName),
     theTableName(tableName),
-    theRelationships(relationships)
-{
-}
+    theRelationships(relationships),
+    theFlags(flags)
+{}
 
 QString QlomTable::displayName() const
 {
@@ -39,4 +39,14 @@ QString QlomTable::tableName() const
 QList<QlomRelationship> QlomTable::relationships() const
 {
     return theRelationships;
+}
+
+bool QlomTable::isHidden() const
+{
+    return (theFlags & HIDDEN_TABLE);
+}
+
+bool QlomTable::isDefault() const
+{
+    return (theFlags & DEFAULT_TABLE);
 }

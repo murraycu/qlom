@@ -33,12 +33,20 @@ class QlomTable
 {
 
 public:
+    /** Flags to indicate hidden or default table status */
+    enum QlomTableFlags {
+        INVALID = 0,
+        HIDDEN_TABLE = 1,
+        DEFAULT_TABLE = 2
+    };
+
     /** A table in a Glom document.
      *  @param[in] tableName the name of the table in the database
      *  @param[in] displayName the name of the table for display
      *  @param[in] relationships a list of relationships */
     QlomTable(const QString &tableName, const QString &displayName,
-        const QList<QlomRelationship> &relationships);
+        const QList<QlomRelationship> &relationships,
+        const QFlags<QlomTableFlags>& flags);
 
     /** Get the table name for display to the user.
      *  @returns the name of the table for display */
@@ -52,10 +60,17 @@ public:
      *  @returns the list of relationships */
     QList<QlomRelationship> relationships() const;
 
+    /** Predicate to check for hidden flag. */
+    bool isHidden() const;
+
+    /** Predicate to check for default flag. */
+    bool isDefault() const;
+
 private:
     QString theDisplayName; /**< the table name, for display to the user */
     QString theTableName; /**< the table name, as in the database */
     QList<QlomRelationship> theRelationships; /**< a list of relationships */
+    QFlags<QlomTableFlags> theFlags; /**< flags for default or hidden tables */
 };
 
 #endif /* QLOM_DOCUMENT_H_ */

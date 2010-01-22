@@ -366,15 +366,24 @@ void QlomDocument::fillTableList()
     GlomTables tables = document->get_tables();
     for(GlomTables::const_iterator iter(tables.begin());
         iter != tables.end(); ++iter) {
+        Glom::sharedptr<Glom::TableInfo> table = *iter;
         Glom::Document::type_vec_relationships documentRelationships(
-            document->get_relationships((*iter)->get_name()));
+            document->get_relationships(table->get_name()));
         // Get a list of GlomRelationship items from the document.
         QList<QlomRelationship> relationships(
             fillRelationships(documentRelationships));
+
+        // Check for flags.
+        QFlags<QlomTable::QlomTableFlags> flags;
+        if (table->m_hidden)
+            flags |= QlomTable::HIDDEN_TABLE;
+        if (table->m_default)
+            flags |= QlomTable::DEFAULT_TABLE;
+
         // Fill the GlomDocument with a list of GlomTables.
-        tableList.push_back(QlomTable(ustringToQstring((*iter)->get_name()),
-            ustringToQstring(document->get_table_title((*iter)->get_name())),
-            relationships));
+        tableList.push_back(QlomTable(ustringToQstring(table->get_name()),
+            ustringToQstring(document->get_table_title(table->get_name())),
+            relationships, flags));
     }
 }
 
