@@ -49,6 +49,8 @@ class QlomDocument : public QObject
     Q_OBJECT
 
 public:
+    typedef Glom::Document::type_listTableInfo GlomTables; // just an alias
+
     /** A Glom document.
      *  Constructor for a blank QlomDocument. Before the object is any use,
      *  loadDocument() should be called.

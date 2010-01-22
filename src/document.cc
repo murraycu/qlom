@@ -363,17 +363,17 @@ void QlomDocument::fillTableList()
         tableList.clear();
     }
 
-    const std::vector<Glib::ustring> tables(document->get_table_names());
-    for(std::vector<Glib::ustring>::const_iterator iter(tables.begin());
+    GlomTables tables = document->get_tables();
+    for(GlomTables::const_iterator iter(tables.begin());
         iter != tables.end(); ++iter) {
         Glom::Document::type_vec_relationships documentRelationships(
-            document->get_relationships(*iter));
+            document->get_relationships((*iter)->get_name()));
         // Get a list of GlomRelationship items from the document.
         QList<QlomRelationship> relationships(
             fillRelationships(documentRelationships));
         // Fill the GlomDocument with a list of GlomTables.
-        tableList.push_back(QlomTable(ustringToQstring(*iter),
-            ustringToQstring(document->get_table_title(*iter)),
+        tableList.push_back(QlomTable(ustringToQstring((*iter)->get_name()),
+            ustringToQstring(document->get_table_title((*iter)->get_name())),
             relationships));
     }
 }
