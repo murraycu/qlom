@@ -35,7 +35,6 @@
 #include <QSqlField>
 #include <QSqlIndex>
 #include <QSqlRecord>
-#include <QStatusBar>
 #include <QTableView>
 #include <QTreeView>
 
@@ -113,9 +112,6 @@ void QlomMainWindow::receiveError(const QlomError &error)
 void QlomMainWindow::setup()
 {
     setWindowTitle(qApp->applicationName());
-
-    // Cause a status bar to be created and shown:
-    statusBar();
 
     // Create the menu.
     QAction *fileOpen = new QAction(tr("&Open"), this);
@@ -258,7 +254,6 @@ void QlomMainWindow::treeviewDoubleclicked(const QModelIndex& index)
     showTable(model);
 
     const QString tableDisplayName = index.data().toString();
-    statusBar()->showMessage(tr("%1 table opened").arg(tableDisplayName));
 }
 
 void QlomMainWindow::showDefaultTable()
@@ -269,7 +264,6 @@ void QlomMainWindow::showDefaultTable()
 
     if (model) {
         showTable(model);
-        statusBar()->showMessage(tr("Default table opened"));
     }
 }
 
