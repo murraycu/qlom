@@ -72,6 +72,7 @@ QlomConnectionDialog::QlomConnectionDialog(const Glom::Document& document,
     password = new QLineEdit();
     gridLayout->addWidget(password, 3, 2);
     password->setEchoMode(QLineEdit::Password);
+    password->setFocus();
 
     QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok
         | QDialogButtonBox::Cancel);
