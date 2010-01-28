@@ -227,16 +227,7 @@ QlomListLayoutModel * QlomDocument::createDefaultTableListLayoutModel()
     }
 
     // Create the model for the table:
-    for (typeTableList::const_iterator iter = tableList.begin();
-        iter != tableList.end(); ++iter) {
-        const QlomTable& table = *iter;
-        if (table.tableName() == defaultTable) {
-            return new QlomListLayoutModel(document, table, theErrorReporter,
-                qobject_cast<QObject*>(this));
-        }
-    }
-
-    return 0;
+    return createListLayoutModel(defaultTable);
 }
 
 QlomErrorReporter & QlomDocument::errorReporter()
