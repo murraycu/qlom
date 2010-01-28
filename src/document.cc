@@ -182,8 +182,7 @@ QlomListLayoutModel * QlomDocument::createListLayoutModel(
          iter != tableList.end();
          ++iter) {
         if ((*iter).tableName() == tableName) {
-            return new QlomListLayoutModel(document, *iter, theErrorReporter,
-                qobject_cast<QObject*>(this));
+            return new QlomListLayoutModel(document, *iter, theErrorReporter, this);
         }
     }
 
@@ -227,6 +226,8 @@ QlomListLayoutModel * QlomDocument::createDefaultTableListLayoutModel()
     }
 
     // Create the model for the table:
+    // TODO: this code path needs testing, when it finds default tables and
+    // when not.
     return createListLayoutModel(defaultTable);
 }
 
