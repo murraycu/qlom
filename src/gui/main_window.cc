@@ -288,15 +288,7 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
     const int colIdx = model->columnCount() - 1;
     model->insertColumnAt(colIdx);
     model->setHeaderData(colIdx + 1, Qt::Horizontal, QVariant(tr("Actions")));
-
-    // This loop only ever inserts a maximum of 256 buttons?!
-    // I think the model operates in chunks, i.e., the SQL result set has a size of 256 records.
-    //qDebug("row count: %i", model->rowCount());
-    for (int idx = 0; idx < model->rowCount(); ++idx) {
-        //qDebug("idx = %i", idx);
-        QPushButton *edit = new QPushButton(tr("edit"), view);
-        view->setIndexWidget(model->index(idx, colIdx + 1), edit);
-    }
+    view->setItemDelegateForColumn(colIdx + 1, new QlomButtonDelegate(view));
 
     view->resizeColumnsToContents();
 }
