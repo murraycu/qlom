@@ -21,6 +21,8 @@
 
 #include <QRegExp>
 #include <QStringList>
+#include <QAbstractItemView>
+#include <QPushButton>
 
 QlomFieldFormattingDelegate::QlomFieldFormattingDelegate(
     const Glom::FieldFormatting &formatting, const GlomSharedField details,
@@ -169,3 +171,21 @@ QString QlomLayoutItemTextDelegate::displayText(const QVariant &, const QLocale 
 {
     return theDisplayText;
 }
+
+
+QlomButtonDelegate::QlomButtonDelegate(QObject *parent)
+: QStyledItemDelegate(parent)
+{}
+
+QlomButtonDelegate::~QlomButtonDelegate()
+{}
+
+void QlomButtonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &, const QModelIndex &index) const
+{
+    QAbstractItemView *view = qobject_cast<QAbstractItemView *>(parent());
+    if (view && !view->indexWidget(index)) {
+        QPushButton *edit = new QPushButton(tr("edit"), view);
+        view->setIndexWidget(index, edit);
+    }
+}
+

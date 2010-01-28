@@ -95,4 +95,24 @@ public:
 private:
     QString theDisplayText;
 };
+
+/** This class inserts a button into the view (at the queried model index)
+  * when it is *first* asked to paint itself. */
+class QlomButtonDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    explicit QlomButtonDelegate(QObject *parent = 0);
+    virtual ~QlomButtonDelegate();
+
+    /** This method assumes:
+      * 1) parent() returns a valid QAbstractItemView,
+      * 2) There is no QWidget at index yet,
+      * 3) The widget at index does not get replaced (this is a soft
+      *    assumption, paint(.) would simply not recreate the button widget in
+      *    that case). */
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option,
+        const QModelIndex &index) const;
+};
 #endif // QLOM_LAYOUT_DELEGATE_H_
