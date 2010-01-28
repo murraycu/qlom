@@ -261,7 +261,7 @@ void QlomMainWindow::showDefaultTable()
 
 void QlomMainWindow::showTable(QlomListLayoutModel *model)
 {
-    Q_CHECK_PTR(model);
+    Q_ASSERT(0 != model);
 
     QMainWindow *tableModelWindow = new QMainWindow;
     QTableView *view = new QTableView(tableModelWindow);
