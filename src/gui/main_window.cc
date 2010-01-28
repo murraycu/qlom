@@ -285,10 +285,10 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
     }
 
     // Setup edit button for last column.
-    const int colIdx = model->columnCount() - 1;
+    const int colIdx = model->columnCount();
     model->insertColumnAt(colIdx);
-    model->setHeaderData(colIdx + 1, Qt::Horizontal, QVariant(tr("Actions")));
-    view->setItemDelegateForColumn(colIdx + 1, new QlomButtonDelegate(tr("Details"), view));
+    model->setHeaderData(colIdx, Qt::Horizontal, QVariant(tr("Actions")));
+    view->setItemDelegateForColumn(colIdx, new QlomButtonDelegate(tr("Details"), view));
 
     view->resizeColumnsToContents();
 }
