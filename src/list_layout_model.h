@@ -74,6 +74,9 @@ public:
       * method. This method will update theStaticTextColumnIndices, too. */
     bool insertColumnAt(int colIdx);
 
+    /** Overriden so that we can drop the shared lock. */
+    virtual bool canFetchMore();
+
 protected:
     /** Overridden from QSqlTableModel. Necessary because appending columns for
       * static text items leaves them without actual content. For those columns

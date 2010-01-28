@@ -182,6 +182,21 @@ bool QlomListLayoutModel::insertColumnAt(int colIdx)
     return QSqlTableModel::insertColumn(colIdx);
 }
 
+bool QlomListLayoutModel::canFetchMore()
+{
+    const bool canFetchMore = QSqlTableModel::canFetchMore();
+
+    // Drop the shared lock by *finishing* the transaction.
+    // Otherwise, other db connections cannot write to the opened table.
+    // Once we fetched all data, there is also no need to keep a lock, since we
+    // don't intend to write to the table (even if so, that'd be another
+    // transaction).
+    if(!canFetchMore)
+        database().commit();
+
+    return canFetchMore;
+}
+
 QVariant QlomListLayoutModel::data(const QModelIndex &index, int role) const
 {
     const int colsIdx = index.column();
