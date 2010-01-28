@@ -176,6 +176,12 @@ QStyledItemDelegate * QlomListLayoutModel::createDelegateFromColumn(int column) 
     return 0;
 }
 
+bool QlomListLayoutModel::insertColumnAt(int colIdx)
+{
+    theStaticTextColumnIndices.push_back(false);
+    return QSqlTableModel::insertColumn(colIdx);
+}
+
 QVariant QlomListLayoutModel::data(const QModelIndex &index, int role) const
 {
     const int colsIdx = index.column();

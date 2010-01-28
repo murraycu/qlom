@@ -24,19 +24,11 @@
 #include "layout_delegates.h"
 
 #include <memory>
-#include <QAction>
-#include <QApplication>
-#include <QFileDialog>
-#include <QMenu>
-#include <QMenuBar>
-#include <QMessageBox>
-#include <QPointer>
-#include <QSettings>
 #include <QSqlField>
 #include <QSqlIndex>
 #include <QSqlRecord>
-#include <QTableView>
-#include <QTreeView>
+#include <QtCore>
+#include <QtGui>
 
 #include "config.h"
 
@@ -269,28 +261,42 @@ void QlomMainWindow::showDefaultTable()
 
 void QlomMainWindow::showTable(QlomListLayoutModel *model)
 {
-    if(!model) {
-        qCritical("QlomMainWindow::showTable(): model is null.");
-        return;
-    }
+    Q_CHECK_PTR(model);
 
-    QMainWindow *tableModelWindow = new QMainWindow(this);
-    tableModelWindow->setAttribute(Qt::WA_DeleteOnClose);
-
+    QMainWindow *tableModelWindow = new QMainWindow;
     QTableView *view = new QTableView(tableModelWindow);
-    view->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    model->setParent(tableModelWindow);
 
+    tableModelWindow->setAttribute(Qt::WA_DeleteOnClose);
+    tableModelWindow->setCentralWidget(view);
+    tableModelWindow->setWindowTitle(model->tableDisplayName());
+    tableModelWindow->show();
+    tableModelWindow->raise();
+    tableModelWindow->activateWindow();
+
+    model->setParent(view);
+    view->setModel(model);
+
+    // Marks model as "read-only" here, because the view has no way to edit it.
+    view->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    // Setup delegates for all columns, if available.
     for(int idx = 0; idx < model->columnCount(); ++idx) {
         view->setItemDelegateForColumn(idx, model->createDelegateFromColumn(idx));
     }
 
-    view->setModel(model);
-    view->resizeColumnsToContents();
-    tableModelWindow->setCentralWidget(view);
-    tableModelWindow->setWindowTitle(model->tableDisplayName());
+    // Setup edit button for last column.
+    const int colIdx = model->columnCount() - 1;
+    model->insertColumnAt(colIdx);
+    model->setHeaderData(colIdx + 1, Qt::Horizontal, QVariant(tr("Actions")));
 
-    tableModelWindow->show();
-    tableModelWindow->raise();
-    tableModelWindow->activateWindow();
+    // This loop only ever inserts a maximum of 256 buttons?!
+    // I think the model operates in chunks, i.e., the SQL result set has a size of 256 records.
+    //qDebug("row count: %i", model->rowCount());
+    for (int idx = 0; idx < model->rowCount(); ++idx) {
+        //qDebug("idx = %i", idx);
+        QPushButton *edit = new QPushButton(tr("edit"), view);
+        view->setIndexWidget(model->index(idx, colIdx + 1), edit);
+    }
+
+    view->resizeColumnsToContents();
 }

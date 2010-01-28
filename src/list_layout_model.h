@@ -70,6 +70,10 @@ public:
      *  specified column cannot be formatted customly. */
     QStyledItemDelegate * createDelegateFromColumn(int column) const;
 
+    /** Since insertColumn isn't virtual we have to wrap in a forwarding
+      * method. This method will update theStaticTextColumnIndices, too. */
+    bool insertColumnAt(int colIdx);
+
 protected:
     /** Overridden from QSqlTableModel. Necessary because appending columns for
       * static text items leaves them without actual content. For those columns
