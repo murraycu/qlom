@@ -288,7 +288,7 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
     const int colIdx = model->columnCount() - 1;
     model->insertColumnAt(colIdx);
     model->setHeaderData(colIdx + 1, Qt::Horizontal, QVariant(tr("Actions")));
-    view->setItemDelegateForColumn(colIdx + 1, new QlomButtonDelegate(view));
+    view->setItemDelegateForColumn(colIdx + 1, new QlomButtonDelegate(tr("Details"), view));
 
     view->resizeColumnsToContents();
 }

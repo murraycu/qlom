@@ -173,8 +173,9 @@ QString QlomLayoutItemTextDelegate::displayText(const QVariant &, const QLocale 
 }
 
 
-QlomButtonDelegate::QlomButtonDelegate(QObject *parent)
-: QStyledItemDelegate(parent)
+QlomButtonDelegate::QlomButtonDelegate(const QString &label, QObject *parent)
+: QStyledItemDelegate(parent),
+  theLabel(label)
 {}
 
 QlomButtonDelegate::~QlomButtonDelegate()
@@ -184,7 +185,7 @@ void QlomButtonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &, 
 {
     QAbstractItemView *view = qobject_cast<QAbstractItemView *>(parent());
     if (view && !view->indexWidget(index)) {
-        QPushButton *edit = new QPushButton(tr("edit"), view);
+        QPushButton *edit = new QPushButton(theLabel, view);
         view->setIndexWidget(index, edit);
     }
 }

@@ -103,7 +103,7 @@ class QlomButtonDelegate : public QStyledItemDelegate
     Q_OBJECT
 
 public:
-    explicit QlomButtonDelegate(QObject *parent = 0);
+    explicit QlomButtonDelegate(const QString &label, QObject *parent = 0);
     virtual ~QlomButtonDelegate();
 
     /** This method assumes:
@@ -114,5 +114,8 @@ public:
       *    that case). */
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option,
         const QModelIndex &index) const;
+
+private:
+    QString theLabel;
 };
 #endif // QLOM_LAYOUT_DELEGATE_H_
