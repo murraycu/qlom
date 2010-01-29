@@ -20,8 +20,7 @@
 #include "document.h"
 #include "error.h"
 #include "tables_model.h"
-#include "list_layout_model.h"
-#include "layout_delegates.h"
+#include "utils.h"
 
 #include <memory>
 #include <QSqlField>
@@ -264,14 +263,12 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
     Q_ASSERT(0 != model);
 
     QMainWindow *tableModelWindow = new QMainWindow;
-    QTableView *view = new QTableView(tableModelWindow);
+    QlomListView *view = new QlomListView(tableModelWindow);
 
     tableModelWindow->setAttribute(Qt::WA_DeleteOnClose);
     tableModelWindow->setCentralWidget(view);
     tableModelWindow->setWindowTitle(model->tableDisplayName());
     tableModelWindow->show();
-    tableModelWindow->raise();
-    tableModelWindow->activateWindow();
 
     model->setParent(view);
     view->setModel(model);
@@ -281,7 +278,7 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
 
     // Setup delegates for all columns, if available.
     for(int idx = 0; idx < model->columnCount(); ++idx) {
-        view->setItemDelegateForColumn(idx, model->createDelegateFromColumn(idx));
+        view->setupDelegateForColumn(idx);
     }
 
     // Setup edit button for last column.
@@ -303,4 +300,56 @@ void QlomMainWindow::onDetailsPressed(QObject *obj)
         QMessageBox::critical(this, tr("Details button pressed"),
                                     tr("Cell index: (%1, %2)").arg(indexObj->index().column())
                                                               .arg(indexObj->index().row()));
+}
+
+QlomListView::QlomListView(QWidget *parent)
+: QTableView(parent)
+{}
+
+QlomListView::~QlomListView()
+{}
+
+void QlomListView::setupDelegateForColumn(int column)
+{
+    QlomListLayoutModel *model = qobject_cast<QlomListLayoutModel *>(this->model());
+
+    if (model)
+    {
+        QStyledItemDelegate *delegate = QlomListView::createDelegateFromColumn(model, column);
+        setItemDelegateForColumn(column, delegate);
+    }
+}
+
+QStyledItemDelegate * QlomListView::createDelegateFromColumn(QlomListLayoutModel *model,
+                                                             int column)
+{
+    /* Need to respect the following constraint: The layout item in
+     * theLayoutGroup that can be found at the position column points to has to
+     * be a LayoutItem_Text or a LayoutItem_Field.
+     * However, this method is not used efficiently, considering how most items
+     * in a list view are field items. If LayoutItem_Text and LayoutItem_Field
+     * had a common base clase featuring the get_formatting_used() API we could
+     * get rid of the most annoying part at least: the dynamic casts. */
+    const QlomListLayoutModel::GlomSharedLayoutItems items = model->getLayoutItems();
+    for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
+        items.begin(); iter != items.end(); ++iter) {
+        if (column == std::distance(items.begin(), iter)) {
+            Glom::sharedptr<const Glom::LayoutItem_Text> textItem =
+                Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
+            if(textItem)
+                return new QlomLayoutItemTextDelegate(
+                    textItem->get_formatting_used(),
+                    QlomLayoutItemTextDelegate::GlomSharedField(),
+                    ustringToQstring(textItem->get_text()));
+
+            Glom::sharedptr<const Glom::LayoutItem_Field> fieldItem =
+                Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
+            if(fieldItem)
+                return new QlomLayoutItemFieldDelegate(
+                    fieldItem->get_formatting_used(),
+                    fieldItem->get_full_field_details());
+        }
+    }
+
+    return 0;
 }

@@ -41,6 +41,8 @@ class QlomListLayoutModel : public QSqlTableModel
     Q_OBJECT
 
 public:
+    typedef Glom::LayoutGroup::type_list_const_items GlomSharedLayoutItems; // just an alias
+
     /* Note: QSqlDatabase should be passed by const reference, but the base
        class makes the same mistake.
        TODO: File a bug when there is a public Qt bug tracker. */
@@ -61,21 +63,15 @@ public:
      *  @returns the table name */
     QString tableDisplayName() const;
 
-    /** Applies Glom's FieldFormatting to a QStyledItemDelegate. Since the view
-     *  only knows about columns (during setup) we need to map columns to
-     *  LayoutItems, as it is already done in the query builder, even if not
-     *  stated explicitly.
-     *  @param[in] column the column to create a delegate for
-     *  @returns the style delegate to be managed by a view, or 0 if the
-     *  specified column cannot be formatted customly. */
-    QStyledItemDelegate * createDelegateFromColumn(int column) const;
-
     /** Since insertColumn isn't virtual we have to wrap in a forwarding
       * method. This method will update theStaticTextColumnIndices, too. */
     bool insertColumnAt(int colIdx);
 
     /** Overriden so that we can drop the shared lock. */
     virtual bool canFetchMore();
+
+    /** Returns the layout items used for the current table. */
+    const GlomSharedLayoutItems getLayoutItems() const;
 
 protected:
     /** Overridden from QSqlTableModel. Necessary because appending columns for

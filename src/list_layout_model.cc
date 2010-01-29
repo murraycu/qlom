@@ -109,6 +109,11 @@ QString QlomListLayoutModel::tableDisplayName() const
     return theTableDisplayName;
 }
 
+const QlomListLayoutModel::GlomSharedLayoutItems QlomListLayoutModel::getLayoutItems() const
+{
+    return theLayoutGroup->get_items();
+}
+
 QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
                                         const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup)
 {
@@ -142,45 +147,13 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
     return ustringToQstring(query);
 }
 
-QStyledItemDelegate * QlomListLayoutModel::createDelegateFromColumn(int column) const
-{
-    /* Need to respect the following constraint: The layout item in
-     * theLayoutGroup that can be found at the position column points to has to
-     * be a LayoutItem_Text or a LayoutItem_Field.
-     * However, this method is not used efficiently, considering how most items
-     * in a list view are field items. If LayoutItem_Text and LayoutItem_Field
-     * had a common base clase featuring the get_formatting_used() API we could
-     * get rid of the most annoying part at least: the dynamic casts. */
-    const Glom::LayoutGroup::type_list_const_items items =
-      theLayoutGroup->get_items();
-    for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
-        items.begin(); iter != items.end(); ++iter) {
-        if (column == std::distance(items.begin(), iter)) {
-            Glom::sharedptr<const Glom::LayoutItem_Text> textItem =
-                Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
-            if(textItem)
-                return new QlomLayoutItemTextDelegate(
-                    textItem->get_formatting_used(),
-                    QlomLayoutItemTextDelegate::GlomSharedField(),
-                    ustringToQstring(textItem->get_text()));
-
-            Glom::sharedptr<const Glom::LayoutItem_Field> fieldItem =
-                Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
-            if(fieldItem)
-                return new QlomLayoutItemFieldDelegate(
-                    fieldItem->get_formatting_used(),
-                    fieldItem->get_full_field_details());
-        }
-    }
-
-    return 0;
-}
-
 bool QlomListLayoutModel::insertColumnAt(int colIdx)
 {
     theStaticTextColumnIndices.push_back(false);
     return QSqlTableModel::insertColumn(colIdx);
 }
+
+
 
 bool QlomListLayoutModel::canFetchMore()
 {
