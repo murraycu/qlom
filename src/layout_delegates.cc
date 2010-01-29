@@ -23,6 +23,7 @@
 #include <QStringList>
 #include <QAbstractItemView>
 #include <QPushButton>
+#include <QSignalMapper>
 
 QlomFieldFormattingDelegate::QlomFieldFormattingDelegate(
     const Glom::FieldFormatting &formatting, const GlomSharedField details,
@@ -172,6 +173,20 @@ QString QlomLayoutItemTextDelegate::displayText(const QVariant &, const QLocale 
     return theDisplayText;
 }
 
+QlomModelIndexObject::QlomModelIndexObject(const QModelIndex &index, QObject *parent)
+: QObject(parent),
+  theIndex(index)
+{}
+
+QlomModelIndexObject::~QlomModelIndexObject()
+{}
+
+QModelIndex QlomModelIndexObject::index() const
+{
+    return theIndex;
+}
+
+
 
 QlomButtonDelegate::QlomButtonDelegate(const QString &label, QObject *parent)
 : QStyledItemDelegate(parent),
@@ -181,12 +196,21 @@ QlomButtonDelegate::QlomButtonDelegate(const QString &label, QObject *parent)
 QlomButtonDelegate::~QlomButtonDelegate()
 {}
 
-void QlomButtonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &, const QModelIndex &index) const
+void QlomButtonDelegate::paint(QPainter * /*painter*/, const QStyleOptionViewItem &, const QModelIndex &index) const
 {
     QAbstractItemView *view = qobject_cast<QAbstractItemView *>(parent());
     if (view && !view->indexWidget(index)) {
-        QPushButton *edit = new QPushButton(theLabel, view);
-        view->setIndexWidget(index, edit);
+        QPushButton *button = new QPushButton(theLabel, view);
+
+        // Bind the index to the button's pressed signal.
+        QSignalMapper *bindIndex = new QSignalMapper(button);
+        bindIndex->setMapping(button, new QlomModelIndexObject(index, button));
+        connect(button, SIGNAL(pressed()),
+                bindIndex, SLOT(map()));
+        connect(bindIndex, SIGNAL(mapped(QObject *)),
+                this, SIGNAL(buttonPressed(QObject *)));
+
+        view->setIndexWidget(index, button);
     }
 }
 

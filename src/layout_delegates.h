@@ -96,6 +96,22 @@ private:
     QString theDisplayText;
 };
 
+/** QSignalMappers only accept a limited subset of types for their bindins, one
+ *  of them being QObjects. This class acts as a closure for QModelIndices */
+class QlomModelIndexObject : public QObject
+{
+   Q_OBJECT
+
+public:
+    explicit QlomModelIndexObject(const QModelIndex &index, QObject *parent = 0);
+    virtual ~QlomModelIndexObject();
+
+    QModelIndex index() const;
+
+private:
+    QModelIndex theIndex;
+};
+
 /** This class inserts a button into the view (at the queried model index)
   * when it is *first* asked to paint itself. */
 class QlomButtonDelegate : public QStyledItemDelegate
@@ -114,6 +130,9 @@ public:
       *    that case). */
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option,
         const QModelIndex &index) const;
+
+Q_SIGNALS:
+    void buttonPressed(QObject *obj);
 
 private:
     QString theLabel;
