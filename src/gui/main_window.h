@@ -27,6 +27,7 @@
 class QlomListLayoutModel;
 class QModelIndex;
 class QTreeView;
+class QlomModelIndexObject;
 
 /** The main window is the central controller and view for Qlom.
  *  The main window both shows the main window and manages the Glom document,
@@ -120,6 +121,10 @@ private Q_SLOTS:
     /** Slot for the signal from a double-click on the table names treeview.
      *  @param[in] index the row that was double-clicked */
     void treeviewDoubleclicked(const QModelIndex &index);
+
+    /** Slot to check whether the details buttons work.
+     *  @param[in] object contains the index of the row that was clicked */
+    void onDetailsPressed(QObject *obj);
 };
 
 #endif /* QLOM_MAIN_WINDOW_H_ */

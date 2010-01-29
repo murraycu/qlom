@@ -288,7 +288,19 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
     const int colIdx = model->columnCount();
     model->insertColumnAt(colIdx);
     model->setHeaderData(colIdx, Qt::Horizontal, QVariant(tr("Actions")));
-    view->setItemDelegateForColumn(colIdx, new QlomButtonDelegate(tr("Details"), view));
+    QlomButtonDelegate *buttonDelegate = new QlomButtonDelegate(tr("Details"), view);
+    connect(buttonDelegate, SIGNAL(buttonPressed(QObject *)),
+            this, SLOT(onDetailsPressed(QObject *)));
+    view->setItemDelegateForColumn(colIdx, buttonDelegate);
 
     view->resizeColumnsToContents();
+}
+
+void QlomMainWindow::onDetailsPressed(QObject *obj)
+{
+    QlomModelIndexObject *indexObj = qobject_cast<QlomModelIndexObject *>(obj);
+    if(indexObj)
+        QMessageBox::critical(this, tr("Details button pressed"),
+                                    tr("Cell index: (%1, %2)").arg(indexObj->index().column())
+                                                              .arg(indexObj->index().row()));
 }
