@@ -286,20 +286,18 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
     //model->insertColumnAt(colIdx);
     model->setHeaderData(colIdx, Qt::Horizontal, QVariant(tr("Actions")));
     QlomButtonDelegate *buttonDelegate = new QlomButtonDelegate(tr("Details"), view);
-    connect(buttonDelegate, SIGNAL(buttonPressed(QObject *)),
-            this, SLOT(onDetailsPressed(QObject *)));
+    connect(buttonDelegate, SIGNAL(buttonPressed(QModelIndex)),
+            this, SLOT(onDetailsPressed(QModelIndex)));
     view->setItemDelegateForColumn(colIdx, buttonDelegate);
 
     view->resizeColumnsToContents();
 }
 
-void QlomMainWindow::onDetailsPressed(QObject *obj)
+void QlomMainWindow::onDetailsPressed(const QModelIndex &index)
 {
-    QlomModelIndexObject *indexObj = qobject_cast<QlomModelIndexObject *>(obj);
-    if(indexObj)
-        QMessageBox::critical(this, tr("Details button pressed"),
-                                    tr("Cell index: (%1, %2)").arg(indexObj->index().column())
-                                                              .arg(indexObj->index().row()));
+    QMessageBox::critical(this, tr("Details button pressed"),
+                                tr("Cell index: (%1, %2)").arg(index.column())
+                                                          .arg(index.row()));
 }
 
 QlomListView::QlomListView(QWidget *parent)

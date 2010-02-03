@@ -137,9 +137,13 @@ public:
         const QModelIndex &index) const;
 
 Q_SIGNALS:
-    void buttonPressed(QObject *obj);
+    void buttonPressed(const QModelIndex &index);
 
 private:
     QString theLabel;
+
+private Q_SLOTS:
+    /** Helper slot to unwrap the QObject from the QSignalMapper. */
+    void onButtonPressed(QObject *obj);
 };
 #endif // QLOM_LAYOUT_DELEGATE_H_

@@ -126,8 +126,8 @@ private Q_SLOTS:
     void treeviewDoubleclicked(const QModelIndex &index);
 
     /** Slot to check whether the details buttons work.
-     *  @param[in] object contains the index of the row that was clicked */
-    void onDetailsPressed(QObject *obj);
+     *  @param[in] index the row that was double-clicked */
+    void onDetailsPressed(const QModelIndex &index);
 };
 
 

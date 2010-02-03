@@ -214,9 +214,16 @@ void QlomButtonDelegate::paint(QPainter * /*painter*/, const QStyleOptionViewIte
         connect(button, SIGNAL(pressed()),
                 bindIndex, SLOT(map()));
         connect(bindIndex, SIGNAL(mapped(QObject *)),
-                this, SIGNAL(buttonPressed(QObject *)));
+                this, SLOT(onButtonPressed(QObject *)));
 
         view->setIndexWidget(index, button);
     }
+}
+
+void QlomButtonDelegate::onButtonPressed(QObject *obj)
+{
+    QlomModelIndexObject *indexObj = qobject_cast<QlomModelIndexObject *>(obj);
+    if(indexObj)
+        Q_EMIT buttonPressed(indexObj->index());
 }
 
