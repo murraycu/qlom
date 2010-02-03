@@ -281,9 +281,9 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
         view->setupDelegateForColumn(idx);
     }
 
-    // Setup edit button for last column.
-    const int colIdx = model->columnCount();
-    model->insertColumnAt(colIdx);
+    // Setup details button for last column.
+    const int colIdx = model->columnCount() - 1;
+    //model->insertColumnAt(colIdx);
     model->setHeaderData(colIdx, Qt::Horizontal, QVariant(tr("Actions")));
     QlomButtonDelegate *buttonDelegate = new QlomButtonDelegate(tr("Details"), view);
     connect(buttonDelegate, SIGNAL(buttonPressed(QObject *)),
@@ -303,8 +303,13 @@ void QlomMainWindow::onDetailsPressed(QObject *obj)
 }
 
 QlomListView::QlomListView(QWidget *parent)
-: QTableView(parent)
-{}
+: QTableView(parent),
+  theLastColumnIndex(-1),
+  theToggledFlag(false)
+{
+    connect(horizontalHeader(), SIGNAL(sectionPressed(int)),
+            this, SLOT(onHeaderSectionPressed(int)));
+}
 
 QlomListView::~QlomListView()
 {}
@@ -352,4 +357,23 @@ QStyledItemDelegate * QlomListView::createDelegateFromColumn(QlomListLayoutModel
     }
 
     return 0;
+}
+
+void QlomListView::onHeaderSectionPressed(int colIdx)
+{
+    Qt::SortOrder order = Qt::DescendingOrder;
+
+    if (colIdx == theLastColumnIndex) {
+        order = (theToggledFlag ? Qt::DescendingOrder : Qt::AscendingOrder);
+        theToggledFlag = !theToggledFlag;
+    } else if (-1 != theLastColumnIndex) {
+        // Switching from another column => some arbitrary sorting is applied,
+        // so we start with Qt::AscendingOrder again.
+        order = Qt::AscendingOrder;
+    }
+    theLastColumnIndex = colIdx;
+
+    // TODO: If this modifies the sorting in the model, we'd need a proxy model
+    // here.
+    sortByColumn(colIdx, order);
 }

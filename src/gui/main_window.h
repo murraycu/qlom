@@ -154,6 +154,14 @@ public:
      *  @returns the style delegate to be managed by a view, or 0 if the
      *  specified column cannot be formatted customly. */
     static QStyledItemDelegate * createDelegateFromColumn(QlomListLayoutModel *model, int column);
+
+public Q_SLOTS:
+    /** Slot to sort columns. */
+    void onHeaderSectionPressed(int colIdx);
+
+private:
+    int theLastColumnIndex; /**< the last column that was used for sorting, default is -1 (i.e., none). */
+    bool theToggledFlag;
 };
 
 

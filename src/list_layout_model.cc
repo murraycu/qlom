@@ -124,6 +124,22 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
     Glom::Utils::type_vecConstLayoutFields fields;
     const Glom::LayoutGroup::type_list_const_items items = layoutGroup->get_items();
 
+
+    // We need to pad the column count of the model created by the SQL query so
+    // that it matches the column count after inserting the buttons for the
+    // actions columns in the view. Else, resorting would again change the
+    // column count by 1, thus losing the extra column in the process.
+    // spaceHolder is my current solution to that problem.
+    //
+    // Glom generated "table"."" in the SQL query projection if the item is
+    // empty. However, we can assume that each Glom relation contains a primary
+    // key (TODO: check back with Murray whether that is really safe. If not,
+    // use a regex over the returned SQL query instead).
+    //
+    // TODO: separate view issues from this model, probably with a proxy model.
+    Glom::sharedptr<Glom::LayoutItem_Field> placeHolder(new Glom::LayoutItem_Field);
+    Glib::ustring primKeyName;
+
     int idx = 0;
     for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
          items.begin();
@@ -131,6 +147,11 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
          ++iter) {
          Glom::sharedptr<const Glom::LayoutItem_Field> field = Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
          if (field) {
+             Glom::sharedptr<const Glom::Field> details = field->get_full_field_details();
+             if (details && details->get_primary_key()) {
+                 sort_clause.push_back(Glom::type_pair_sort_field(field, true));
+                 primKeyName = field->get_name();
+             }
              fields.push_back(field);
              setHeaderData(idx, Qt::Horizontal, QVariant(ustringToQstring(field->get_title_or_name())));
              ++idx;
@@ -142,6 +163,17 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
              insertColumn(idx); // inserts before
          }
     }
+
+    // If no primary key was found it means we have no placeholder column,
+    // which is bad for the actions column.
+    Q_ASSERT(!primKeyName.empty());
+
+    // Re-use the primary key for the place holder item.
+    placeHolder->set_name(primKeyName);
+    // Make a const copy for the list.
+    fields.push_back(placeHolder);
+    // Pad the static text column lookup list accordingly.
+    theStaticTextColumnIndices.push_back(false);
 
     Glib::ustring query = Glom::Utils::build_sql_select_with_where_clause(table, fields, where_clause, extra_join, sort_clause, group_by);
     return ustringToQstring(query);

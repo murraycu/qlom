@@ -196,10 +196,16 @@ QlomButtonDelegate::QlomButtonDelegate(const QString &label, QObject *parent)
 QlomButtonDelegate::~QlomButtonDelegate()
 {}
 
+QString QlomButtonDelegate::displayTest(const QVariant &, const QLocale&) const
+{
+    // Silence the output for this delegate.
+    return QString();
+}
+
 void QlomButtonDelegate::paint(QPainter * /*painter*/, const QStyleOptionViewItem &, const QModelIndex &index) const
 {
     QAbstractItemView *view = qobject_cast<QAbstractItemView *>(parent());
-    if (view && !view->indexWidget(index)) {
+    if(view && !view->indexWidget(index)) {
         QPushButton *button = new QPushButton(theLabel, view);
 
         // Bind the index to the button's pressed signal.

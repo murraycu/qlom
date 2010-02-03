@@ -122,6 +122,11 @@ public:
     explicit QlomButtonDelegate(const QString &label, QObject *parent = 0);
     virtual ~QlomButtonDelegate();
 
+    /** Overriden to silence the output of this delegate, since it is meant to
+      * show a widget. */
+    virtual QString displayTest(const QVariant &value, const QLocale &locale)
+        const;
+
     /** This method assumes:
       * 1) parent() returns a valid QAbstractItemView,
       * 2) There is no QWidget at index yet,
