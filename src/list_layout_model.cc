@@ -132,13 +132,11 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
     // spaceHolder is my current solution to that problem.
     //
     // Glom generated "table"."" in the SQL query projection if the item is
-    // empty. However, we can assume that each Glom relation contains a primary
-    // key (TODO: check back with Murray whether that is really safe. If not,
-    // use a regex over the returned SQL query instead).
+    // empty. However, we can assume that each Glom relation consists of at
+    // least one field (even if that means it's only the primary key).
     //
     // TODO: separate view issues from this model, probably with a proxy model.
-    Glom::sharedptr<Glom::LayoutItem_Field> placeHolder(new Glom::LayoutItem_Field);
-    Glib::ustring primKeyName;
+    Glom::sharedptr<const Glom::LayoutItem_Field> placeHolder;
 
     int idx = 0;
     for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
@@ -147,11 +145,17 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
          ++iter) {
          Glom::sharedptr<const Glom::LayoutItem_Field> field = Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
          if (field) {
+
+             // Copy the first field we find into the place holder
+             if (!placeHolder) {
+                 placeHolder = field;
+             }
+
              Glom::sharedptr<const Glom::Field> details = field->get_full_field_details();
              if (details && details->get_primary_key()) {
                  sort_clause.push_back(Glom::type_pair_sort_field(field, true));
-                 primKeyName = field->get_name();
              }
+
              fields.push_back(field);
              setHeaderData(idx, Qt::Horizontal, QVariant(ustringToQstring(field->get_title_or_name())));
              ++idx;
@@ -164,12 +168,9 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
          }
     }
 
-    // If no primary key was found it means we have no placeholder column,
-    // which is bad for the actions column.
-    Q_ASSERT(!primKeyName.empty());
+    // Assume that at least one column was queried, basically.
+    Q_ASSERT(placeHolder);
 
-    // Re-use the primary key for the place holder item.
-    placeHolder->set_name(primKeyName);
     // Make a const copy for the list.
     fields.push_back(placeHolder);
     // Pad the static text column lookup list accordingly.
