@@ -146,8 +146,10 @@ QString QlomLayoutItemFieldDelegate::applyNumericFormatting(double numeric,
         myLocale.setNumberOptions(0); // Do not rely on defaults here.
 
     // TODO: check max precision in Glom source.
-    int precision = (numFormat.m_decimal_places_restricted
-        ? numFormat.m_decimal_places : numFormat.get_default_precision());
+    // libglom-1.13 specific:
+    // int precision = (numFormat.m_decimal_places_restricted
+    //    ? numFormat.m_decimal_places : numFormat.get_default_precision());
+    int precision = numFormat.m_decimal_places;
     /* 'g' trims trailing zeroes, although not documented in [1], whereas 'f'
        prints the decimal places instead of using mantisse + exponent.
        [1] http://doc.trolltech.com/4.6/qstring.html#argument-formats */
