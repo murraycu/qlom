@@ -40,6 +40,10 @@ void printUsage()
  */
 bool checkInstallation()
 {
+#ifdef Q_WS_MAEMO_5
+    // the package libqt4-sql-psql is not available for Maemo
+    return true;
+#else
     //Check that the PostgreSQL QSQL driver is installed,
     //because qlom will not be useful without it:
     QStringList drivers = QSqlDatabase::drivers();
@@ -56,6 +60,7 @@ bool checkInstallation()
         QObject::tr("Your installation of Glom is not complete, because the QtSQL PostgreSQL database driver (QPSQL) is not available on your system.\n\nPlease report this bug to your vendor or your system administrator so it can be corrected."));
 
     return false;
+#endif
 }
 
 int main(int argc, char **argv)

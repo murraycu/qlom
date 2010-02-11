@@ -21,8 +21,7 @@
 #include "utils.h"
 #include "error.h"
 
-// libglom-1.13 specific:
-// #include <libglom/utils.h>
+#include <libglom/utils.h>
 #include <QSqlQuery>
 #include <QSqlIndex>
 #include <QSqlRecord>
@@ -120,11 +119,9 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
 {
     Glib::ustring where_clause;
     Glib::ustring extra_join;
-    // libglom-1.13 specific:
-    // Glom::type_sort_clause sort_clause;
+    Glom::type_sort_clause sort_clause;
     Glib::ustring group_by;
-    // libglom-1.13 specific:
-    // Glom::Utils::type_vecConstLayoutFields fields;
+    Glom::Utils::type_vecConstLayoutFields fields;
     const Glom::LayoutGroup::type_list_const_items items = layoutGroup->get_items();
 
 
@@ -156,12 +153,10 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
 
              Glom::sharedptr<const Glom::Field> details = field->get_full_field_details();
              if (details && details->get_primary_key()) {
-                 // libglom-1.13 specific:
-                 // sort_clause.push_back(Glom::type_pair_sort_field(field, true));
+                sort_clause.push_back(Glom::type_pair_sort_field(field, true));
              }
 
-             // libglom-1.13 specific:
-             // fields.push_back(field);
+             fields.push_back(field);
              setHeaderData(idx, Qt::Horizontal, QVariant(ustringToQstring(field->get_title_or_name())));
              ++idx;
          }
@@ -177,13 +172,11 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
     Q_ASSERT(placeHolder);
 
     // Make a const copy for the list.
-    // libglom-1.13 specific:
-    // fields.push_back(placeHolder);
+    fields.push_back(placeHolder);
     // Pad the static text column lookup list accordingly.
     theStaticTextColumnIndices.push_back(false);
 
-    // libglom-1.13 specific:
-    Glib::ustring query; // = Glom::Utils::build_sql_select_with_where_clause(table, fields, where_clause, extra_join, sort_clause, group_by);
+    Glib::ustring query = Glom::Utils::build_sql_select_with_where_clause(table, fields, where_clause, extra_join, sort_clause, group_by);
     return ustringToQstring(query);
 }
 
