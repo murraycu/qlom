@@ -149,11 +149,15 @@ void QlomMainWindow::setup()
 
     // Create page containing the table and the navigation widget.
     QWidget *tableContainer = new QWidget;
-    
+
     listLayoutView = new QlomListView(tableContainer);
     listLayoutView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     listLayoutView->setAlternatingRowColors(true);
-    
+    // TODO: Confirm with Qt 4.6 - the grid settings get ignored with Qt 4.5
+    listLayoutView->setShowGrid(false);
+    listLayoutView->setGridStyle(Qt::NoPen);
+    listLayoutView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+
     tablesComboBox = new QComboBox(tableContainer);
     connect(tablesComboBox, SIGNAL(activated(int)),
         this, SLOT(showTableFromIndex(const int)));
@@ -161,7 +165,7 @@ void QlomMainWindow::setup()
         tableContainer);
     connect(listLayoutBackButton, SIGNAL(clicked(bool)),
         this, SLOT(showTablesList()));
-        
+
     QWidget *navigationContainer = new QWidget;
     QHBoxLayout *navigationLayout = new QHBoxLayout(navigationContainer);
     navigationLayout->addWidget(tablesComboBox, 1);
@@ -170,9 +174,9 @@ void QlomMainWindow::setup()
     QVBoxLayout *tableLayout = new QVBoxLayout(tableContainer);
     tableLayout->addWidget(navigationContainer);
     tableLayout->addWidget(listLayoutView);
-    
+
     mainWidget->addWidget(tableContainer);
- 
+
     setCentralWidget(mainWidget);
 }
 
@@ -303,9 +307,13 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
     const QString tableDisplayName(model->tableDisplayName());
     tablesComboBox->setCurrentIndex(
         tablesComboBox->findText(tableDisplayName));
+
+    listLayoutView->hide();
     model->setParent(listLayoutView);
     listLayoutView->setModel(model);
-    listLayoutView->resizeColumnsToContents();
+    //listLayoutView->resizeColumnsToContents();
+    listLayoutView->show();
+
     mainWidget->setCurrentIndex(1);
     setWindowTitle(tableDisplayName);
 
