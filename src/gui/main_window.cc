@@ -50,10 +50,10 @@ QlomMainWindow::QlomMainWindow(const QString &filepath) :
     }
 
     QlomTablesModel *model = glomDocument.createTablesModel();
-    centralTreeView->setModel(model);
+    tablesTreeView->setModel(model);
 
-    connect(centralTreeView, SIGNAL(doubleClicked(QModelIndex)),
-        this, SLOT(treeviewDoubleclicked(QModelIndex)));
+    connect(tablesTreeView, SIGNAL(doubleClicked(QModelIndex)),
+        this, SLOT(tablesTreeviewDoubleclicked(QModelIndex)));
     show();
 
     // Open default table.
@@ -102,6 +102,7 @@ void QlomMainWindow::receiveError(const QlomError &error)
 
 void QlomMainWindow::setup()
 {
+    readSettings();
     setWindowTitle(qApp->applicationName());
 
     // Create the menu.
@@ -138,11 +139,33 @@ void QlomMainWindow::setup()
     connect(&glomDocument.errorReporter(), SIGNAL(errorRaised(QlomError)),
         this, SLOT(receiveError(QlomError)));
 
-    centralTreeView = new QTreeView(this);
-    centralTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    setCentralWidget(centralTreeView);
+    QWidget* notTheMainWidget = new QWidget(this);
+    mainWidget = new QStackedWidget(notTheMainWidget);
 
-    readSettings();
+    QWidget *tablesTreeWidget = new QWidget;
+    tablesTreeView = new QTreeView(tablesTreeWidget);
+    tablesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    mainWidget->addWidget(tablesTreeWidget);
+
+    QWidget *listLayoutWidget = new QWidget;
+    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    listLayoutWidget->setSizePolicy(sizePolicy);
+    QVBoxLayout *listLayoutLayout = new QVBoxLayout(listLayoutWidget);
+    listLayoutBackButton = new QPushButton("Back to table list",
+        listLayoutWidget);
+    listLayoutLayout->addWidget(listLayoutBackButton);
+    connect(listLayoutBackButton, SIGNAL(clicked(bool)),
+        this, SLOT(showTablesList()));
+
+    listLayoutView = new QlomListView(listLayoutWidget);
+    listLayoutView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    listLayoutLayout->addWidget(listLayoutView);
+
+    /* Adding a widget does not change the current widget, iff the
+     * QStackedWidget is not empty. */
+    mainWidget->addWidget(listLayoutWidget);
+
+    setCentralWidget(notTheMainWidget);
 }
 
 QlomMainWindow::~QlomMainWindow()
@@ -212,7 +235,7 @@ void QlomMainWindow::fileOpenTriggered()
         }
 
         QlomTablesModel *model = glomDocument.createTablesModel();
-        centralTreeView->setModel(model);
+        tablesTreeView->setModel(model);
         // Open default table.
         showDefaultTable();
     }
@@ -221,11 +244,13 @@ void QlomMainWindow::fileOpenTriggered()
 
 void QlomMainWindow::fileCloseTriggered()
 {
-    centralTreeView->deleteLater();
-    centralTreeView = new QTreeView(this);
-    setCentralWidget(centralTreeView);
-    connect(centralTreeView, SIGNAL(doubleClicked(QModelIndex)),
-        this, SLOT(treeviewDoubleclicked(QModelIndex)));
+    tablesTreeView->deleteLater();
+    tablesTreeView = new QTreeView(this);
+    mainWidget->insertWidget(0, tablesTreeView);
+    mainWidget->setCurrentIndex(0);
+    setWindowTitle(qApp->applicationName());
+    connect(tablesTreeView, SIGNAL(doubleClicked(QModelIndex)),
+        this, SLOT(tablesTreeviewDoubleclicked(QModelIndex)));
 }
 
 void QlomMainWindow::fileQuitTriggered()
@@ -238,13 +263,16 @@ void QlomMainWindow::helpAboutTriggered()
     showAboutDialog();
 }
 
-void QlomMainWindow::treeviewDoubleclicked(const QModelIndex& index)
+void QlomMainWindow::showTablesList()
+{
+    mainWidget->setCurrentIndex(0);
+}
+
+void QlomMainWindow::tablesTreeviewDoubleclicked(const QModelIndex& index)
 {
     const QString &tableName = index.data(Qlom::TableNameRole).toString();
     QlomListLayoutModel *model = glomDocument.createListLayoutModel(tableName);
     showTable(model);
-
-    const QString tableDisplayName = index.data().toString();
 }
 
 void QlomMainWindow::showDefaultTable()
@@ -262,51 +290,42 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
 {
     Q_ASSERT(0 != model);
 
-    QMainWindow *tableModelWindow = new QMainWindow;
-    QlomListView *view = new QlomListView(tableModelWindow);
-
-    tableModelWindow->setAttribute(Qt::WA_DeleteOnClose);
-    tableModelWindow->setCentralWidget(view);
-    tableModelWindow->setWindowTitle(model->tableDisplayName());
-    tableModelWindow->show();
-
-    model->setParent(view);
-    view->setModel(model);
+    setWindowTitle(model->tableDisplayName());
+    model->setParent(listLayoutView);
+    listLayoutView->setModel(model);
+    listLayoutView->resizeColumnsToContents();
+    mainWidget->setCurrentIndex(1);
 
     // Marks model as "read-only" here, because the view has no way to edit it.
-    view->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    listLayoutView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     // Setup delegates for all columns, if available.
-    for(int idx = 0; idx < model->columnCount(); ++idx) {
-        view->setupDelegateForColumn(idx);
+    for(int index = 0; index < model->columnCount(); ++index) {
+        listLayoutView->setupDelegateForColumn(index);
     }
 
     // Setup details button for last column.
-    const int colIdx = model->columnCount() - 1;
+    const int columnIndex = model->columnCount() - 1;
     //model->insertColumnAt(colIdx);
-    model->setHeaderData(colIdx, Qt::Horizontal, QVariant(tr("Actions")));
-    QlomButtonDelegate *buttonDelegate = new QlomButtonDelegate(tr("Details"), view);
+    model->setHeaderData(columnIndex, Qt::Horizontal, QVariant(tr("Actions")));
+    QlomButtonDelegate *buttonDelegate =
+        new QlomButtonDelegate(tr("Details"), listLayoutView);
     connect(buttonDelegate, SIGNAL(buttonPressed(QModelIndex)),
-            this, SLOT(onDetailsPressed(QModelIndex)));
-    view->setItemDelegateForColumn(colIdx, buttonDelegate);
-
-    view->resizeColumnsToContents();
+        this, SLOT(onDetailsPressed(QModelIndex)));
+    listLayoutView->setItemDelegateForColumn(columnIndex, buttonDelegate);
 }
 
 void QlomMainWindow::onDetailsPressed(const QModelIndex &index)
 {
     QMessageBox::critical(this, tr("Details button pressed"),
-                                tr("Cell index: (%1, %2)").arg(index.column())
-                                                          .arg(index.row()));
+        tr("Cell index: (%1, %2)").arg(index.column()).arg(index.row()));
 }
 
 QlomListView::QlomListView(QWidget *parent)
-: QTableView(parent),
-  theLastColumnIndex(-1),
-  theToggledFlag(false)
+: QTableView(parent), theLastColumnIndex(-1), theToggledFlag(false)
 {
     connect(horizontalHeader(), SIGNAL(sectionPressed(int)),
-            this, SLOT(onHeaderSectionPressed(int)));
+        this, SLOT(onHeaderSectionPressed(int)));
 }
 
 QlomListView::~QlomListView()
@@ -314,17 +333,18 @@ QlomListView::~QlomListView()
 
 void QlomListView::setupDelegateForColumn(int column)
 {
-    QlomListLayoutModel *model = qobject_cast<QlomListLayoutModel *>(this->model());
+    QlomListLayoutModel *model =
+        qobject_cast<QlomListLayoutModel *>(this->model());
 
-    if (model)
-    {
-        QStyledItemDelegate *delegate = QlomListView::createDelegateFromColumn(model, column);
+    if (model) {
+        QStyledItemDelegate *delegate =
+          QlomListView::createDelegateFromColumn(model, column);
         setItemDelegateForColumn(column, delegate);
     }
 }
 
-QStyledItemDelegate * QlomListView::createDelegateFromColumn(QlomListLayoutModel *model,
-                                                             int column)
+QStyledItemDelegate * QlomListView::createDelegateFromColumn(
+    QlomListLayoutModel *model, int column)
 {
     /* Need to respect the following constraint: The layout item in
      * theLayoutGroup that can be found at the position column points to has to

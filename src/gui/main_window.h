@@ -29,6 +29,9 @@
 
 class QlomListLayoutModel;
 class QModelIndex;
+class QPushButton;
+class QStackedWidget;
+class QlomListView;
 class QTreeView;
 class QlomModelIndexObject;
 
@@ -102,7 +105,12 @@ private:
     QString errorDomainLookup(const Qlom::QlomErrorDomain errorDomain);
 
     QlomDocument glomDocument; /**< a Glom document to view */
-    QTreeView *centralTreeView; /**< a tree view for the table names model */
+    QStackedWidget *mainWidget; /**< a container for multiple stacked display
+    widgets */
+    QTreeView *tablesTreeView; /**< a tree view for the table names model */
+    QlomListView *listLayoutView; /**< a table view for a list layout */
+    QPushButton *listLayoutBackButton; /**< a button to go back to the tables
+                                        list view. */
     QlomErrorReporter theErrorReporter; /**< an error reporting facility that
                                           can be used in lieu of C++
                                           exceptions. */
@@ -121,15 +129,17 @@ private Q_SLOTS:
     /** Slot for the signal from the Help menu item. */
     void helpAboutTriggered();
 
+    /** Slot to show the list of tables. */
+    void showTablesList();
+
     /** Slot for the signal from a double-click on the table names treeview.
      *  @param[in] index the row that was double-clicked */
-    void treeviewDoubleclicked(const QModelIndex &index);
+    void tablesTreeviewDoubleclicked(const QModelIndex &index);
 
     /** Slot to check whether the details buttons work.
      *  @param[in] index the row that was double-clicked */
     void onDetailsPressed(const QModelIndex &index);
 };
-
 
 /** This class extends the QTableView by a delegate factory specialised to the
  *  QlomListLayoutModel. */
@@ -153,16 +163,16 @@ public:
      *  @param[in] column the column to create a delegate for
      *  @returns the style delegate to be managed by a view, or 0 if the
      *  specified column cannot be formatted customly. */
-    static QStyledItemDelegate * createDelegateFromColumn(QlomListLayoutModel *model, int column);
+    static QStyledItemDelegate * createDelegateFromColumn(
+        QlomListLayoutModel *model, int column);
 
 public Q_SLOTS:
     /** Slot to sort columns. */
-    void onHeaderSectionPressed(int colIdx);
+    void onHeaderSectionPressed(int columnIndex);
 
 private:
     int theLastColumnIndex; /**< the last column that was used for sorting, default is -1 (i.e., none). */
     bool theToggledFlag;
 };
-
 
 #endif /* QLOM_MAIN_WINDOW_H_ */
