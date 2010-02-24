@@ -51,8 +51,8 @@ bool checkInstallation()
     }
 
     QMessageBox::critical(0, QObject::tr("Incomplete Qlom Installation"),
-        QObject::tr("Your installation of Glom is not complete, because the "
-                    "QtSQL database driver (QPSQL or SQLite) is not "
+        QObject::tr("Your installation of Glom is not complete, because no "
+                    "QtSQL database driver (QPSQL or SQLite) is "
                     "available on your system.\n\nPlease report this bug to "
                     "your vendor or your system administrator so it can be "
                     "corrected."));
