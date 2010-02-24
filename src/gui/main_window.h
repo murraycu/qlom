@@ -28,6 +28,7 @@
 #include <QTableView>
 
 class QlomListLayoutModel;
+class QComboBox;
 class QModelIndex;
 class QPushButton;
 class QStackedWidget;
@@ -109,6 +110,7 @@ private:
     widgets */
     QTreeView *tablesTreeView; /**< a tree view for the table names model */
     QlomListView *listLayoutView; /**< a table view for a list layout */
+    QComboBox *tablesComboBox; /**< a combo box for the table names model */
     QPushButton *listLayoutBackButton; /**< a button to go back to the tables
                                         list view. */
     QlomErrorReporter theErrorReporter; /**< an error reporting facility that
@@ -139,6 +141,10 @@ private Q_SLOTS:
     /** Slot to check whether the details buttons work.
      *  @param[in] index the row that was double-clicked */
     void onDetailsPressed(const QModelIndex &index);
+
+    /** Slot to show a table given a numeric index.
+     *  @param[in] index the index of the table to show */
+    void showTableFromIndex(const int index);
 };
 
 /** This class extends the QTableView by a delegate factory specialised to the

@@ -141,25 +141,33 @@ void QlomMainWindow::setup()
 
     mainWidget = new QStackedWidget(this);
 
-    // create page containing the treeview
+    // Create page containing the treeview.
     tablesTreeView = new QTreeView;
     tablesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     mainWidget->addWidget(tablesTreeView);
 
-    // create page containing the table and the back button
+    // Create page containing the table and the navigation widget.
     QWidget *tableContainer = new QWidget;
     
     listLayoutView = new QlomListView(tableContainer);
     listLayoutView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     
-    listLayoutBackButton =
-      new QPushButton("Back to table list", tableContainer);
+    tablesComboBox = new QComboBox(tableContainer);
+    connect(tablesComboBox, SIGNAL(activated(int)),
+        this, SLOT(showTableFromIndex(const int)));
+    listLayoutBackButton = new QPushButton(tr("&Back to table list"),
+        tableContainer);
     connect(listLayoutBackButton, SIGNAL(clicked(bool)),
         this, SLOT(showTablesList()));
+        
+    QWidget *navigationContainer = new QWidget;
+    QHBoxLayout *navigationLayout = new QHBoxLayout(navigationContainer);
+    navigationLayout->addWidget(tablesComboBox, 1);
+    navigationLayout->addWidget(listLayoutBackButton, 0, Qt::AlignRight);
 
     QVBoxLayout *tableLayout = new QVBoxLayout(tableContainer);
+    tableLayout->addWidget(navigationContainer);
     tableLayout->addWidget(listLayoutView);
-    tableLayout->addWidget(listLayoutBackButton);
     
     mainWidget->addWidget(tableContainer);
  
@@ -234,6 +242,7 @@ void QlomMainWindow::fileOpenTriggered()
 
         QlomTablesModel *model = glomDocument.createTablesModel();
         tablesTreeView->setModel(model);
+        tablesComboBox->setModel(model);
         // Open default table.
         showDefaultTable();
     }
@@ -288,11 +297,14 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
 {
     Q_ASSERT(0 != model);
 
-    setWindowTitle(model->tableDisplayName());
+    const QString tableDisplayName(model->tableDisplayName());
+    tablesComboBox->setCurrentIndex(
+        tablesComboBox->findText(tableDisplayName));
     model->setParent(listLayoutView);
     listLayoutView->setModel(model);
     listLayoutView->resizeColumnsToContents();
     mainWidget->setCurrentIndex(1);
+    setWindowTitle(tableDisplayName);
 
     // Marks model as "read-only" here, because the view has no way to edit it.
     listLayoutView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -311,6 +323,18 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
     connect(buttonDelegate, SIGNAL(buttonPressed(QModelIndex)),
         this, SLOT(onDetailsPressed(QModelIndex)));
     listLayoutView->setItemDelegateForColumn(columnIndex, buttonDelegate);
+}
+
+void QlomMainWindow::showTableFromIndex(const int index)
+{
+    QlomListLayoutModel *model =
+        glomDocument.createListLayoutModel(
+            tablesTreeView->model()->index(index, 0)
+                .data(Qlom::TableNameRole).toString());
+
+    if (model) {
+        showTable(model);
+    }
 }
 
 void QlomMainWindow::onDetailsPressed(const QModelIndex &index)
