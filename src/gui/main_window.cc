@@ -139,33 +139,31 @@ void QlomMainWindow::setup()
     connect(&glomDocument.errorReporter(), SIGNAL(errorRaised(QlomError)),
         this, SLOT(receiveError(QlomError)));
 
-    QWidget* notTheMainWidget = new QWidget(this);
-    mainWidget = new QStackedWidget(notTheMainWidget);
+    mainWidget = new QStackedWidget(this);
 
-    QWidget *tablesTreeWidget = new QWidget;
-    tablesTreeView = new QTreeView(tablesTreeWidget);
+    // create page containing the treeview
+    tablesTreeView = new QTreeView;
     tablesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    mainWidget->addWidget(tablesTreeWidget);
+    mainWidget->addWidget(tablesTreeView);
 
-    QWidget *listLayoutWidget = new QWidget;
-    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    listLayoutWidget->setSizePolicy(sizePolicy);
-    QVBoxLayout *listLayoutLayout = new QVBoxLayout(listLayoutWidget);
-    listLayoutBackButton = new QPushButton("Back to table list",
-        listLayoutWidget);
-    listLayoutLayout->addWidget(listLayoutBackButton);
+    // create page containing the table and the back button
+    QWidget *tableContainer = new QWidget;
+    
+    listLayoutView = new QlomListView(tableContainer);
+    listLayoutView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    
+    listLayoutBackButton =
+      new QPushButton("Back to table list", tableContainer);
     connect(listLayoutBackButton, SIGNAL(clicked(bool)),
         this, SLOT(showTablesList()));
 
-    listLayoutView = new QlomListView(listLayoutWidget);
-    listLayoutView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    listLayoutLayout->addWidget(listLayoutView);
-
-    /* Adding a widget does not change the current widget, iff the
-     * QStackedWidget is not empty. */
-    mainWidget->addWidget(listLayoutWidget);
-
-    setCentralWidget(notTheMainWidget);
+    QVBoxLayout *tableLayout = new QVBoxLayout(tableContainer);
+    tableLayout->addWidget(listLayoutView);
+    tableLayout->addWidget(listLayoutBackButton);
+    
+    mainWidget->addWidget(tableContainer);
+ 
+    setCentralWidget(mainWidget);
 }
 
 QlomMainWindow::~QlomMainWindow()
