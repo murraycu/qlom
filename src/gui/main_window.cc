@@ -144,6 +144,7 @@ void QlomMainWindow::setup()
     // Create page containing the treeview.
     tablesTreeView = new QTreeView;
     tablesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    tablesTreeView->setAlternatingRowColors(true);
     mainWidget->addWidget(tablesTreeView);
 
     // Create page containing the table and the navigation widget.
@@ -151,6 +152,7 @@ void QlomMainWindow::setup()
     
     listLayoutView = new QlomListView(tableContainer);
     listLayoutView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    listLayoutView->setAlternatingRowColors(true);
     
     tablesComboBox = new QComboBox(tableContainer);
     connect(tablesComboBox, SIGNAL(activated(int)),
@@ -253,6 +255,7 @@ void QlomMainWindow::fileCloseTriggered()
 {
     tablesTreeView->deleteLater();
     tablesTreeView = new QTreeView(this);
+    tablesTreeView->setAlternatingRowColors(true);
     mainWidget->insertWidget(0, tablesTreeView);
     mainWidget->setCurrentIndex(0);
     setWindowTitle(qApp->applicationName());
