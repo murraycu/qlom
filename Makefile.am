@@ -14,6 +14,9 @@ src_qlom_SOURCES = src/qlom.cc \
 		   src/error_reporter.h \
 		   src/error.cc \
 		   src/error.h \
+		   src/gui/list_view.cc \
+		   src/gui/list_view.moc.cc \
+		   src/gui/list_view.h \
                    src/gui/main_window.cc \
                    src/gui/main_window.moc.cc \
                    src/gui/main_window.h \
@@ -45,6 +48,7 @@ src_qlom_LDADD = $(QT_LIBS) $(QLOM_LIBS)
 
 BUILT_SOURCES = src/document.moc.cc \
 		src/error_reporter.moc.cc \
+		src/gui/list_view.moc.cc \
                 src/gui/main_window.moc.cc \
                 src/tables_model.moc.cc \
                 src/list_layout_model.moc.cc \

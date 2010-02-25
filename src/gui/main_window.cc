@@ -19,6 +19,7 @@
 #include "main_window.h"
 #include "document.h"
 #include "error.h"
+#include "list_view.h"
 #include "tables_model.h"
 #include "utils.h"
 
@@ -350,79 +351,4 @@ void QlomMainWindow::onDetailsPressed(const QModelIndex &index)
 {
     QMessageBox::critical(this, tr("Details button pressed"),
         tr("Cell index: (%1, %2)").arg(index.column()).arg(index.row()));
-}
-
-QlomListView::QlomListView(QWidget *parent)
-: QTableView(parent), theLastColumnIndex(-1), theToggledFlag(false)
-{
-    connect(horizontalHeader(), SIGNAL(sectionPressed(int)),
-        this, SLOT(onHeaderSectionPressed(int)));
-}
-
-QlomListView::~QlomListView()
-{}
-
-void QlomListView::setupDelegateForColumn(int column)
-{
-    QlomListLayoutModel *model =
-        qobject_cast<QlomListLayoutModel *>(this->model());
-
-    if (model) {
-        QStyledItemDelegate *delegate =
-          QlomListView::createDelegateFromColumn(model, column);
-        setItemDelegateForColumn(column, delegate);
-    }
-}
-
-QStyledItemDelegate * QlomListView::createDelegateFromColumn(
-    QlomListLayoutModel *model, int column)
-{
-    /* Need to respect the following constraint: The layout item in
-     * theLayoutGroup that can be found at the position column points to has to
-     * be a LayoutItem_Text or a LayoutItem_Field.
-     * However, this method is not used efficiently, considering how most items
-     * in a list view are field items. If LayoutItem_Text and LayoutItem_Field
-     * had a common base clase featuring the get_formatting_used() API we could
-     * get rid of the most annoying part at least: the dynamic casts. */
-    const QlomListLayoutModel::GlomSharedLayoutItems items = model->getLayoutItems();
-    for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
-        items.begin(); iter != items.end(); ++iter) {
-        if (column == std::distance(items.begin(), iter)) {
-            Glom::sharedptr<const Glom::LayoutItem_Text> textItem =
-                Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
-            if(textItem)
-                return new QlomLayoutItemTextDelegate(
-                    textItem->get_formatting_used(),
-                    QlomLayoutItemTextDelegate::GlomSharedField(),
-                    ustringToQstring(textItem->get_text()));
-
-            Glom::sharedptr<const Glom::LayoutItem_Field> fieldItem =
-                Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
-            if(fieldItem)
-                return new QlomLayoutItemFieldDelegate(
-                    fieldItem->get_formatting_used(),
-                    fieldItem->get_full_field_details());
-        }
-    }
-
-    return 0;
-}
-
-void QlomListView::onHeaderSectionPressed(int colIdx)
-{
-    Qt::SortOrder order = Qt::DescendingOrder;
-
-    if (colIdx == theLastColumnIndex) {
-        order = (theToggledFlag ? Qt::DescendingOrder : Qt::AscendingOrder);
-        theToggledFlag = !theToggledFlag;
-    } else if (-1 != theLastColumnIndex) {
-        // Switching from another column => some arbitrary sorting is applied,
-        // so we start with Qt::AscendingOrder again.
-        order = Qt::AscendingOrder;
-    }
-    theLastColumnIndex = colIdx;
-
-    // TODO: If this modifies the sorting in the model, we'd need a proxy model
-    // here.
-    sortByColumn(colIdx, order);
 }
