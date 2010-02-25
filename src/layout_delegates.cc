@@ -66,6 +66,7 @@ void QlomFieldFormattingDelegate::paint(QPainter *painter,
 
     // Still draw the background manually.
     painter->save();
+    painter->setPen(Qt::NoPen);
     painter->setBrush(bgColor);
     painter->drawRect(opt.rect);
     painter->restore();

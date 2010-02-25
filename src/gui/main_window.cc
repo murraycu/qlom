@@ -153,9 +153,7 @@ void QlomMainWindow::setup()
     listLayoutView = new QlomListView(tableContainer);
     listLayoutView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     listLayoutView->setAlternatingRowColors(true);
-    // TODO: Confirm with Qt 4.6 - the grid settings get ignored with Qt 4.5
     listLayoutView->setShowGrid(false);
-    listLayoutView->setGridStyle(Qt::NoPen);
     listLayoutView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 
     tablesComboBox = new QComboBox(tableContainer);
