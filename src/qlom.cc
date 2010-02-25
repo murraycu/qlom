@@ -40,20 +40,23 @@ void printUsage()
  */
 bool checkInstallation()
 {
-    //Check that the PostgreSQL QSQL driver is installed,
-    //because qlom will not be useful without it:
+    /* Check that the PostgreSQL or the SQLite QSQL driver is installed,
+     * because qlom will not be useful without it. */
     QStringList drivers = QSqlDatabase::drivers();
     QStringList::const_iterator end = drivers.end();
-    for(QStringList::const_iterator iter = drivers.begin(); iter != end; ++iter) {
+    for(QStringList::const_iterator iter = drivers.begin(); iter != end;
+        ++iter) {
         const QString name = *iter;
-        if(name == "QPSQL")
+        if(name == QLatin1String("QPSQL") || name == QLatin1String("QSQLITE"))
             return true;
-       //else if(name == "QSQLITE")
-       //   return true;
     }
 
     QMessageBox::critical(0, QObject::tr("Incomplete Qlom Installation"),
-        QObject::tr("Your installation of Glom is not complete, because the QtSQL PostgreSQL database driver (QPSQL) is not available on your system.\n\nPlease report this bug to your vendor or your system administrator so it can be corrected."));
+        QObject::tr("Your installation of Glom is not complete, because the "
+                    "QtSQL database driver (QPSQL or SQLite) is not "
+                    "available on your system.\n\nPlease report this bug to "
+                    "your vendor or your system administrator so it can be "
+                    "corrected."));
 
     return false;
 }
