@@ -147,7 +147,7 @@ void QlomMainWindow::setup()
     connect(helpAbout, SIGNAL(triggered(bool)),
         this, SLOT(helpAboutTriggered()));
 
-    connect(&theGlomDocument.errorReporter(), SIGNAL(errorRaised(QlomError)),
+    connect(&theGlomDocument, SIGNAL(errorRaised(QlomError)),
         this, SLOT(receiveError(QlomError)));
 
     theMainWidget = new QStackedWidget(this);

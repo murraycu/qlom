@@ -44,6 +44,8 @@ QlomDocument::QlomDocument(QObject *parent) :
     document(0)
 {
     /* No document case. */
+    connect(&theErrorReporter, SIGNAL(errorRaised(QlomError)),
+        this, SIGNAL(errorRaised(QlomError)));
 }
 
 bool QlomDocument::loadDocument(const QString &filepath)
@@ -229,11 +231,6 @@ QlomListLayoutModel * QlomDocument::createDefaultTableListLayoutModel()
     // TODO: this code path needs testing, when it finds default tables and
     // when not.
     return createListLayoutModel(defaultTable);
-}
-
-QlomErrorReporter & QlomDocument::errorReporter()
-{
-    return theErrorReporter;
 }
 
 std::string QlomDocument::filepathToUri(const QString &theFilepath)
