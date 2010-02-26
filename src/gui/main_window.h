@@ -103,20 +103,20 @@ private:
     /** Lookup the text that corresponds to an error domain.
      *  @param[in] errorDomain the error domain to provide a string for
      *  @returns a human-readable description of the error domain */
-    QString errorDomainLookup(const Qlom::QlomErrorDomain errorDomain);
+    QString errorDomainLookup(const Qlom::QlomErrorDomain errorDomain) const;
 
-    QlomDocument glomDocument; /**< a Glom document to view */
-    QStackedWidget *mainWidget; /**< a container for multiple stacked display
+    QlomDocument theGlomDocument; /**< a Glom document to view */
+    QStackedWidget *theMainWidget; /**< a container for multiple stacked display
     widgets */
-    QTreeView *tablesTreeView; /**< a tree view for the table names model */
-    QlomListView *listLayoutView; /**< a table view for a list layout */
-    QComboBox *tablesComboBox; /**< a combo box for the table names model */
-    QPushButton *listLayoutBackButton; /**< a button to go back to the tables
+    QTreeView *theTablesTreeView; /**< a tree view for the table names model */
+    QlomListView *theListLayoutView; /**< a table view for a list layout */
+    QComboBox *theTablesComboBox; /**< a combo box for the table names model */
+    QPushButton *theListLayoutBackButton; /**< a button to go back to the tables
                                         list view. */
     QlomErrorReporter theErrorReporter; /**< an error reporting facility that
                                           can be used in lieu of C++
                                           exceptions. */
-    bool valid; /**< See isValid(). */
+    bool theValidFlag; /**< See isValid(). */
 
 private Q_SLOTS:
     /** Slot for the signal from the Open menu item. */

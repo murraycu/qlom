@@ -33,28 +33,38 @@
 #include "config.h"
 
 QlomMainWindow::QlomMainWindow() :
-    glomDocument(this),
-    valid(true)
+    theGlomDocument(this),
+    theMainWidget(0),
+    theTablesTreeView(0),
+    theListLayoutView(0),
+    theTablesComboBox(0),
+    theListLayoutBackButton(0),
+    theValidFlag(true)
 {
   setup();
 }
 
 QlomMainWindow::QlomMainWindow(const QString &filepath) :
-    glomDocument(this),
-    valid(true)
+    theGlomDocument(this),
+    theMainWidget(0),
+    theTablesTreeView(0),
+    theListLayoutView(0),
+    theTablesComboBox(0),
+    theListLayoutBackButton(0),
+    theValidFlag(true)
 {
     setup();
 
-    if(!glomDocument.loadDocument(filepath)) {
-        valid = false;
+    if(!theGlomDocument.loadDocument(filepath)) {
+        theValidFlag = false;
         return;
     }
 
-    QlomTablesModel *model = glomDocument.createTablesModel();
-    tablesTreeView->setModel(model);
+    QlomTablesModel *model = theGlomDocument.createTablesModel();
+    theTablesTreeView->setModel(model);
 
-    connect(tablesTreeView, SIGNAL(doubleClicked(QModelIndex)),
-        this, SLOT(tablesTreeviewDoubleclicked(QModelIndex)));
+    connect(theTablesTreeView, SIGNAL(doubleClicked(QModelIndex)),
+        this, SLOT(theTablesTreeviewDoubleclicked(QModelIndex)));
     show();
 
     // Open default table.
@@ -63,7 +73,7 @@ QlomMainWindow::QlomMainWindow(const QString &filepath) :
 
 bool QlomMainWindow::isValid() const
 {
-    return valid;
+    return theValidFlag;
 }
 
 void QlomMainWindow::receiveError(const QlomError &error)
@@ -137,46 +147,49 @@ void QlomMainWindow::setup()
     connect(helpAbout, SIGNAL(triggered(bool)),
         this, SLOT(helpAboutTriggered()));
 
-    connect(&glomDocument.errorReporter(), SIGNAL(errorRaised(QlomError)),
+    connect(&theGlomDocument.errorReporter(), SIGNAL(errorRaised(QlomError)),
         this, SLOT(receiveError(QlomError)));
 
-    mainWidget = new QStackedWidget(this);
+    theMainWidget = new QStackedWidget(this);
 
     // Create page containing the treeview.
-    tablesTreeView = new QTreeView;
-    tablesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    tablesTreeView->setAlternatingRowColors(true);
-    mainWidget->addWidget(tablesTreeView);
+    theTablesTreeView = new QTreeView;
+    theTablesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    theTablesTreeView->setAlternatingRowColors(true);
+    theMainWidget->addWidget(theTablesTreeView);
 
     // Create page containing the table and the navigation widget.
     QWidget *tableContainer = new QWidget;
 
-    listLayoutView = new QlomListView(tableContainer);
-    listLayoutView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    listLayoutView->setAlternatingRowColors(true);
-    listLayoutView->setShowGrid(false);
-    listLayoutView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    theListLayoutView = new QlomListView(tableContainer);
+    theListLayoutView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    theListLayoutView->setAlternatingRowColors(true);
+    theListLayoutView->setShowGrid(false);
+    theListLayoutView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 
-    tablesComboBox = new QComboBox(tableContainer);
-    connect(tablesComboBox, SIGNAL(activated(int)),
+    theTablesComboBox = new QComboBox(tableContainer);
+    connect(theTablesComboBox, SIGNAL(activated(int)),
         this, SLOT(showTableFromIndex(const int)));
-    listLayoutBackButton = new QPushButton(tr("&Back to table list"),
+
+    // TODO: Do we really need this button member? Isn't it fire&forget once
+    // we've set up the connection?
+    theListLayoutBackButton = new QPushButton(tr("&Back to table list"),
         tableContainer);
-    connect(listLayoutBackButton, SIGNAL(clicked(bool)),
+    connect(theListLayoutBackButton, SIGNAL(clicked(bool)),
         this, SLOT(showTablesList()));
 
     QWidget *navigationContainer = new QWidget;
     QHBoxLayout *navigationLayout = new QHBoxLayout(navigationContainer);
-    navigationLayout->addWidget(tablesComboBox, 1);
-    navigationLayout->addWidget(listLayoutBackButton, 0, Qt::AlignRight);
+    navigationLayout->addWidget(theTablesComboBox, 1);
+    navigationLayout->addWidget(theListLayoutBackButton, 0, Qt::AlignRight);
 
     QVBoxLayout *tableLayout = new QVBoxLayout(tableContainer);
     tableLayout->addWidget(navigationContainer);
-    tableLayout->addWidget(listLayoutView);
+    tableLayout->addWidget(theListLayoutView);
 
-    mainWidget->addWidget(tableContainer);
+    theMainWidget->addWidget(tableContainer);
 
-    setCentralWidget(mainWidget);
+    setCentralWidget(theMainWidget);
 }
 
 QlomMainWindow::~QlomMainWindow()
@@ -210,7 +223,7 @@ void QlomMainWindow::readSettings()
 }
 
 QString QlomMainWindow::errorDomainLookup(
-    const Qlom::QlomErrorDomain errorDomain)
+    const Qlom::QlomErrorDomain errorDomain) const
 {
     switch (errorDomain) {
     case Qlom::DOCUMENT_ERROR_DOMAIN:
@@ -231,6 +244,9 @@ QString QlomMainWindow::errorDomainLookup(
 
 void QlomMainWindow::fileOpenTriggered()
 {
+    // TODO: check whether this can be replaced with
+    // http://doc.trolltech.com/4.6/qfiledialog.html#getOpenFileName
+    // Saves the ugly deletions.
     QPointer<QFileDialog> dialog = new QFileDialog(this);
     dialog->setFileMode(QFileDialog::ExistingFile);
     dialog->setNameFilter("Glom document (*.glom)");
@@ -239,15 +255,15 @@ void QlomMainWindow::fileOpenTriggered()
         fileCloseTriggered();
 
         QStringList files = dialog->selectedFiles();
-        if(!glomDocument.loadDocument(files.first()))
+        if(!theGlomDocument.loadDocument(files.first()))
         {
             delete dialog;
             return;
         }
 
-        QlomTablesModel *model = glomDocument.createTablesModel();
-        tablesTreeView->setModel(model);
-        tablesComboBox->setModel(model);
+        QlomTablesModel *model = theGlomDocument.createTablesModel();
+        theTablesTreeView->setModel(model);
+        theTablesComboBox->setModel(model);
         // Open default table.
         showDefaultTable();
     }
@@ -256,13 +272,13 @@ void QlomMainWindow::fileOpenTriggered()
 
 void QlomMainWindow::fileCloseTriggered()
 {
-    tablesTreeView->deleteLater();
-    tablesTreeView = new QTreeView(this);
-    tablesTreeView->setAlternatingRowColors(true);
-    mainWidget->insertWidget(0, tablesTreeView);
-    mainWidget->setCurrentIndex(0);
+    theTablesTreeView->deleteLater();
+    theTablesTreeView = new QTreeView(this);
+    theTablesTreeView->setAlternatingRowColors(true);
+    theMainWidget->insertWidget(0, theTablesTreeView);
+    theMainWidget->setCurrentIndex(0);
     setWindowTitle(qApp->applicationName());
-    connect(tablesTreeView, SIGNAL(doubleClicked(QModelIndex)),
+    connect(theTablesTreeView, SIGNAL(doubleClicked(QModelIndex)),
         this, SLOT(tablesTreeviewDoubleclicked(QModelIndex)));
 }
 
@@ -278,13 +294,13 @@ void QlomMainWindow::helpAboutTriggered()
 
 void QlomMainWindow::showTablesList()
 {
-    mainWidget->setCurrentIndex(0);
+    theMainWidget->setCurrentIndex(0);
 }
 
 void QlomMainWindow::tablesTreeviewDoubleclicked(const QModelIndex& index)
 {
     const QString &tableName = index.data(Qlom::TableNameRole).toString();
-    QlomListLayoutModel *model = glomDocument.createListLayoutModel(tableName);
+    QlomListLayoutModel *model = theGlomDocument.createListLayoutModel(tableName);
     showTable(model);
 }
 
@@ -292,7 +308,7 @@ void QlomMainWindow::showDefaultTable()
 {
     // Show the default table, or the first non-hidden table, if there is one.
     QlomListLayoutModel *model =
-      glomDocument.createDefaultTableListLayoutModel();
+      theGlomDocument.createDefaultTableListLayoutModel();
 
     if (model) {
         showTable(model);
@@ -304,24 +320,24 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
     Q_ASSERT(0 != model);
 
     const QString tableDisplayName(model->tableDisplayName());
-    tablesComboBox->setCurrentIndex(
-        tablesComboBox->findText(tableDisplayName));
+    theTablesComboBox->setCurrentIndex(
+        theTablesComboBox->findText(tableDisplayName));
 
-    listLayoutView->hide();
-    model->setParent(listLayoutView);
-    listLayoutView->setModel(model);
+    theListLayoutView->hide();
+    model->setParent(theListLayoutView);
+    theListLayoutView->setModel(model);
     //listLayoutView->resizeColumnsToContents();
-    listLayoutView->show();
+    theListLayoutView->show();
 
-    mainWidget->setCurrentIndex(1);
+    theMainWidget->setCurrentIndex(1);
     setWindowTitle(tableDisplayName);
 
     // Marks model as "read-only" here, because the view has no way to edit it.
-    listLayoutView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    theListLayoutView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     // Setup delegates for all columns, if available.
     for(int index = 0; index < model->columnCount(); ++index) {
-        listLayoutView->setupDelegateForColumn(index);
+        theListLayoutView->setupDelegateForColumn(index);
     }
 
     // Setup details button for last column.
@@ -329,17 +345,17 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
     //model->insertColumnAt(colIdx);
     model->setHeaderData(columnIndex, Qt::Horizontal, QVariant(tr("Actions")));
     QlomButtonDelegate *buttonDelegate =
-        new QlomButtonDelegate(tr("Details"), listLayoutView);
+        new QlomButtonDelegate(tr("Details"), theListLayoutView);
     connect(buttonDelegate, SIGNAL(buttonPressed(QModelIndex)),
         this, SLOT(onDetailsPressed(QModelIndex)));
-    listLayoutView->setItemDelegateForColumn(columnIndex, buttonDelegate);
+    theListLayoutView->setItemDelegateForColumn(columnIndex, buttonDelegate);
 }
 
 void QlomMainWindow::showTableFromIndex(const int index)
 {
     QlomListLayoutModel *model =
-        glomDocument.createListLayoutModel(
-            tablesTreeView->model()->index(index, 0)
+        theGlomDocument.createListLayoutModel(
+            theTablesTreeView->model()->index(index, 0)
                 .data(Qlom::TableNameRole).toString());
 
     if (model) {
