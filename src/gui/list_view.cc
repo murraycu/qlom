@@ -23,8 +23,10 @@
 
 #include <QHeaderView>
 
-QlomListView::QlomListView(QWidget *parent)
-: QTableView(parent), theLastColumnIndex(-1), theToggledFlag(false)
+QlomListView::QlomListView(QWidget *parent) :
+    QTableView(parent),
+    theLastColumnIndex(-1),
+    theToggledFlag(false)
 {
     connect(horizontalHeader(), SIGNAL(sectionPressed(int)),
         this, SLOT(onHeaderSectionPressed(int)));
