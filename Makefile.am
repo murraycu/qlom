@@ -74,5 +74,9 @@ mimedir = $(datadir)/mime
 mimepackagesdir = $(mimedir)/packages
 dist_mimepackages_DATA = qlom.xml
 
+if QLOM_ENABLE_MAEMO
+desktopdir = $(OSSO_DESKTOPDIR)
+else
 desktopdir = $(datadir)/applications
+endif
 dist_desktop_DATA = qlom.desktop

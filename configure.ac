@@ -24,5 +24,16 @@ DK_ARG_ENABLE_WARNINGS([QLOM_WARNINGS],
         [-Wall -Wextra])
 AC_SUBST([QLOM_WARNINGS])
 
+AM_CONDITIONAL([QLOM_ENABLE_MAEMO], [test "x$qlom_enable_maemo" = xyes])
+
+AS_IF([test "x$qlom_enable_maemo" = xyes],
+      [AC_DEFINE([QLOM_ENABLE_MAEMO], [1],
+                 [Define to enable support for the Maemo platform.])])
+
+AS_IF([test "x$qlom_enable_maemo" = xyes],
+     [REQUIRED_QLOM_LIBS="$REQUIRED_QLOM_LIBS hildonmm hildon-fmmm libossomm osso-af-settings"
+      MM_PKG_CONFIG_SUBST([OSSO_SERVICEDIR], [--variable=dbusservicedir osso-af-settings])
+      MM_PKG_CONFIG_SUBST([OSSO_DESKTOPDIR], [--variable=desktopentrydir osso-af-settings])])
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
