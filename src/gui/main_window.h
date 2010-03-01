@@ -1,4 +1,4 @@
-/* Qlom is copyright Openismus GmbH, 2009
+/* Qlom is copyright Openismus GmbH, 2009, 2010.
  *
  * This file is part of Qlom
  *
@@ -111,8 +111,6 @@ private:
     QTreeView *theTablesTreeView; /**< a tree view for the table names model */
     QlomListView *theListLayoutView; /**< a table view for a list layout */
     QComboBox *theTablesComboBox; /**< a combo box for the table names model */
-    QPushButton *theListLayoutBackButton; /**< a button to go back to the tables
-                                        list view. */
     QlomErrorReporter theErrorReporter; /**< an error reporting facility that
                                           can be used in lieu of C++
                                           exceptions. */

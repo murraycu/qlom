@@ -1,4 +1,4 @@
-/* Qlom is copyright Openismus GmbH, 2009
+/* Qlom is copyright Openismus GmbH, 2009, 2010.
  *
  * This file is part of Qlom
  *
@@ -38,7 +38,6 @@ QlomMainWindow::QlomMainWindow() :
     theTablesTreeView(0),
     theListLayoutView(0),
     theTablesComboBox(0),
-    theListLayoutBackButton(0),
     theValidFlag(true)
 {
   setup();
@@ -50,7 +49,6 @@ QlomMainWindow::QlomMainWindow(const QString &filepath) :
     theTablesTreeView(0),
     theListLayoutView(0),
     theTablesComboBox(0),
-    theListLayoutBackButton(0),
     theValidFlag(true)
 {
     setup();
@@ -171,17 +169,15 @@ void QlomMainWindow::setup()
     connect(theTablesComboBox, SIGNAL(activated(int)),
         this, SLOT(showTableFromIndex(const int)));
 
-    // TODO: Do we really need this button member? Isn't it fire&forget once
-    // we've set up the connection?
-    theListLayoutBackButton = new QPushButton(tr("&Back to table list"),
-        tableContainer);
-    connect(theListLayoutBackButton, SIGNAL(clicked(bool)),
+    QPushButton *listLayoutBackButton =
+      new QPushButton(tr("&Back to table list"), tableContainer);
+    connect(listLayoutBackButton, SIGNAL(clicked(bool)),
         this, SLOT(showTablesList()));
 
     QWidget *navigationContainer = new QWidget;
     QHBoxLayout *navigationLayout = new QHBoxLayout(navigationContainer);
     navigationLayout->addWidget(theTablesComboBox, 1);
-    navigationLayout->addWidget(theListLayoutBackButton, 0, Qt::AlignRight);
+    navigationLayout->addWidget(listLayoutBackButton, 0, Qt::AlignRight);
 
     QVBoxLayout *tableLayout = new QVBoxLayout(tableContainer);
     tableLayout->addWidget(navigationContainer);
