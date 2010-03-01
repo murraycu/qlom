@@ -1,12 +1,15 @@
 [Desktop Entry]
+Encoding=UTF-8
 Version=1.0
 Type=Application
 Name=Qlom
 GenericName=Glom database viewer
 Comment=A Glom database viewer, using Qt
 TryExec=qlom
-Exec=qlom %f
+Exec=qlom
 Terminal=false
 Icon=qlom
 Categories=Office;Database;Qt;
 MimeType=application/x-glom;
+X-HildonDesk-ShowInToolbar=true
+X-Osso-Type=application/x-executable

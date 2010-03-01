@@ -24,6 +24,19 @@ DK_ARG_ENABLE_WARNINGS([QLOM_WARNINGS],
         [-Wall -Wextra])
 AC_SUBST([QLOM_WARNINGS])
 
+AC_ARG_ENABLE([maemo],
+              [AS_HELP_STRING([--enable-maemo],
+                              [build with support for the Maemo platform
+                               (implies --enable-client-only)])],
+              [qlom_enable_maemo=$enableval],
+              [qlom_enable_maemo=no])
+
+AC_ARG_ENABLE([client-only],
+              [AS_HELP_STRING([--enable-client-only],
+                              [build without developer mode and self-hosting])],
+              [qlom_enable_client_only=$enableval],
+              [qlom_enable_client_only=$qlom_enable_maemo])
+
 AM_CONDITIONAL([QLOM_ENABLE_MAEMO], [test "x$qlom_enable_maemo" = xyes])
 
 AS_IF([test "x$qlom_enable_maemo" = xyes],
