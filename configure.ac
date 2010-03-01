@@ -15,7 +15,25 @@ AC_LANG([C++])
 
 AT_WITH_QT([core gui sql],[no_keywords])
 
-PKG_CHECK_MODULES([QLOM], [glom-1.14 >= 1.13.1])
+REQUIRED_QLOM_LIBS='glom-1.14 >= 1.13.1'
+
+AC_ARG_ENABLE([maemo],
+              [AS_HELP_STRING([--enable-maemo],
+                              [build with support for the Maemo platform])],
+              [qlom_enable_maemo=$enableval],
+              [qlom_enable_maemo=no])
+
+AM_CONDITIONAL([QLOM_ENABLE_MAEMO], [test "x$qlom_enable_maemo" = xyes])
+
+AS_IF([test "x$qlom_enable_maemo" = xyes],
+      [AC_DEFINE([QLOM_ENABLE_MAEMO], [1],
+                 [Define to enable support for the Maemo platform.])])
+
+AS_IF([test "x$qlom_enable_maemo" = xyes],
+     [REQUIRED_QLOM_LIBS="$REQUIRED_QLOM_LIBS osso-af-settings"
+      MM_PKG_CONFIG_SUBST([OSSO_DESKTOPDIR], [--variable=desktopentrydir osso-af-settings])])
+
+PKG_CHECK_MODULES([QLOM], [$REQUIRED_QLOM_LIBS])
 AC_SUBST([QLOM_CFLAGS])
 AC_SUBST([QLOM_LIBS])
 
