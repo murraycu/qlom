@@ -1,4 +1,4 @@
-/* Qlom is copyright Openismus GmbH, 2009
+/* Qlom is copyright Openismus GmbH, 2009, 2010.
  *
  * This file is part of Qlom
  *
@@ -108,28 +108,35 @@ bool QlomDocument::loadDocument(const QString &filepath)
     switch (document->get_hosting_mode()) {
     case Glom::Document::HOSTING_MODE_POSTGRES_CENTRAL:
     {
-        //TODO: Why use a QPointer here?
+        /* Modal dialogs can be deleted by code elsewhere, hence this resource
+         * is wrapped in a QPointer. However, it's only correct if *each*
+         * access to this resource is 0-checked afterwards. See
+         * http://www.kdedevelopers.org/node/3918#comment-8645 */
         QPointer<QlomConnectionDialog> connectionDialog =
                 new QlomConnectionDialog(*document);
         bool keepOffering = true;
         bool connected = false;
+
         while (keepOffering) {
             // TODO: request a connection dialog from MainWindow.
+
             const int result = connectionDialog->exec();
-            if(result == QDialog::Accepted) {
-                if (connectionDialog->connectionWasSuccessful()) {
-                    // The connection worked with these settings.
-                    connected = true;
-                    keepOffering = false;
-                } else {
-                    // Let the user try again, until he clicks Cancel.
-                    keepOffering = true;
+            if (result == QDialog::Accepted) {
+                if (connectionDialog) {
+                    if (connectionDialog->connectionWasSuccessful()) {
+                        // The connection worked with these settings.
+                        connected = true;
+                        keepOffering = false;
+                    } else {
+                        // Let the user try again, until he clicks Cancel.
+                        keepOffering = true;
+                    }
                 }
-            } else if(result == QDialog::Rejected) {
+            } else if (result == QDialog::Rejected) {
                 // The user cancelled the dialog.
                 keepOffering = false;
             } else {
-              qCritical("GlomDocument::loadDocument() Unexpected exec() result."); 
+                qCritical("GlomDocument::loadDocument() Unexpected exec() result.");
             }
         }
             
