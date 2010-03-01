@@ -243,15 +243,12 @@ void QlomMainWindow::fileOpenTriggered()
     // Close the document before opening a document.
     fileCloseTriggered();
 
-    // TODO: check whether this can be replaced with
-    // http://doc.trolltech.com/4.6/qfiledialog.html#getOpenFileName
-    // Saves the ugly deletions.
-
-    // Modal dialogs can be deleted by code elsewhere, hence this resource is
-    // wrapped in a QPointer. However, it's only correct if *each* access to
-    // this resource is 0-checked afterwards. See
-    // http://www.kdedevelopers.org/node/3918#comment-8645
+    /* Modal dialogs can be deleted by code elsewhere, hence this resource is
+     * wrapped in a QPointer. However, it's only correct if *each* access to
+     * this resource is 0-checked afterwards. See
+     * http://www.kdedevelopers.org/node/3918#comment-8645 */
     QPointer<QFileDialog> dialog = new QFileDialog(this);
+    // Only allow opening a single, existing file.
     dialog->setFileMode(QFileDialog::ExistingFile);
     dialog->setNameFilter("Glom document (*.glom)");
 
@@ -259,8 +256,6 @@ void QlomMainWindow::fileOpenTriggered()
         bool wasDocumentLoaded = false;
 
         if (dialog) {
-            // TODO: If we already allow multi-selection, then what does the
-            // user expect? That we open one, or all?
             QStringList files = dialog->selectedFiles();
             wasDocumentLoaded = theGlomDocument.loadDocument(files.first());
         }
