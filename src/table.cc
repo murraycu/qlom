@@ -19,7 +19,8 @@
 #include "table.h"
 
 QlomTable::QlomTable(const QString &tableName, const QString &displayName,
-    const QList<QlomRelationship> &relationships, const QFlags<QlomTableFlags>& flags) :
+    const QList<QlomRelationship> &relationships,
+    const QFlags<QlomTableFlags> &flags) :
     theDisplayName(displayName),
     theTableName(tableName),
     theRelationships(relationships),

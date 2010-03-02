@@ -25,28 +25,31 @@
 #include <QString>
 
 /** A table in a Glom document.
- *  Designed for use in a QlomDocument, QlomTable has three construct-time
- *  properties: the name, the display name and a list of relationships. The
- *  properties cannot be changed once a table has been constructed, but can be
- *  accessed with the displayName(), tableName() and relationships() methods. */
+ *  Designed for use in a QlomDocument, QlomTable has four construct-time
+ *  properties: the name, the display name, a list of relationships and the
+ *  flags. The properties cannot be changed once a table has been constructed,
+ *  but can be accessed with the displayName(), tableName() and relationships()
+ *  methods, and the flags can be checked with the isHidden() and isDefault()
+ *  methods. */
 class QlomTable
 {
 
 public:
-    /** Flags to indicate hidden or default table status */
+    /** Flags to indicate the status of a table. */
     enum QlomTableFlags {
-        INVALID = 0,
-        HIDDEN_TABLE = 1,
-        DEFAULT_TABLE = 2
+        INVALID_TABLE = 0, /**< invalid status */
+        HIDDEN_TABLE = 1, /**< hidden table */
+        DEFAULT_TABLE = 2 /**< default table */
     };
 
     /** A table in a Glom document.
      *  @param[in] tableName the name of the table in the database
      *  @param[in] displayName the name of the table for display
-     *  @param[in] relationships a list of relationships */
+     *  @param[in] relationships a list of relationships
+     *  @param[in] flags flags for the table */
     QlomTable(const QString &tableName, const QString &displayName,
         const QList<QlomRelationship> &relationships,
-        const QFlags<QlomTableFlags>& flags);
+        const QFlags<QlomTableFlags> &flags);
 
     /** Get the table name for display to the user.
      *  @returns the name of the table for display */
@@ -60,10 +63,12 @@ public:
      *  @returns the list of relationships */
     QList<QlomRelationship> relationships() const;
 
-    /** Predicate to check for hidden flag. */
+    /** Predicate to check for hidden flag.
+     *  @returns whether the table is a hidden table */
     bool isHidden() const;
 
-    /** Predicate to check for default flag. */
+    /** Predicate to check for default flag.
+     *  @returns whether the table is the default table */
     bool isDefault() const;
 
 private:
