@@ -37,7 +37,7 @@ QlomListLayoutModel::QlomListLayoutModel(const Glom::Document *document,
     const QlomTable &table, QlomErrorReporter &error,
     QObject *parent, QSqlDatabase db) :
     QSqlTableModel(parent, db),
-    theTableDisplayName(table.displayName()), // TODO: Add GlomTable member.
+    theTable(table),
     theErrorReporter(error)
 {
     setTable(table.tableName());
@@ -106,7 +106,7 @@ void QlomListLayoutModel::adjustColumnHeaders(const Glom::sharedptr<const Glom::
 
 QString QlomListLayoutModel::tableDisplayName() const
 {
-    return theTableDisplayName;
+    return theTable.displayName();
 }
 
 const QlomListLayoutModel::GlomSharedLayoutItems QlomListLayoutModel::getLayoutItems() const

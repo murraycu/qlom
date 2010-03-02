@@ -101,7 +101,7 @@ private:
       * title specified by the matching layout item. */
     void adjustColumnHeaders(const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup);
 
-    QString theTableDisplayName; /**< the display name of the layout table */
+    QlomTable theTable; /**< the layout table */
     Glom::sharedptr<const Glom::LayoutGroup> theLayoutGroup; /**< the layout group used for the list layout */
     QlomErrorReporter &theErrorReporter; /**< the facility used to report
                                            errors, a dynamic dependency */
