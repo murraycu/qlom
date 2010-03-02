@@ -41,7 +41,8 @@ class QlomListLayoutModel : public QSqlTableModel
     Q_OBJECT
 
 public:
-    typedef Glom::LayoutGroup::type_list_const_items GlomSharedLayoutItems; // just an alias
+    // Just an alias.
+    typedef Glom::LayoutGroup::type_list_const_items GlomSharedLayoutItems;
 
     /* Note: QSqlDatabase should be passed by const reference, but the base
        class makes the same mistake.
@@ -63,9 +64,9 @@ public:
      *  @returns the table name */
     QString tableDisplayName() const;
 
-    /** Since insertColumn isn't virtual we have to wrap in a forwarding
-      * method. This method will update theStaticTextColumnIndices, too. */
-    bool insertColumnAt(int colIdx);
+    /** Since insertColumn is not virtual, it must be wrapped in a forwarding
+      * method. This method will update theStaticTextColumnIndices too. */
+    bool insertColumnAt(int columnIndex);
 
     /** Overriden so that we can drop the shared lock. */
     virtual bool canFetchMore();
@@ -79,7 +80,8 @@ protected:
       * we want to return an empty QString (rather than a "isNull" QString). The
       * reason is that for valid QVariants containing null values, the style
       * delegate's displayText() method is not called. */
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole)
+        const;
 
 private:
     /** A wrapper for Glom::Utils::build_sql_select_with_where_clause() which
@@ -88,10 +90,10 @@ private:
       * @param[in] table the name of the table
       * @param[in] layoutGroup a shared pointer to a Glom LayoutGroup that is
       *            suitable for a list view (i.e., contains LayoutItem_Fields).
-      * @returns the SQL query as string.
+      * @returns the SQL query as a string
       */
-    QString buildQuery(const Glib::ustring& table,
-                       const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup);
+    QString buildQuery(const Glib::ustring &table,
+        const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup);
 
     /** Iterates over the layout group to find static text items so that it can
       * insert columns into the table. */

@@ -61,46 +61,53 @@ QlomListLayoutModel::QlomListLayoutModel(const Glom::Document *document,
         }
     } else {
         /* Display a warning message if the Glom document could not provide
-         * us with a main layout group. */
+         * a main layout group. */
         error.raiseError(QlomError(Qlom::DATABASE_ERROR_DOMAIN,
             tr("%1: no list model found").arg("GlomLayoutModel"),
             Qlom::WARNING_ERROR_SEVERITY));
     }
 }
 
-void QlomListLayoutModel::addStaticTextColumns(const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup)
+void QlomListLayoutModel::addStaticTextColumns(
+    const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup)
 {
-    const Glom::LayoutGroup::type_list_const_items items = layoutGroup->get_items();
+    const Glom::LayoutGroup::type_list_const_items items =
+        layoutGroup->get_items();
 
-    int colsIdx = 0;
+    int columnsIndex = 0;
     for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
          items.begin();
          iter != items.end();
          ++iter) {
          bool flag = false;
 
-         Glom::sharedptr<const Glom::LayoutItem_Text> text = Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
+         Glom::sharedptr<const Glom::LayoutItem_Text> text =
+             Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
          if (text) {
-             insertColumn(colsIdx); // inserts before, and it is allowed to fail!
+             // Inserts before, and it is allowed to fail!
+             insertColumn(columnsIndex);
              flag = true;
          }
 
          theStaticTextColumnIndices.push_back(flag);
-         ++colsIdx;
+         ++columnsIndex;
     }
 }
 
-void QlomListLayoutModel::adjustColumnHeaders(const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup)
+void QlomListLayoutModel::adjustColumnHeaders(
+    const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup)
 {
-    const Glom::LayoutGroup::type_list_const_items items = layoutGroup->get_items();
+    const Glom::LayoutGroup::type_list_const_items items =
+        layoutGroup->get_items();
 
-    int colsIdx = 0;
+    int columnsIndex = 0;
     for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
          items.begin();
          iter != items.end();
          ++iter) {
-         setHeaderData(colsIdx, Qt::Horizontal, QVariant(ustringToQstring((*iter)->get_title_or_name())));
-         ++colsIdx;
+         setHeaderData(columnsIndex, Qt::Horizontal,
+             QVariant(ustringToQstring((*iter)->get_title_or_name())));
+         ++columnsIndex;
     }
 }
 
@@ -125,25 +132,26 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
     const Glom::LayoutGroup::type_list_const_items items = layoutGroup->get_items();
 
 
-    // We need to pad the column count of the model created by the SQL query so
-    // that it matches the column count after inserting the buttons for the
-    // actions columns in the view. Else, resorting would again change the
-    // column count by 1, thus losing the extra column in the process.
-    // spaceHolder is my current solution to that problem.
-    //
-    // Glom generated "table"."" in the SQL query projection if the item is
-    // empty. However, we can assume that each Glom relation consists of at
-    // least one field (even if that means it's only the primary key).
-    //
+    /* We need to pad the column count of the model created by the SQL query so
+     * that it matches the column count after inserting the buttons for the
+     * actions columns in the view. Else, resorting would again change the
+     * column count by 1, thus losing the extra column in the process.
+     * spaceHolder is my current solution to that problem.
+     *
+     * Glom generated "table"."" in the SQL query projection if the item is
+     * empty. However, we can assume that each Glom relation consists of at
+     * least one field (even if that means it's only the primary key). */
+
     // TODO: separate view issues from this model, probably with a proxy model.
     Glom::sharedptr<const Glom::LayoutItem_Field> placeHolder;
 
-    int idx = 0;
+    int index = 0;
     for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
          items.begin();
          iter != items.end();
          ++iter) {
-         Glom::sharedptr<const Glom::LayoutItem_Field> field = Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
+         Glom::sharedptr<const Glom::LayoutItem_Field> field =
+             Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
          if (field) {
 
              // Copy the first field we find into the place holder
@@ -151,20 +159,23 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
                  placeHolder = field;
              }
 
-             Glom::sharedptr<const Glom::Field> details = field->get_full_field_details();
+             Glom::sharedptr<const Glom::Field> details =
+                 field->get_full_field_details();
              if (details && details->get_primary_key()) {
                  sort_clause.push_back(Glom::type_pair_sort_field(field, true));
              }
 
              fields.push_back(field);
-             setHeaderData(idx, Qt::Horizontal, QVariant(ustringToQstring(field->get_title_or_name())));
-             ++idx;
+             setHeaderData(index, Qt::Horizontal,
+                 QVariant(ustringToQstring(field->get_title_or_name())));
+             ++index;
          }
 
-         Glom::sharedptr<const Glom::LayoutItem_Text> text = Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
+         Glom::sharedptr<const Glom::LayoutItem_Text> text =
+             Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
          if (text) {
-             ++idx;
-             insertColumn(idx); // inserts before
+             ++index;
+             insertColumn(index); // inserts before
          }
     }
 
@@ -176,14 +187,15 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
     // Pad the static text column lookup list accordingly.
     theStaticTextColumnIndices.push_back(false);
 
-    Glib::ustring query = Glom::Utils::build_sql_select_with_where_clause(table, fields, where_clause, extra_join, sort_clause, group_by);
+    Glib::ustring query = Glom::Utils::build_sql_select_with_where_clause(
+        table, fields, where_clause, extra_join, sort_clause, group_by);
     return ustringToQstring(query);
 }
 
-bool QlomListLayoutModel::insertColumnAt(int colIdx)
+bool QlomListLayoutModel::insertColumnAt(int columnIndex)
 {
     theStaticTextColumnIndices.push_back(false);
-    return QSqlTableModel::insertColumn(colIdx);
+    return QSqlTableModel::insertColumn(columnIndex);
 }
 
 
@@ -192,11 +204,11 @@ bool QlomListLayoutModel::canFetchMore()
 {
     const bool canFetchMore = QSqlTableModel::canFetchMore();
 
-    // Drop the shared lock by *finishing* the transaction.
-    // Otherwise, other db connections cannot write to the opened table.
-    // Once we fetched all data, there is also no need to keep a lock, since we
-    // don't intend to write to the table (even if so, that'd be another
-    // transaction).
+    /* Drop the shared lock by *finishing* the transaction.
+     * Otherwise, other db connections cannot write to the opened table.
+     * Once we fetched all data, there is also no need to keep a lock, since we
+     * don't intend to write to the table (even if so, that'd be another
+     * transaction). */
     if(!canFetchMore)
         database().commit();
 
@@ -205,16 +217,16 @@ bool QlomListLayoutModel::canFetchMore()
 
 QVariant QlomListLayoutModel::data(const QModelIndex &index, int role) const
 {
-    const int colsIdx = index.column();
-    if (colsIdx >= theStaticTextColumnIndices.size())
+    const int columnsIndex = index.column();
+    if (columnsIndex >= theStaticTextColumnIndices.size())
         theErrorReporter.raiseError(QlomError(Qlom::LOGIC_ERROR_DOMAIN,
-                                              QString("Invalid model column requested."),
-                                              Qlom::CRITICAL_ERROR_SEVERITY));
+            QString("Invalid model column requested."),
+            Qlom::CRITICAL_ERROR_SEVERITY));
 
-    // Return the empty string which creates a "non-null" QString for the
-    // QVariants. For valid QVariants containing null values, the style
-    // delegate's displayText() is not called.
-    if (theStaticTextColumnIndices[colsIdx] && Qt::DisplayRole == role)
+    /* Return the empty string which creates a "non-null" QString for the
+     * QVariants. For valid QVariants containing null values, the style
+     * delegate's displayText() is not called. */
+    if (theStaticTextColumnIndices[columnsIndex] && Qt::DisplayRole == role)
         return QVariant(QString(""));
 
    return QSqlTableModel::data(index, role);
