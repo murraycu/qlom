@@ -1,4 +1,4 @@
-/* Qlom is copyright Openismus GmbH, 2009
+/* Qlom is copyright Openismus GmbH, 2009, 2010.
  *
  * This file is part of Qlom
  *
@@ -28,7 +28,11 @@
 #include <QTableView>
 
 class QlomListLayoutModel;
+class QComboBox;
 class QModelIndex;
+class QPushButton;
+class QStackedWidget;
+class QlomListView;
 class QTreeView;
 class QlomModelIndexObject;
 
@@ -99,14 +103,18 @@ private:
     /** Lookup the text that corresponds to an error domain.
      *  @param[in] errorDomain the error domain to provide a string for
      *  @returns a human-readable description of the error domain */
-    QString errorDomainLookup(const Qlom::QlomErrorDomain errorDomain);
+    QString errorDomainLookup(const Qlom::QlomErrorDomain errorDomain) const;
 
-    QlomDocument glomDocument; /**< a Glom document to view */
-    QTreeView *centralTreeView; /**< a tree view for the table names model */
+    QlomDocument theGlomDocument; /**< a Glom document to view */
+    QStackedWidget *theMainWidget; /**< a container for multiple stacked display
+    widgets */
+    QTreeView *theTablesTreeView; /**< a tree view for the table names model */
+    QlomListView *theListLayoutView; /**< a table view for a list layout */
+    QComboBox *theTablesComboBox; /**< a combo box for the table names model */
     QlomErrorReporter theErrorReporter; /**< an error reporting facility that
                                           can be used in lieu of C++
                                           exceptions. */
-    bool valid; /**< See isValid(). */
+    bool theValidFlag; /**< See isValid(). */
 
 private Q_SLOTS:
     /** Slot for the signal from the Open menu item. */
@@ -121,48 +129,20 @@ private Q_SLOTS:
     /** Slot for the signal from the Help menu item. */
     void helpAboutTriggered();
 
+    /** Slot to show the list of tables. */
+    void showTablesList();
+
     /** Slot for the signal from a double-click on the table names treeview.
      *  @param[in] index the row that was double-clicked */
-    void treeviewDoubleclicked(const QModelIndex &index);
+    void tablesTreeviewDoubleclicked(const QModelIndex &index);
 
     /** Slot to check whether the details buttons work.
      *  @param[in] index the row that was double-clicked */
     void onDetailsPressed(const QModelIndex &index);
+
+    /** Slot to show a table given a numeric index.
+     *  @param[in] index the index of the table to show */
+    void showTableFromIndex(const int index);
 };
-
-
-/** This class extends the QTableView by a delegate factory specialised to the
- *  QlomListLayoutModel. */
-class QlomListView : public QTableView
-{
-    Q_OBJECT
-
-public:
-    explicit QlomListView(QWidget *parent = 0);
-    virtual ~QlomListView();
-
-    /** Creates the necessary Qlom layout delegates for the current model and
-      * installs them in the view. */
-    void setupDelegateForColumn(int column);
-
-    /** Applies Glom's FieldFormatting to a QStyledItemDelegate. Since the view
-     *  only knows about columns (during setup) we need to map columns to
-     *  LayoutItems, as it is already done in the query builder, even if not
-     *  stated explicitly.
-     *  @param[in] model the layout model that needs to be queried for layout items
-     *  @param[in] column the column to create a delegate for
-     *  @returns the style delegate to be managed by a view, or 0 if the
-     *  specified column cannot be formatted customly. */
-    static QStyledItemDelegate * createDelegateFromColumn(QlomListLayoutModel *model, int column);
-
-public Q_SLOTS:
-    /** Slot to sort columns. */
-    void onHeaderSectionPressed(int colIdx);
-
-private:
-    int theLastColumnIndex; /**< the last column that was used for sorting, default is -1 (i.e., none). */
-    bool theToggledFlag;
-};
-
 
 #endif /* QLOM_MAIN_WINDOW_H_ */

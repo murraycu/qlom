@@ -86,12 +86,11 @@ public:
      *  @returns a model of the layout, or 0 if no default table was found */
     QlomListLayoutModel* createDefaultTableListLayoutModel();
 
-    /** Get the error reporter object.
-     *  Gets the error reporter object, for connection of signals to a class
-     *  with a slot for receiving signals containing a Error. MainWindow
-     *  has this functionality.
-     *  @returns a reference to the error reporter */
-    QlomErrorReporter & errorReporter();
+Q_SIGNALS:
+    /** Signal that gets emitted when an internal error happened. An error
+      * reporter can connect to this signal, for example to display the raised
+      * error to the user. */
+    void errorRaised(const QlomError &error);
 
 private:
     /** Convert a filepath to a URI.

@@ -40,11 +40,12 @@ void printUsage()
  */
 bool checkInstallation()
 {
-    //Check that the PostgreSQL or the SQLite QSQL driver is installed,
-    //because qlom will not be useful without it:
+    /* Check that the PostgreSQL or the SQLite QSQL driver is installed,
+     * because qlom will not be useful without it. */
     QStringList drivers = QSqlDatabase::drivers();
     QStringList::const_iterator end = drivers.end();
-    for(QStringList::const_iterator iter = drivers.begin(); iter != end; ++iter) {
+    for(QStringList::const_iterator iter = drivers.begin(); iter != end;
+        ++iter) {
         const QString name = *iter;
         if(name == QLatin1String("QPSQL") || name == QLatin1String("QSQLITE"))
             return true;
