@@ -19,22 +19,15 @@
 #include "tables_model.h"
 
 QlomTablesModel::QlomTablesModel(QList<QlomTable> tableList, QObject *parent) :
-    QAbstractListModel(parent)
+    QAbstractListModel(parent),
+    theTableList(tableList)
 {
-    // Read out table names from document, and add them to the model.
-    for (QList<QlomTable>::const_iterator iter(tableList.begin());
-        iter != tableList.end(); ++iter) {
-        if (!iter->isHidden()) {
-            tableNames.push_back(iter->tableName());
-            tableDisplayNames.push_back(iter->displayName());
-        }
-    }
 }
 
 int QlomTablesModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return tableNames.length();
+    return theTableList.length();
 }
 
 QVariant QlomTablesModel::data(const QModelIndex &index, int role) const
@@ -42,15 +35,15 @@ QVariant QlomTablesModel::data(const QModelIndex &index, int role) const
     if(!index.isValid()) {
         return QVariant();
     }
-    if(index.row() >= tableNames.length()) {
+    if(index.row() >= theTableList.length()) {
         return QVariant();
     }
     switch(role) {
     case Qt::DisplayRole:
-        return tableDisplayNames.at(index.row());
+        return theTableList.at(index.row()).displayName();
         break;
     case Qlom::TableNameRole:
-        return tableNames.at(index.row());
+        return theTableList.at(index.row()).tableName();
         break;
     default:
         return QVariant();

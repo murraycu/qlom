@@ -73,9 +73,8 @@ public:
         int role = Qt::DisplayRole) const;
 
 private:
-    QStringList tableNames; /**< the list of tables in the Glom document */
-    QStringList tableDisplayNames; /**< the list of table display names in the
-                                    *   Glom document. */
+    QList<QlomTable> theTableList; /**< the list of tables in the Glom
+                                    *   document */
 };
 
 #endif /* QLOM_TABLES_MODEL_H_ */
