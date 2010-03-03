@@ -197,7 +197,8 @@ QlomMainWindow::~QlomMainWindow()
 void QlomMainWindow::showAboutDialog()
 {
     // About dialogs are window-modal in Qt, except on Mac OS X.
-    QMessageBox::about(this, tr("About Qlom"), tr(PACKAGE_NAME "\n"
+    QMessageBox::about(this, tr("About Qlom"),
+          tr(PACKAGE_NAME " " PACKAGE_VERSION "\n"
           "A Qt Glom database viewer\n"
           "Copyright 2009 Openismus GmbH"));
     /* lupdate does not recognise the above string, although if the string is
