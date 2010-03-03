@@ -37,7 +37,7 @@ AS_IF([test "x$qlom_enable_maemo" = xyes],
                  [Define to enable support for the Maemo platform.])])
 
 AS_IF([test "x$qlom_enable_maemo" = xyes],
-     [QLOM_LIBS="$QLOM_LIBS osso-af-settings"
+     [REQUIRED_QLOM_LIBS="$REQUIRED_QLOM_LIBS osso-af-settings"
       MM_PKG_CONFIG_SUBST([OSSO_SERVICEDIR], [--variable=dbusservicedir osso-af-settings])
       MM_PKG_CONFIG_SUBST([OSSO_DESKTOPDIR], [--variable=desktopentrydir osso-af-settings])])
 
