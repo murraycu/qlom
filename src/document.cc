@@ -356,14 +356,7 @@ bool QlomDocument::openSqlite()
 
 void QlomDocument::fillTableList()
 {
-    if (!tableList.empty()) {
-        // TODO: Decide whether we should report this to the user or we should
-        // just handle the error. ppenz
-        //theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
-        //    tr("Filling non-empty table list, the Glom document might be corrupted."),
-        //    Qlom::WARNING_ERROR_SEVERITY);
-        tableList.clear();
-    }
+    Q_ASSERT(tableList.empty());
 
     GlomTables tables = document->get_tables();
     for(GlomTables::const_iterator iter(tables.begin());
