@@ -17,7 +17,6 @@
  */
 
 #include "list_layout_model.h"
-#include "error_reporter.h"
 #include "utils.h"
 #include "error.h"
 

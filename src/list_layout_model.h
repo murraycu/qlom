@@ -19,8 +19,6 @@
 #ifndef QLOM_LIST_LAYOUT_MODEL_H_
 #define QLOM_LIST_LAYOUT_MODEL_H_
 
-class QlomErrorReporter;
-
 #include "table.h"
 #include "layout_delegates.h"
 
