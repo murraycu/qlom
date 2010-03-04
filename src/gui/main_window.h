@@ -20,7 +20,6 @@
 #define QLOM_MAIN_WINDOW_H_
 
 #include "document.h"
-#include "error_reporter.h"
 #include "layout_delegates.h"
 #include "list_layout_model.h"
 
@@ -38,11 +37,7 @@ class QlomModelIndexObject;
 
 /** The main window is the central controller and view for Qlom.
  *  The main window both shows the main window and manages the Glom document,
- *  through the glomDocument member. Errors from QlomDocument are reported as
- *  a QlomError to the receiveError slot. From there, the error domain is
- *  looked up in the errorDomainLookup() method and a dialog is shown to the
- *  user. glomDocument has a QlomErrorReporter member, which is the only source
- *  of QlomError signals in Qlom. */
+ *  through the glomDocument member. */
 class QlomMainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -69,18 +64,13 @@ public:
      */
     bool isValid() const;
 
-public Q_SLOTS:
-    /** Receive errors from ErrorReporter.
-     *  QlomDocument, via the member glomDocument, is the only reporter of
-     *  errors to the main window. The error is checked for content, with the
-     *  error domain being looked up by the errorDomainLookup() method. A
-     *  generic error message for the error domain is shown in a dialog, and
+private:
+    /** A generic error message for the error domain is shown in a dialog, and
      *  the detailed error message is shown in the initially-hidden details
      *  section.
      *  @param error the error */
-    void receiveError(const QlomError &error);
+    void showError(const QlomError &error);
 
-private:
     /** General setup method. */
     void setup();
 
@@ -111,9 +101,6 @@ private:
     QTreeView *theTablesTreeView; /**< a tree view for the table names model */
     QlomListView *theListLayoutView; /**< a table view for a list layout */
     QComboBox *theTablesComboBox; /**< a combo box for the table names model */
-    QlomErrorReporter theErrorReporter; /**< an error reporting facility that
-                                          can be used in lieu of C++
-                                          exceptions. */
     bool theValidFlag; /**< See isValid(). */
 
 private Q_SLOTS:

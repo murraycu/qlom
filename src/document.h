@@ -24,12 +24,13 @@ class QlomListLayoutModel;
 class QlomTablesModel;
 
 #include "table.h"
-#include "error_reporter.h"
+#include "error.h"
 
 #include <memory>
 #include <string>
 
 #include <QList>
+#include <QObject>
 #include <QString>
 
 #include <libglom/document/document.h>
@@ -86,11 +87,8 @@ public:
      *  @returns a model of the layout, or 0 if no default table was found */
     QlomListLayoutModel* createDefaultTableListLayoutModel();
 
-Q_SIGNALS:
-    /** Signal that gets emitted when an internal error happened. An error
-      * reporter can connect to this signal, for example to display the raised
-      * error to the user. */
-    void errorRaised(const QlomError &error);
+    /** Returns the error of the last operation that has failed. */
+    QlomError lastError() const;
 
 private:
     /** Convert a filepath to a URI.
@@ -126,7 +124,7 @@ private:
         const Glom::Document::type_vec_relationships &documentRelationships);
 
     Glom::Document *document; /**< libglom's representaton of a Glom document */
-    QlomErrorReporter theErrorReporter; /**< an error-reporting object */
+    QlomError theLastError; /**< contains the error of the last failed operation */
 
     typedef QList<QlomTable> typeTableList;
     typeTableList tableList; /**< a list of tables in the document */

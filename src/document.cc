@@ -44,8 +44,6 @@ QlomDocument::QlomDocument(QObject *parent) :
     document(0)
 {
     /* No document case. */
-    connect(&theErrorReporter, SIGNAL(errorRaised(QlomError)),
-        this, SIGNAL(errorRaised(QlomError)));
 }
 
 bool QlomDocument::loadDocument(const QString &filepath)
@@ -55,10 +53,9 @@ bool QlomDocument::loadDocument(const QString &filepath)
         qCritical("The file does not exist with filepath %s", 
             qPrintable(filepath));
 
-        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
+        theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("The file does not exist"),
             Qlom::CRITICAL_ERROR_SEVERITY);
-        theErrorReporter.raiseError(error);
         return false;
     }
 
@@ -86,9 +83,8 @@ bool QlomDocument::loadDocument(const QString &filepath)
            message = tr("libglom failed to load the Glom document");
         }
        
-        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN, message,
+        theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN, message,
             Qlom::CRITICAL_ERROR_SEVERITY);
-        theErrorReporter.raiseError(error);
         return false;
     }
 
@@ -96,10 +92,9 @@ bool QlomDocument::loadDocument(const QString &filepath)
      * resaved — that would be an extra feature. */
     if(document->get_is_example_file()) {
         qCritical("Document is an example file, cannot process");
-        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
+        theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("Cannot open the document because it is an example file"),
             Qlom::CRITICAL_ERROR_SEVERITY);
-        theErrorReporter.raiseError(error);
         return false;
     }
 
@@ -144,10 +139,9 @@ bool QlomDocument::loadDocument(const QString &filepath)
         connectionDialog = 0;
 
         if (!connected) {
-            const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
+            theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
                 tr("Failed to connect to the PostgreSQL server"),
                 Qlom::CRITICAL_ERROR_SEVERITY);
-            theErrorReporter.raiseError(error);
             return false;
         }
     }
@@ -155,10 +149,9 @@ bool QlomDocument::loadDocument(const QString &filepath)
     case Glom::Document::HOSTING_MODE_SQLITE:
     {
         if(!openSqlite()) {
-            const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
+            theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
                 tr("Failed to open the SQLite database"),
                 Qlom::CRITICAL_ERROR_SEVERITY);
-            theErrorReporter.raiseError(error);
             return false;
         }
     }
@@ -167,10 +160,9 @@ bool QlomDocument::loadDocument(const QString &filepath)
     // Fall through.
     default:
         qCritical("Database type not supported, cannot process");
-        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
+        theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("Database type not supported, failed to open the Glom document"),
             Qlom::CRITICAL_ERROR_SEVERITY);
-        theErrorReporter.raiseError(error);
         return false;
         break;
     }
@@ -191,14 +183,24 @@ QlomListLayoutModel * QlomDocument::createListLayoutModel(
          iter != tableList.end();
          ++iter) {
         if ((*iter).tableName() == tableName) {
-            return new QlomListLayoutModel(document, *iter, theErrorReporter, this);
+            bool error = false;
+            QlomListLayoutModel *model = new QlomListLayoutModel(document, *iter, error, this);
+            if (error) {
+                theLastError = QlomError(Qlom::DATABASE_ERROR_DOMAIN,
+                    tr("%1: no list model found").arg("GlomLayoutModel"),
+                    Qlom::WARNING_ERROR_SEVERITY);
+                delete model;
+                model = 0;
+                return 0;
+            }
+            return model;
         }
     }
 
     /* TODO: change from critical to warning once Qlom can handle failed model
      * initialisations. */
-    theErrorReporter.raiseError(QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
-        tr("Cannot find requested table."), Qlom::CRITICAL_ERROR_SEVERITY));
+    theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
+        tr("Cannot find requested table."), Qlom::CRITICAL_ERROR_SEVERITY);
 
     return 0;
 }
@@ -228,9 +230,9 @@ QlomListLayoutModel * QlomDocument::createDefaultTableListLayoutModel()
     }
 
     if(defaultTable.isEmpty()) {
-        theErrorReporter.raiseError(QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
+        theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("The document contains no non-hidden tables."),
-            Qlom::CRITICAL_ERROR_SEVERITY));
+            Qlom::CRITICAL_ERROR_SEVERITY);
         return 0; //There were no non-hidden tables.
     }
 
@@ -238,6 +240,11 @@ QlomListLayoutModel * QlomDocument::createDefaultTableListLayoutModel()
     // TODO: this code path needs testing, when it finds default tables and
     // when not.
     return createListLayoutModel(defaultTable);
+}
+
+QlomError QlomDocument::lastError() const
+{
+    return theLastError;
 }
 
 std::string QlomDocument::filepathToUri(const QString &theFilepath)
@@ -252,10 +259,9 @@ std::string QlomDocument::filepathToUri(const QString &theFilepath)
     catch(const Glib::ConvertError& convertException) {
         qCritical("Exception from Glib::filename_to_uri(): %s",
             convertException.what().c_str());
-        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
+        theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("Failed to convert the document file name to a URI"),
             Qlom::CRITICAL_ERROR_SEVERITY);
-        theErrorReporter.raiseError(error);
     }
 #else /* !GLIBMM_EXCEPTIONS_ENABLED */
     std::auto_ptr<Glib::Error> convertError;
@@ -263,10 +269,9 @@ std::string QlomDocument::filepathToUri(const QString &theFilepath)
     if(convertError.get()) {
         qCritical("Error from Glib::filename_to_uri(): %s",
             convertError->what());
-        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
+        theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("Failed to convert the document file name to a URI"),
             Qlom::CRITICAL_ERROR_SEVERITY);
-        theErrorReporter.raiseError(error);
     }
 #endif /* GLIBMM_EXCEPTIONS_ENABLED */
 
@@ -284,11 +289,11 @@ bool QlomDocument::openSqlite()
         qCritical("Database backend \"%s\" does not exist\nError details: %s",
             qPrintable(backend),
             qPrintable(sqlError.text()));
-        const QlomError error(Qlom::DATABASE_ERROR_DOMAIN,
+        // TODO: theLastError is also set in QlomDocument::loadDocument(). ppenz
+        theLastError = QlomError(Qlom::DATABASE_ERROR_DOMAIN,
             tr("%1 database backend does not exist. Further details:\n%2")
                 .arg(backend).arg(sqlError.text()),
                 Qlom::CRITICAL_ERROR_SEVERITY);
-        theErrorReporter.raiseError(error);
         return false;
     }
 
@@ -334,10 +339,10 @@ bool QlomDocument::openSqlite()
     if (sqliteDb.exists()) {
         db.setDatabaseName(filename);
     } else {
-        const QlomError error(Qlom::DATABASE_ERROR_DOMAIN,
+        // TODO: theLastError is also set in QlomDocument::loadDocument(). ppenz
+        theLastError = QlomError(Qlom::DATABASE_ERROR_DOMAIN,
             tr("The SQLite database listed in the Glom document does not exist"),
             Qlom::CRITICAL_ERROR_SEVERITY);
-        theErrorReporter.raiseError(error);
         return false;
     }
 
@@ -351,13 +356,7 @@ bool QlomDocument::openSqlite()
 
 void QlomDocument::fillTableList()
 {
-    if (!tableList.empty()) {
-        const QlomError error(Qlom::DOCUMENT_ERROR_DOMAIN,
-            tr("Filling non-empty table list, the Glom document might be corrupted."),
-            Qlom::WARNING_ERROR_SEVERITY);
-        theErrorReporter.raiseError(error);
-        tableList.clear();
-    }
+    Q_ASSERT(tableList.empty());
 
     GlomTables tables = document->get_tables();
     for(GlomTables::const_iterator iter(tables.begin());
