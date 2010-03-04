@@ -50,13 +50,14 @@ public:
     /** Create a model of a list layout from a Glom document and a table.
      *  The parameters are construct-time only, and thereafter the object is
      *  read-only.
-     *  @param[in] document a Glom document
-     *  @param[in] table the Glom table containing a list layout
-     *  @param[in] error error-reporting facility
-     *  @param[in] parent a parent QObject
-     *  @param[in] db a database connection, or the default connection */
+     *  @param[in]  document a Glom document
+     *  @param[in]  table the Glom table containing a list layout
+     *  @param[out] error true, if an error occure, because no list model has
+     *                    been found
+     *  @param[in]  parent a parent QObject
+     *  @param[in]  db a database connection, or the default connection */
     explicit QlomListLayoutModel(const Glom::Document *document,
-        const QlomTable &table, QlomErrorReporter &error, QObject *parent = 0,
+        const QlomTable &table, bool &error, QObject *parent = 0,
         QSqlDatabase db = QSqlDatabase());
 
     /** Get the table name used in the model, for display to the user.
@@ -103,8 +104,6 @@ private:
 
     QString theTableDisplayName; /**< the display name of the layout table */
     Glom::sharedptr<const Glom::LayoutGroup> theLayoutGroup; /**< the layout group used for the list layout */
-    QlomErrorReporter &theErrorReporter; /**< the facility used to report
-                                           errors, a dynamic dependency */
     QVector<bool> theStaticTextColumnIndices; /**< the list of columns that
                                                    would return empty QVariants
                                                    because we display their
