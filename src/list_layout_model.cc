@@ -200,8 +200,11 @@ bool QlomListLayoutModel::canFetchMore()
 
 QVariant QlomListLayoutModel::data(const QModelIndex &index, int role) const
 {
-    const int colsIdx = index.column();
-    Q_ASSERT(colsIdx >= theStaticTextColumnIndices.size()); // TODO: report as error? ppenz
+    int colsIdx = index.column();
+    if (colsIdx >= theStaticTextColumnIndices.size()) {
+        qWarning("Invalid model column requested.");
+        colsIdx = 0;
+    }
 
     // Return the empty string which creates a "non-null" QString for the
     // QVariants. For valid QVariants containing null values, the style
