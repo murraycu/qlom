@@ -92,7 +92,7 @@ void QlomConnectionDialog::databaseConnect()
         openPostgresql();
         break;
     default:
-        qCritical("Unexpected database hosting mode");
+        qWarning("Unexpected database hosting mode");
 
         // Note that we don't use done(QDialog::Rejected) to tell the caller 
         // that the connection failed, because then there would be no way to 
@@ -116,7 +116,7 @@ void QlomConnectionDialog::openPostgresql()
     const QSqlError error(db.lastError());
     if (error.isValid()) {
         // TODO: Give feedback in the UI.
-        qCritical("Database backend \"%s\" does not exist\nError details: %s",
+        qWarning("Database backend \"%s\" does not exist\nError details: %s",
             qPrintable(backend), qPrintable(error.text()));
 
         // Note that we don't use done(QDialog::Rejected) to tell the caller 
@@ -161,7 +161,7 @@ void QlomConnectionDialog::openPostgresql()
             } else {
                //TODO: Show this detailed error in the UI.
                const QSqlError error = db.lastError();
-               qCritical("Database connection (port %d) could not be opened.\n  Error: %s", port, qPrintable(error.text()));
+               qWarning("Database connection (port %d) could not be opened.\n Error: %s", port, qPrintable(error.text()));
 
                listPortsTried.push_back(port);
             }

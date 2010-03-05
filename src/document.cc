@@ -50,7 +50,7 @@ bool QlomDocument::loadDocument(const QString &filepath)
 {
     QFileInfo info(filepath);
     if(!info.exists()) {
-        qCritical("The file does not exist with filepath %s", 
+        qWarning("The file does not exist with filepath %s",
             qPrintable(filepath));
 
         theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
@@ -59,10 +59,9 @@ bool QlomDocument::loadDocument(const QString &filepath)
         return false;
     }
 
-    // filepathToUri raises an error if it fails.
+    // filepathToUri provides an error if it fails.
     const std::string uri(filepathToUri(filepath));
     if(uri.empty()) {
-        qCritical("Empty file URI");
         return false;
     }
 
@@ -72,7 +71,7 @@ bool QlomDocument::loadDocument(const QString &filepath)
     int failure_code = 0;
     const bool test = document->load(failure_code);
     if(!test) {
-        qCritical("Document loading failed with uri %s (failure_code=%d)", 
+        qWarning("Document loading failed with uri %s (failure_code=%d)",
             uri.c_str(), failure_code);
 
         QString message;
@@ -91,7 +90,7 @@ bool QlomDocument::loadDocument(const QString &filepath)
     /* Check that the document is not an example document, which must be
      * resaved — that would be an extra feature. */
     if(document->get_is_example_file()) {
-        qCritical("Document is an example file, cannot process");
+        qWarning("Document is an example file, cannot process");
         theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("Cannot open the document because it is an example file"),
             Qlom::CRITICAL_ERROR_SEVERITY);
@@ -131,7 +130,7 @@ bool QlomDocument::loadDocument(const QString &filepath)
                 // The user cancelled the dialog.
                 keepOffering = false;
             } else {
-                qCritical("GlomDocument::loadDocument() Unexpected exec() result.");
+                qWarning("GlomDocument::loadDocument() Unexpected exec() result.");
             }
         }
             
@@ -139,6 +138,7 @@ bool QlomDocument::loadDocument(const QString &filepath)
         connectionDialog = 0;
 
         if (!connected) {
+            qWarning("Failed to connect to the PostgreSQL server");
             theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
                 tr("Failed to connect to the PostgreSQL server"),
                 Qlom::CRITICAL_ERROR_SEVERITY);
@@ -149,6 +149,7 @@ bool QlomDocument::loadDocument(const QString &filepath)
     case Glom::Document::HOSTING_MODE_SQLITE:
     {
         if(!openSqlite()) {
+            qWarning("Failed to open the SQLite database");
             theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
                 tr("Failed to open the SQLite database"),
                 Qlom::CRITICAL_ERROR_SEVERITY);
@@ -159,7 +160,7 @@ bool QlomDocument::loadDocument(const QString &filepath)
     case Glom::Document::HOSTING_MODE_POSTGRES_SELF:
     // Fall through.
     default:
-        qCritical("Database type not supported, cannot process");
+        qWarning("Database type not supported, cannot process");
         theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("Database type not supported, failed to open the Glom document"),
             Qlom::CRITICAL_ERROR_SEVERITY);
@@ -186,6 +187,7 @@ QlomListLayoutModel * QlomDocument::createListLayoutModel(
             bool error = false;
             QlomListLayoutModel *model = new QlomListLayoutModel(document, *iter, error, this);
             if (error) {
+                qWarning("GlomLayoutModel: no list model found");
                 theLastError = QlomError(Qlom::DATABASE_ERROR_DOMAIN,
                     tr("%1: no list model found").arg("GlomLayoutModel"),
                     Qlom::WARNING_ERROR_SEVERITY);
@@ -199,6 +201,7 @@ QlomListLayoutModel * QlomDocument::createListLayoutModel(
 
     /* TODO: change from critical to warning once Qlom can handle failed model
      * initialisations. */
+    qWarning("Cannot find requested table.");
     theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
         tr("Cannot find requested table."), Qlom::CRITICAL_ERROR_SEVERITY);
 
@@ -230,6 +233,7 @@ QlomListLayoutModel * QlomDocument::createDefaultTableListLayoutModel()
     }
 
     if(defaultTable.isEmpty()) {
+        qWarning("The document contains no non-hidden tables.");
         theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("The document contains no non-hidden tables."),
             Qlom::CRITICAL_ERROR_SEVERITY);
@@ -257,7 +261,7 @@ std::string QlomDocument::filepathToUri(const QString &theFilepath)
         uri = Glib::filename_to_uri(filepath);
     }
     catch(const Glib::ConvertError& convertException) {
-        qCritical("Exception from Glib::filename_to_uri(): %s",
+        qWarning("Exception from Glib::filename_to_uri(): %s",
             convertException.what().c_str());
         theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("Failed to convert the document file name to a URI"),
@@ -267,7 +271,7 @@ std::string QlomDocument::filepathToUri(const QString &theFilepath)
     std::auto_ptr<Glib::Error> convertError;
     uri = Glib::filename_to_uri(filepath, convertError);
     if(convertError.get()) {
-        qCritical("Error from Glib::filename_to_uri(): %s",
+        qWarning("Error from Glib::filename_to_uri(): %s",
             convertError->what());
         theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("Failed to convert the document file name to a URI"),
@@ -285,15 +289,9 @@ bool QlomDocument::openSqlite()
 
     const QSqlError sqlError(db.lastError());
     if (sqlError.isValid()) {
-        // TODO: Give feedback in the UI.
-        qCritical("Database backend \"%s\" does not exist\nError details: %s",
+        qWarning("Database backend \"%s\" does not exist\nError details: %s",
             qPrintable(backend),
             qPrintable(sqlError.text()));
-        // TODO: theLastError is also set in QlomDocument::loadDocument(). ppenz
-        theLastError = QlomError(Qlom::DATABASE_ERROR_DOMAIN,
-            tr("%1 database backend does not exist. Further details:\n%2")
-                .arg(backend).arg(sqlError.text()),
-                Qlom::CRITICAL_ERROR_SEVERITY);
         return false;
     }
 
@@ -306,7 +304,7 @@ bool QlomDocument::openSqlite()
                 document->get_connection_self_hosted_directory_uri())));
     }
     catch (const Glib::ConvertError &convertException) {
-        qCritical("Exception from Glib::filename_to_uri(): %s",
+        qWarning("Exception from Glib::filename_to_uri(): %s",
             convertException.what().c_str());
         return false;
     }
@@ -316,7 +314,7 @@ bool QlomDocument::openSqlite()
         document->get_connection_self_hosted_directory_uri(),
         convertError));
     if (convertError.get()) {
-        qCritical("Error from Glib::filename_from_uri(): %s",
+        qWarning("Error from Glib::filename_from_uri(): %s",
             convertError->what());
         return false;
     }
@@ -324,7 +322,7 @@ bool QlomDocument::openSqlite()
     filename = ustringToQstring(Glib::filename_to_utf8(stdFilename,
         convertError));
     if (convertError.get()) {
-        qCritical("Error from Glib::filename_to_utf8(): %s",
+        qWarning("Error from Glib::filename_to_utf8(): %s",
             convertError->what());
         return false;
     }
@@ -339,15 +337,12 @@ bool QlomDocument::openSqlite()
     if (sqliteDb.exists()) {
         db.setDatabaseName(filename);
     } else {
-        // TODO: theLastError is also set in QlomDocument::loadDocument(). ppenz
-        theLastError = QlomError(Qlom::DATABASE_ERROR_DOMAIN,
-            tr("The SQLite database listed in the Glom document does not exist"),
-            Qlom::CRITICAL_ERROR_SEVERITY);
+        qWarning("The SQLite database listed in the Glom document does not exist");
         return false;
     }
 
     if (!db.open()) {
-        qCritical("Database connection could not be opened");
+        qWarning("Database connection could not be opened");
         return false;
     } else {
         return true;
