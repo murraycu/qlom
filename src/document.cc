@@ -138,6 +138,7 @@ bool QlomDocument::loadDocument(const QString &filepath)
         connectionDialog = 0;
 
         if (!connected) {
+            qWarning("Failed to connect to the PostgreSQL server");
             theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
                 tr("Failed to connect to the PostgreSQL server"),
                 Qlom::CRITICAL_ERROR_SEVERITY);
@@ -186,6 +187,7 @@ QlomListLayoutModel * QlomDocument::createListLayoutModel(
             bool error = false;
             QlomListLayoutModel *model = new QlomListLayoutModel(document, *iter, error, this);
             if (error) {
+                qWarning("GlomLayoutModel: no list model found");
                 theLastError = QlomError(Qlom::DATABASE_ERROR_DOMAIN,
                     tr("%1: no list model found").arg("GlomLayoutModel"),
                     Qlom::WARNING_ERROR_SEVERITY);
@@ -199,6 +201,7 @@ QlomListLayoutModel * QlomDocument::createListLayoutModel(
 
     /* TODO: change from critical to warning once Qlom can handle failed model
      * initialisations. */
+    qWarning("Cannot find requested table.");
     theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
         tr("Cannot find requested table."), Qlom::CRITICAL_ERROR_SEVERITY);
 
@@ -230,6 +233,7 @@ QlomListLayoutModel * QlomDocument::createDefaultTableListLayoutModel()
     }
 
     if(defaultTable.isEmpty()) {
+        qWarning("The document contains no non-hidden tables.");
         theLastError = QlomError(Qlom::DOCUMENT_ERROR_DOMAIN,
             tr("The document contains no non-hidden tables."),
             Qlom::CRITICAL_ERROR_SEVERITY);

@@ -219,7 +219,7 @@ QString QlomMainWindow::errorDomainLookup(
         return tr("The programmmer had a logic error.");
         break;
     default:
-        qCritical("Unhandled error domain: %i", errorDomain);
+        qWarning("Unhandled error domain: %i", errorDomain);
         return tr("Unhandled error domain");
         break;
     }
