@@ -17,7 +17,6 @@
  */
 
 #include "list_layout_model.h"
-#include "error_reporter.h"
 #include "utils.h"
 #include "error.h"
 
@@ -34,12 +33,12 @@
   */
 // We don't check for nullptr in document and error?
 QlomListLayoutModel::QlomListLayoutModel(const Glom::Document *document,
-    const QlomTable &table, QlomErrorReporter &error,
+    const QlomTable &table, bool &error,
     QObject *parent, QSqlDatabase db) :
     QSqlTableModel(parent, db),
-    theTable(table),
-    theErrorReporter(error)
+    theTable(table)
 {
+    error = false;
     setTable(table.tableName());
 
     // The first item in a list layout group is always a main layout group.
@@ -60,11 +59,7 @@ QlomListLayoutModel::QlomListLayoutModel(const Glom::Document *document,
             adjustColumnHeaders(group);
         }
     } else {
-        /* Display a warning message if the Glom document could not provide
-         * a main layout group. */
-        error.raiseError(QlomError(Qlom::DATABASE_ERROR_DOMAIN,
-            tr("%1: no list model found").arg("GlomLayoutModel"),
-            Qlom::WARNING_ERROR_SEVERITY));
+        error = true;
     }
 }
 
@@ -217,11 +212,11 @@ bool QlomListLayoutModel::canFetchMore()
 
 QVariant QlomListLayoutModel::data(const QModelIndex &index, int role) const
 {
-    const int columnsIndex = index.column();
-    if (columnsIndex >= theStaticTextColumnIndices.size())
-        theErrorReporter.raiseError(QlomError(Qlom::LOGIC_ERROR_DOMAIN,
-            QString("Invalid model column requested."),
-            Qlom::CRITICAL_ERROR_SEVERITY));
+    int columnsIndex = index.column();
+    if (columnsIndex >= theStaticTextColumnIndices.size()) {
+        qWarning("Invalid model column requested.");
+        columnsIndex = 0;
+    }
 
     /* Return the empty string which creates a "non-null" QString for the
      * QVariants. For valid QVariants containing null values, the style

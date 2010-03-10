@@ -74,7 +74,7 @@ bool QlomMainWindow::isValid() const
     return theValidFlag;
 }
 
-void QlomMainWindow::receiveError(const QlomError &error)
+void QlomMainWindow::showError(const QlomError &error)
 {
     if(!error.what().isNull()) {
         QPointer<QMessageBox> dialog = new QMessageBox(this);
@@ -95,17 +95,6 @@ void QlomMainWindow::receiveError(const QlomError &error)
 
         dialog->exec();
         delete dialog;
-    }
-
-    // TODO: Whether to shut down the application should be for the caller to 
-    // decide. murrayc.
-    // QApplication::exit() does not work for us because libglom eats up the
-    // important signals:
-    // http://git.gnome.org/browse/glom/tree/glom/libglom/connectionpool.cc#n538
-    /* If the error message was non-empty then the error message was shown to
-     * the user too. All that remains is to shut down the application. */
-    if(Qlom::CRITICAL_ERROR_SEVERITY == error.severity()) {
-        exit(EXIT_FAILURE);
     }
 }
 
@@ -144,9 +133,6 @@ void QlomMainWindow::setup()
         this, SLOT(fileQuitTriggered()));
     connect(helpAbout, SIGNAL(triggered(bool)),
         this, SLOT(helpAboutTriggered()));
-
-    connect(&theGlomDocument, SIGNAL(errorRaised(QlomError)),
-        this, SLOT(receiveError(QlomError)));
 
     theMainWidget = new QStackedWidget(this);
 
@@ -233,7 +219,7 @@ QString QlomMainWindow::errorDomainLookup(
         return tr("The programmmer had a logic error.");
         break;
     default:
-        qCritical("Unhandled error domain: %i", errorDomain);
+        qWarning("Unhandled error domain: %i", errorDomain);
         return tr("Unhandled error domain");
         break;
     }
@@ -309,7 +295,15 @@ void QlomMainWindow::tablesTreeviewDoubleclicked(const QModelIndex& index)
 {
     const QString &tableName = index.data(Qlom::TableNameRole).toString();
     QlomListLayoutModel *model = theGlomDocument.createListLayoutModel(tableName);
-    showTable(model);
+    if (model) {
+        showTable(model);
+    } else {
+        const QlomError error = theGlomDocument.lastError();
+        showError(error);
+        if (error.severity() == Qlom::CRITICAL_ERROR_SEVERITY) {
+            exit(EXIT_FAILURE);
+        }
+    }
 }
 
 void QlomMainWindow::showDefaultTable()
@@ -320,6 +314,12 @@ void QlomMainWindow::showDefaultTable()
 
     if (model) {
         showTable(model);
+    } else {
+        const QlomError error = theGlomDocument.lastError();
+        showError(error);
+        if (error.severity() == Qlom::CRITICAL_ERROR_SEVERITY) {
+            exit(EXIT_FAILURE);
+        }
     }
 }
 
