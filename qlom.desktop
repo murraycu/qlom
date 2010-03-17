@@ -10,3 +10,4 @@ Terminal=false
 Icon=qlom
 Categories=Office;Database;Qt;
 MimeType=application/x-glom;
+StartupNotify=true
