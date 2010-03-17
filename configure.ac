@@ -15,7 +15,22 @@ AC_LANG([C++])
 
 AT_WITH_QT([core gui sql],[no_keywords])
 
-REQUIRED_QLOM_LIBS='glom-1.14 >= 1.13.1'
+PKG_PROG_PKG_CONFIG
+
+GLOM_1_12="glom-1.12 >= 1.12.6"
+GLOM_1_14="glom-1.14 >= 1.13.3"
+AC_MSG_CHECKING([for a suitable libglom version])
+PKG_CHECK_EXISTS([$GLOM_1_12],
+                 [AC_MSG_RESULT([1.12])
+                  REQUIRED_GLOM_VERSION=$GLOM_1_12],
+                 [PKG_CHECK_EXISTS([$GLOM_1_14],
+                                   [AC_MSG_RESULT([1.14])
+                                    REQUIRED_GLOM_VERSION=$GLOM_1_14],
+                                    [AC_MSG_ERROR([suitable libglom version not found])])])
+
+PKG_CHECK_MODULES([QLOM], [$REQUIRED_GLOM_VERSION])
+AC_SUBST([QLOM_CFLAGS])
+AC_SUBST([QLOM_LIBS])
 
 AC_ARG_ENABLE([maemo],
               [AS_HELP_STRING([--enable-maemo],
@@ -32,10 +47,6 @@ AS_IF([test "x$qlom_enable_maemo" = xyes],
         [Define to enable support for the Maemo platform.])],
       [AC_MSG_ERROR([osso-af-settings not found])])
       ])
-
-PKG_CHECK_MODULES([QLOM], [$REQUIRED_QLOM_LIBS])
-AC_SUBST([QLOM_CFLAGS])
-AC_SUBST([QLOM_LIBS])
 
 DK_ARG_ENABLE_WARNINGS([QLOM_WARNINGS],
         [-Wall],
