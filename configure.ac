@@ -18,7 +18,7 @@ AT_WITH_QT([core gui sql],[no_keywords])
 PKG_PROG_PKG_CONFIG
 
 GLOM_1_12="glom-1.12 >= 1.12.6"
-GLOM_1_14="glom-1.14 >= 1.13.3"
+GLOM_1_14="glom-1.14 >= 1.14.0"
 AC_MSG_CHECKING([for a suitable libglom version])
 PKG_CHECK_EXISTS([$GLOM_1_12],
                  [AC_MSG_RESULT([1.12])

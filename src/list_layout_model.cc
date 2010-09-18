@@ -119,10 +119,11 @@ const QlomListLayoutModel::GlomSharedLayoutItems QlomListLayoutModel::getLayoutI
 QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
                                         const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup)
 {
-    Glib::ustring where_clause;
-    Glib::ustring extra_join;
+    //TODO: The where_clause and extra_join types must be in ifdefed if we 
+    //really want to support the libglom-1-12 too:
+    const Gnome::Gda::SqlExpr where_clause; //Ignored.
+    const Glom::sharedptr<const Glom::Relationship> extra_join; //Ignored.
     Glom::type_sort_clause sort_clause;
-    Glib::ustring group_by;
     Glom::Utils::type_vecConstLayoutFields fields;
     const Glom::LayoutGroup::type_list_const_items items = layoutGroup->get_items();
 
@@ -145,7 +146,7 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
          items.begin();
          iter != items.end();
          ++iter) {
-         Glom::sharedptr<const Glom::LayoutItem_Field> field =
+         const Glom::sharedptr<const Glom::LayoutItem_Field> field =
              Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
          if (field) {
 
@@ -166,7 +167,7 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
              ++index;
          }
 
-         Glom::sharedptr<const Glom::LayoutItem_Text> text =
+         const Glom::sharedptr<const Glom::LayoutItem_Text> text =
              Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
          if (text) {
              ++index;
@@ -182,8 +183,10 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
     // Pad the static text column lookup list accordingly.
     theStaticTextColumnIndices.push_back(false);
 
-    Glib::ustring query = Glom::Utils::build_sql_select_with_where_clause(
-        table, fields, where_clause, extra_join, sort_clause, group_by);
+    const Glib::RefPtr<Gnome::Gda::SqlBuilder> builder 
+        = Glom::Utils::build_sql_select_with_where_clause(
+            table, fields, where_clause, extra_join, sort_clause);
+    const Glib::ustring query = Glom::Utils::sqlbuilder_get_full_query(builder);
     return ustringToQstring(query);
 }
 
