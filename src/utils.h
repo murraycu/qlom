@@ -25,11 +25,11 @@
 /** Convert a QString to a Glib::ustring.
  *  @param[in] qstring the string to convert
  *  @returns the converted string */
-Glib::ustring qstringToUstring(QString qstring);
+Glib::ustring qstringToUstring(const QString& qstring);
 
 /** Convert a Glib::ustring to a QString.
  *  @param[in] ustring the string to convert
  *  @returns the converted string */
-QString ustringToQstring(Glib::ustring ustring);
+QString ustringToQstring(const Glib::ustring& ustring);
 
 #endif /* QLOM_UTILS_H_ */

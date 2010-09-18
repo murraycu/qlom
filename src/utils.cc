@@ -18,12 +18,12 @@
 
 #include "utils.h"
 
-Glib::ustring qstringToUstring(QString qstring)
+Glib::ustring qstringToUstring(const QString& qstring)
 {
     return Glib::ustring(qstring.toUtf8().constData());
 }
 
-QString ustringToQstring(Glib::ustring ustring)
+QString ustringToQstring(const Glib::ustring& ustring)
 {
     return QString::fromUtf8(ustring.c_str());
 }
