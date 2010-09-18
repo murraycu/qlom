@@ -7,6 +7,3 @@ autoreconf --force --install "$srcdir"
 
 echo "--"
 echo "autoreconf --force --install"
-echo "--"
-echo "Remember it well, because one day, autogen.sh may be replaced with an"
-echo "even smaller shell script."
