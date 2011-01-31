@@ -8,3 +8,15 @@ http://www.glom.org/
 
 Qlom uses Autotroll in its build system:
 http://www.tsunanet.net/autotroll/
+
+
+Build:
+
+The autogen.sh script uses autoreconf but you might need to do this first
+  export ACLOCAL=aclocal-1.11
+  export AUTOMAKE=automake-1.11
+to avoid these errors:
+configure.ac:29: error: possibly undefined macro: AC_MSG_ERROR
+configure.ac:46: error: possibly undefined macro: AC_DEFINE
+
+
