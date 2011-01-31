@@ -62,7 +62,7 @@ QlomMainWindow::QlomMainWindow(const QString &filepath) :
     theTablesTreeView->setModel(model);
 
     connect(theTablesTreeView, SIGNAL(doubleClicked(QModelIndex)),
-        this, SLOT(theTablesTreeviewDoubleclicked(QModelIndex)));
+        this, SLOT(tablesTreeviewDoubleclicked(QModelIndex)));
     show();
 
     // Open default table.
