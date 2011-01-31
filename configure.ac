@@ -20,17 +20,21 @@ PKG_PROG_PKG_CONFIG
 GLOM_1_12="glom-1.12 >= 1.12.6"
 GLOM_1_14="glom-1.14 >= 1.14.0"
 GLOM_1_16="glom-1.16 >= 1.16.0"
+GLOM_1_18="glom-1.18 >= 1.17.0"
 AC_MSG_CHECKING([for a suitable libglom version])
-PKG_CHECK_EXISTS([$GLOM_1_16],
-                 [AC_MSG_RESULT([1.16])
-                 REQUIRED_GLOM_VERSION=$GLOM_1_16],
-                 [PKG_CHECK_EXISTS([$GLOM_1_14], 
-                   [AC_MSG_RESULT([1.14])
-                   REQUIRED_GLOM_VERSION=$GLOM_1_14],
-                   [PKG_CHECK_EXISTS([$GLOM_1_12],
-                     [AC_MSG_RESULT([1.12])
-                     REQUIRED_GLOM_VERSION=$GLOM_1_12],
-                     [AC_MSG_ERROR([suitable libglom version not found])])])])
+PKG_CHECK_EXISTS($GLOM_1_18,
+                   [AC_MSG_RESULT([1.18])
+                   REQUIRED_GLOM_VERSION=$GLOM_1_18],
+                   [PKG_CHECK_EXISTS([$GLOM_1_16], 
+                   [AC_MSG_RESULT([1.16])
+                   REQUIRED_GLOM_VERSION=$GLOM_1_16],
+                   [PKG_CHECK_EXISTS([$GLOM_1_14], 
+                     [AC_MSG_RESULT([1.14])
+                     REQUIRED_GLOM_VERSION=$GLOM_1_14],
+                     [PKG_CHECK_EXISTS([$GLOM_1_12],
+                       [AC_MSG_RESULT([1.12])
+                       REQUIRED_GLOM_VERSION=$GLOM_1_12],
+                       [AC_MSG_ERROR([suitable libglom version not found])])])])])
 
 PKG_CHECK_MODULES([QLOM], [$REQUIRED_GLOM_VERSION])
 AC_SUBST([QLOM_CFLAGS])
