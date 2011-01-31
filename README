@@ -3,6 +3,19 @@ Qlom
 A Qt application to view Glom databases, using libglom, the non-UI component
 of Glom.
 
+
+Qlom currently only works with
+- A centrally-hosted PostgreSQL database, such as one created by Glom.
+  That means, one that will still be hosted by PostgreSQL even when Glom is 
+  not running.
+- A sqlite database, such as the one in Glom's git checkout. For instance:
+    $ qlom /home/murrayc/checkouts/gnome30/glom/examples/sqlite/test_sqlite_music/test_sqlite_music.glom 
+  (A patch would be welcome to make that accept a relative file path.)
+
+However, it wouldn't be too hard to make Qlom start the PostgreSQL instance 
+when necessary. There is libglom API for that.
+
+
 See also:
 http://www.glom.org/
 
@@ -17,8 +30,8 @@ Patches to fix these problems properly would be appreciated.
 
 * The autogen.sh script uses autoreconf but you might need to do this first when 
 building from git:
-  export ACLOCAL=aclocal-1.11
-  export AUTOMAKE=automake-1.11
+  $ export ACLOCAL=aclocal-1.11
+  $ export AUTOMAKE=automake-1.11
 to avoid these errors:
 configure.ac:29: error: possibly undefined macro: AC_MSG_ERROR
 configure.ac:46: error: possibly undefined macro: AC_DEFINE
@@ -26,4 +39,5 @@ configure.ac:46: error: possibly undefined macro: AC_DEFINE
 
 * You might also need to remove your qt3 -dev package so that autotroll 
 correctly finds qt4. For instance, remove libqt3-mt-dev on Ubuntu or Debian.
+
 
