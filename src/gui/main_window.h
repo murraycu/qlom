@@ -114,23 +114,23 @@ private:
 
 private Q_SLOTS:
     /** Slot for the signal from the Open menu item. */
-    void fileOpenTriggered();
+    void onFileOpenTriggered();
 
     /** Slot for the signal from the Close menu item. */
-    void fileCloseTriggered();
+    void onFileCloseTriggered();
 
     /** Slot for the signal from the Quit menu item. */
-    void fileQuitTriggered();
+    void onFileQuitTriggered();
 
     /** Slot for the signal from the Help menu item. */
-    void helpAboutTriggered();
+    void onHelpAboutTriggered();
 
     /** Slot to show the list of tables. */
-    void showTablesList();
+    void onBackButton();
 
     /** Slot for the signal from a double-click on the table names treeview.
      *  @param[in] index the row that was double-clicked */
-    void tablesTreeviewDoubleclicked(const QModelIndex &index);
+    void onTablesTreeviewDoubleclicked(const QModelIndex &index);
 
     /** Slot to check whether the details buttons work.
      *  @param[in] index the row that was double-clicked */
@@ -138,7 +138,7 @@ private Q_SLOTS:
 
     /** Slot to show a table given a numeric index.
      *  @param[in] index the index of the table to show */
-    void showTableFromIndex(const int index);
+    void onTablesComboActivated(const int index);
 };
 
 #endif /* QLOM_MAIN_WINDOW_H_ */

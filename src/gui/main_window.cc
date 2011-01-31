@@ -62,7 +62,7 @@ QlomMainWindow::QlomMainWindow(const QString &filepath) :
     theTablesTreeView->setModel(model);
 
     connect(theTablesTreeView, SIGNAL(doubleClicked(QModelIndex)),
-        this, SLOT(tablesTreeviewDoubleclicked(QModelIndex)));
+        this, SLOT(onTablesTreeviewDoubleclicked(QModelIndex)));
     show();
 
     // Open default table.
@@ -126,13 +126,13 @@ void QlomMainWindow::setup()
     aboutMenu->addAction(helpAbout);
 
     connect(fileOpen, SIGNAL(triggered(bool)),
-        this, SLOT(fileOpenTriggered()));
+        this, SLOT(onFileOpenTriggered()));
     connect(fileClose, SIGNAL(triggered(bool)),
-        this, SLOT(fileCloseTriggered()));
+        this, SLOT(onFileCloseTriggered()));
     connect(fileQuit, SIGNAL(triggered(bool)),
-        this, SLOT(fileQuitTriggered()));
+        this, SLOT(onFileQuitTriggered()));
     connect(helpAbout, SIGNAL(triggered(bool)),
-        this, SLOT(helpAboutTriggered()));
+        this, SLOT(onHelpAboutTriggered()));
 
     theMainWidget = new QStackedWidget(this);
 
@@ -153,12 +153,12 @@ void QlomMainWindow::setup()
 
     theTablesComboBox = new QComboBox(tableContainer);
     connect(theTablesComboBox, SIGNAL(activated(int)),
-        this, SLOT(showTableFromIndex(const int)));
+        this, SLOT(onTablesComboActivated(const int)));
 
     QPushButton *listLayoutBackButton =
       new QPushButton(tr("&Back to table list"), tableContainer);
     connect(listLayoutBackButton, SIGNAL(clicked(bool)),
-        this, SLOT(showTablesList()));
+        this, SLOT(onBackButton()));
 
     QWidget *navigationContainer = new QWidget;
     QHBoxLayout *navigationLayout = new QHBoxLayout(navigationContainer);
@@ -225,10 +225,10 @@ QString QlomMainWindow::errorDomainLookup(
     }
 }
 
-void QlomMainWindow::fileOpenTriggered()
+void QlomMainWindow::onFileOpenTriggered()
 {
     // Close the document before opening a document.
-    fileCloseTriggered();
+    onFileCloseTriggered();
 
     /* Modal dialogs can be deleted by code elsewhere, hence this resource is
      * wrapped in a QPointer. However, it's only correct if *each* access to
@@ -264,7 +264,7 @@ void QlomMainWindow::fileOpenTriggered()
     delete dialog;
 }
 
-void QlomMainWindow::fileCloseTriggered()
+void QlomMainWindow::onFileCloseTriggered()
 {
     theTablesTreeView->deleteLater();
     theTablesTreeView = new QTreeView(this);
@@ -273,25 +273,25 @@ void QlomMainWindow::fileCloseTriggered()
     theMainWidget->setCurrentIndex(0);
     setWindowTitle(qApp->applicationName());
     connect(theTablesTreeView, SIGNAL(doubleClicked(QModelIndex)),
-        this, SLOT(tablesTreeviewDoubleclicked(QModelIndex)));
+        this, SLOT(onTablesTreeviewDoubleclicked(QModelIndex)));
 }
 
-void QlomMainWindow::fileQuitTriggered()
+void QlomMainWindow::onFileQuitTriggered()
 {
     qApp->quit();
 }
 
-void QlomMainWindow::helpAboutTriggered()
+void QlomMainWindow::onHelpAboutTriggered()
 {
     showAboutDialog();
 }
 
-void QlomMainWindow::showTablesList()
+void QlomMainWindow::onBackButton()
 {
     theMainWidget->setCurrentIndex(0);
 }
 
-void QlomMainWindow::tablesTreeviewDoubleclicked(const QModelIndex& index)
+void QlomMainWindow::onTablesTreeviewDoubleclicked(const QModelIndex& index)
 {
     const QString &tableName = index.data(Qlom::TableNameRole).toString();
     QlomListLayoutModel *model = theGlomDocument.createListLayoutModel(tableName);
@@ -359,7 +359,7 @@ void QlomMainWindow::showTable(QlomListLayoutModel *model)
     theListLayoutView->setItemDelegateForColumn(columnIndex, buttonDelegate);
 }
 
-void QlomMainWindow::showTableFromIndex(const int index)
+void QlomMainWindow::onTablesComboActivated(const int index)
 {
     QlomListLayoutModel *model =
         theGlomDocument.createListLayoutModel(
