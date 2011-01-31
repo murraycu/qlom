@@ -96,12 +96,21 @@ private:
     QString errorDomainLookup(const Qlom::QlomErrorDomain errorDomain) const;
 
     QlomDocument theGlomDocument; /**< a Glom document to view */
-    QStackedWidget *theMainWidget; /**< a container for multiple stacked display
-    widgets */
-    QTreeView *theTablesTreeView; /**< a tree view for the table names model */
-    QlomListView *theListLayoutView; /**< a table view for a list layout */
-    QComboBox *theTablesComboBox; /**< a combo box for the table names model */
-    bool theValidFlag; /**< See isValid(). */
+
+    /** A container for multiple stacked display widgets. */
+    QStackedWidget *theMainWidget;
+
+    /** A tree view for the table names model. */
+    QTreeView *theTablesTreeView; 
+
+    /** A table view for a list layout. */
+    QlomListView *theListLayoutView;
+
+    /** A combo box for the table names model. */
+    QComboBox *theTablesComboBox;
+
+    /** See isValid(). */
+    bool theValidFlag;
 
 private Q_SLOTS:
     /** Slot for the signal from the Open menu item. */
