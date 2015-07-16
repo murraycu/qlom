@@ -50,8 +50,8 @@ QlomListLayoutModel::QlomListLayoutModel(const Glom::Document *document,
      * one place. */
     if (1 == listLayout.size()) {
         theLayoutGroup = listLayout[0];
-        Glom::sharedptr<const Glom::LayoutGroup> group =
-            Glom::sharedptr<const Glom::LayoutGroup>::cast_dynamic(theLayoutGroup);
+        std::shared_ptr<const Glom::LayoutGroup> group =
+            std::dynamic_pointer_cast<const Glom::LayoutGroup>(theLayoutGroup);
         if (group) {
             QSqlQuery query = buildQuery(tableNameU, group);
             setQuery(query);
@@ -64,7 +64,7 @@ QlomListLayoutModel::QlomListLayoutModel(const Glom::Document *document,
 }
 
 void QlomListLayoutModel::addStaticTextColumns(
-    const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup)
+    const std::shared_ptr<const Glom::LayoutGroup> &layoutGroup)
 {
     const Glom::LayoutGroup::type_list_const_items items =
         layoutGroup->get_items();
@@ -76,8 +76,8 @@ void QlomListLayoutModel::addStaticTextColumns(
          ++iter) {
          bool flag = false;
 
-         Glom::sharedptr<const Glom::LayoutItem_Text> text =
-             Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
+         std::shared_ptr<const Glom::LayoutItem_Text> text =
+             std::dynamic_pointer_cast<const Glom::LayoutItem_Text>(*iter);
          if (text) {
              // Inserts before, and it is allowed to fail!
              insertColumn(columnsIndex);
@@ -90,7 +90,7 @@ void QlomListLayoutModel::addStaticTextColumns(
 }
 
 void QlomListLayoutModel::adjustColumnHeaders(
-    const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup)
+    const std::shared_ptr<const Glom::LayoutGroup> &layoutGroup)
 {
     const Glom::LayoutGroup::type_list_const_items items =
         layoutGroup->get_items();
@@ -117,12 +117,12 @@ const QlomListLayoutModel::GlomSharedLayoutItems QlomListLayoutModel::getLayoutI
 }
 
 QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
-                                        const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup)
+                                        const std::shared_ptr<const Glom::LayoutGroup> &layoutGroup)
 {
     //TODO: The where_clause and extra_join types must be in ifdefed if we 
     //really want to support the libglom-1-12 too:
     const Gnome::Gda::SqlExpr where_clause; //Ignored.
-    const Glom::sharedptr<const Glom::Relationship> extra_join; //Ignored.
+    const std::shared_ptr<const Glom::Relationship> extra_join; //Ignored.
     Glom::type_sort_clause sort_clause;
     Glom::Utils::type_vecConstLayoutFields fields;
     const Glom::LayoutGroup::type_list_const_items items = layoutGroup->get_items();
@@ -139,15 +139,15 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
      * least one field (even if that means it's only the primary key). */
 
     // TODO: separate view issues from this model, probably with a proxy model.
-    Glom::sharedptr<const Glom::LayoutItem_Field> placeHolder;
+    std::shared_ptr<const Glom::LayoutItem_Field> placeHolder;
 
     int index = 0;
     for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
          items.begin();
          iter != items.end();
          ++iter) {
-         const Glom::sharedptr<const Glom::LayoutItem_Field> field =
-             Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
+         const std::shared_ptr<const Glom::LayoutItem_Field> field =
+             std::dynamic_pointer_cast<const Glom::LayoutItem_Field>(*iter);
          if (field) {
 
              // Copy the first field we find into the place holder
@@ -155,7 +155,7 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
                  placeHolder = field;
              }
 
-             Glom::sharedptr<const Glom::Field> details =
+             std::shared_ptr<const Glom::Field> details =
                  field->get_full_field_details();
              if (details && details->get_primary_key()) {
                  sort_clause.push_back(Glom::type_pair_sort_field(field, true));
@@ -167,8 +167,8 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
              ++index;
          }
 
-         const Glom::sharedptr<const Glom::LayoutItem_Text> text =
-             Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
+         const std::shared_ptr<const Glom::LayoutItem_Text> text =
+             std::dynamic_pointer_cast<const Glom::LayoutItem_Text>(*iter);
          if (text) {
              ++index;
              insertColumn(index); // inserts before

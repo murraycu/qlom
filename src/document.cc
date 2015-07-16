@@ -356,7 +356,7 @@ void QlomDocument::fillTableList()
     GlomTables tables = document->get_tables();
     for(GlomTables::const_iterator iter(tables.begin());
         iter != tables.end(); ++iter) {
-        Glom::sharedptr<Glom::TableInfo> table = *iter;
+        std::shared_ptr<Glom::TableInfo> table = *iter;
         Glom::Document::type_vec_relationships documentRelationships(
             document->get_relationships(table->get_name()));
         // Get a list of GlomRelationship items from the document.
@@ -384,7 +384,7 @@ QList<QlomRelationship> QlomDocument::fillRelationships(
     for (Glom::Document::type_vec_relationships::const_iterator iter(
         documentRelationships.begin()); iter != documentRelationships.end();
         ++iter) {
-        const Glom::sharedptr<const Glom::Relationship>
+        const std::shared_ptr<const Glom::Relationship>
             documentRelationship(*iter);
         relationships.push_back(QlomRelationship(
             ustringToQstring(documentRelationship->get_from_field()),

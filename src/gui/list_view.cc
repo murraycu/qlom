@@ -62,16 +62,16 @@ QStyledItemDelegate * QlomListView::createDelegateFromColumn(
     for (Glom::LayoutGroup::type_list_const_items::const_iterator iter =
         items.begin(); iter != items.end(); ++iter) {
         if (column == std::distance(items.begin(), iter)) {
-            Glom::sharedptr<const Glom::LayoutItem_Text> textItem =
-                Glom::sharedptr<const Glom::LayoutItem_Text>::cast_dynamic(*iter);
+            std::shared_ptr<const Glom::LayoutItem_Text> textItem =
+                std::dynamic_pointer_cast<const Glom::LayoutItem_Text>(*iter);
             if(textItem)
                 return new QlomLayoutItemTextDelegate(
                     textItem->get_formatting_used(),
                     QlomLayoutItemTextDelegate::GlomSharedField(),
                     ustringToQstring(textItem->get_text()));
 
-            Glom::sharedptr<const Glom::LayoutItem_Field> fieldItem =
-                Glom::sharedptr<const Glom::LayoutItem_Field>::cast_dynamic(*iter);
+            std::shared_ptr<const Glom::LayoutItem_Field> fieldItem =
+                std::dynamic_pointer_cast<const Glom::LayoutItem_Field>(*iter);
             if(fieldItem)
                 return new QlomLayoutItemFieldDelegate(
                     fieldItem->get_formatting_used(),

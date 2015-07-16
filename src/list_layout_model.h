@@ -92,18 +92,18 @@ private:
       * @returns the SQL query as a string
       */
     QString buildQuery(const Glib::ustring &table,
-        const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup);
+        const std::shared_ptr<const Glom::LayoutGroup> &layoutGroup);
 
     /** Iterates over the layout group to find static text items so that it can
       * insert columns into the table. */
-    void addStaticTextColumns(const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup);
+    void addStaticTextColumns(const std::shared_ptr<const Glom::LayoutGroup> &layoutGroup);
 
     /** Iterates over the layout group to set each column header to the display
       * title specified by the matching layout item. */
-    void adjustColumnHeaders(const Glom::sharedptr<const Glom::LayoutGroup> &layoutGroup);
+    void adjustColumnHeaders(const std::shared_ptr<const Glom::LayoutGroup> &layoutGroup);
 
     QlomTable theTable; /**< the layout table */
-    Glom::sharedptr<const Glom::LayoutGroup> theLayoutGroup; /**< the layout group used for the list layout */
+    std::shared_ptr<const Glom::LayoutGroup> theLayoutGroup; /**< the layout group used for the list layout */
     QVector<bool> theStaticTextColumnIndices; /**< the list of columns that
                                                    would return empty QVariants
                                                    because we display their
