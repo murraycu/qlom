@@ -7,7 +7,7 @@ Makefile
 Makefile.in
 # configure script
 configure
-config.*
+config.h
 # Generated files
 INSTALL
 build-aux/depcomp
