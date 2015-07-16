@@ -42,7 +42,10 @@ void QlomFieldFormattingDelegate::paint(QPainter *painter,
     QStyleOptionViewItemV4 opt = option;
     initStyleOption(&opt, index);
 
+#if defined(Q_WS_X11) //TODO: Why isn't this defined for us?
     QColor::setAllowX11ColorNames(true);
+#endif
+
     QColor fgColor = painter->pen().color();
     QString fgColorName =
         ustringToQstring(theFormattingUsed.get_text_format_color_foreground());

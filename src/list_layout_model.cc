@@ -53,7 +53,8 @@ QlomListLayoutModel::QlomListLayoutModel(const Glom::Document *document,
         std::shared_ptr<const Glom::LayoutGroup> group =
             std::dynamic_pointer_cast<const Glom::LayoutGroup>(theLayoutGroup);
         if (group) {
-            QSqlQuery query = buildQuery(tableNameU, group);
+            const QString strQuery = buildQuery(tableNameU, group);;
+            QSqlQuery query(strQuery);
             setQuery(query);
             addStaticTextColumns(group);
             adjustColumnHeaders(group);

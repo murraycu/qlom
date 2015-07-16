@@ -29,6 +29,7 @@
 #include <QSqlRecord>
 #include <QtCore>
 #include <QtGui>
+#include <QtWidgets>
 
 #include "config.h"
 
@@ -149,7 +150,7 @@ void QlomMainWindow::setup()
     theListLayoutView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     theListLayoutView->setAlternatingRowColors(true);
     theListLayoutView->setShowGrid(false);
-    theListLayoutView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    theListLayoutView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     theTablesComboBox = new QComboBox(tableContainer);
     connect(theTablesComboBox, SIGNAL(activated(int)),
