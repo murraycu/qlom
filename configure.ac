@@ -10,6 +10,8 @@ m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
 AC_PROG_CXX
+MM_AX_CXX_COMPILE_STDCXX_11([noext],[mandatory])
+
 AC_PROG_INSTALL
 AC_LANG([C++])
 
