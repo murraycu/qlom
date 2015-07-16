@@ -1,5 +1,12 @@
 TARGET = qlom
 
+isEmpty(PREFIX) {
+ PREFIX = /usr
+}
+target.path = $$PREFIX/bin/
+target.files += $$TARGET
+INSTALLS += target
+
 CONFIG+=link_pkgconfig
 PKGCONFIG+=glom-1.30
 
