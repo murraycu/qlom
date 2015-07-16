@@ -17,6 +17,7 @@
  */
 
 #include "utils.h"
+#include <QLocale>
 
 Glib::ustring qstringToUstring(const QString& qstring)
 {
@@ -26,4 +27,13 @@ Glib::ustring qstringToUstring(const QString& qstring)
 QString ustringToQstring(const Glib::ustring& ustring)
 {
     return QString::fromUtf8(ustring.c_str());
+}
+
+/** Get the current locale ID, for use with libglom method calls
+ * such as TableInfo::get_table_title(locale_id);
+ * For instance, en_US.
+ */
+std::string getCurrentLocaleId()
+{
+    return QLocale().name().toStdString();
 }

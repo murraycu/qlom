@@ -68,7 +68,7 @@ QStyledItemDelegate * QlomListView::createDelegateFromColumn(
                 return new QlomLayoutItemTextDelegate(
                     textItem->get_formatting_used(),
                     QlomLayoutItemTextDelegate::GlomSharedField(),
-                    ustringToQstring(textItem->get_text()));
+                    ustringToQstring(textItem->get_text(getCurrentLocaleId())));
 
             std::shared_ptr<const Glom::LayoutItem_Field> fieldItem =
                 std::dynamic_pointer_cast<const Glom::LayoutItem_Field>(*iter);

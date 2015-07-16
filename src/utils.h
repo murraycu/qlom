@@ -32,4 +32,10 @@ Glib::ustring qstringToUstring(const QString& qstring);
  *  @returns the converted string */
 QString ustringToQstring(const Glib::ustring& ustring);
 
+/** Get the current locale ID, for use with libglom method calls
+ * such as TableInfo::get_table_title(locale_id);
+ * For instance, en_US.
+ */
+std::string getCurrentLocaleId();
+
 #endif /* QLOM_UTILS_H_ */

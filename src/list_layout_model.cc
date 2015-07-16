@@ -101,7 +101,7 @@ void QlomListLayoutModel::adjustColumnHeaders(
          iter != items.end();
          ++iter) {
          setHeaderData(columnsIndex, Qt::Horizontal,
-             QVariant(ustringToQstring((*iter)->get_title_or_name())));
+             QVariant(ustringToQstring((*iter)->get_title_or_name(getCurrentLocaleId()))));
          ++columnsIndex;
     }
 }
@@ -163,7 +163,7 @@ QString QlomListLayoutModel::buildQuery(const Glib::ustring& table,
 
              fields.push_back(field);
              setHeaderData(index, Qt::Horizontal,
-                 QVariant(ustringToQstring(field->get_title_or_name())));
+                 QVariant(ustringToQstring(field->get_title_or_name(getCurrentLocaleId()))));
              ++index;
          }
 

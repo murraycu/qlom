@@ -372,7 +372,7 @@ void QlomDocument::fillTableList()
 
         // Fill the GlomDocument with a list of GlomTables.
         tableList.push_back(QlomTable(ustringToQstring(table->get_name()),
-            ustringToQstring(document->get_table_title(table->get_name())),
+            ustringToQstring(document->get_table_title(table->get_name(), getCurrentLocaleId())),
             relationships, flags));
     }
 }
