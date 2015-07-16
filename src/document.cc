@@ -365,9 +365,9 @@ void QlomDocument::fillTableList()
 
         // Check for flags.
         QFlags<QlomTable::QlomTableFlags> flags;
-        if (table->m_hidden)
+        if (table->get_hidden())
             flags |= QlomTable::HIDDEN_TABLE;
-        if (table->m_default)
+        if (table->get_default())
             flags |= QlomTable::DEFAULT_TABLE;
 
         // Fill the GlomDocument with a list of GlomTables.
