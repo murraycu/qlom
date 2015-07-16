@@ -26,7 +26,7 @@
 #include <QSignalMapper>
 
 QlomFieldFormattingDelegate::QlomFieldFormattingDelegate(
-    const Glom::FieldFormatting &formatting, const GlomSharedField details,
+    const Glom::Formatting &formatting, const GlomSharedField details,
     QObject *parent) :
     QStyledItemDelegate(parent),
     theFormattingUsed(formatting),
@@ -85,7 +85,7 @@ QSize QlomFieldFormattingDelegate::sizeHint(const QStyleOptionViewItem &option,
 }
 
 QlomLayoutItemFieldDelegate::QlomLayoutItemFieldDelegate(
-    const Glom::FieldFormatting &formatting, const GlomSharedField details,
+    const Glom::Formatting &formatting, const GlomSharedField details,
     QObject *parent) :
     QlomFieldFormattingDelegate(formatting, details, parent)
 {}
@@ -162,7 +162,7 @@ QString QlomLayoutItemFieldDelegate::applyNumericFormatting(double numeric,
 }
 
 QlomLayoutItemTextDelegate::QlomLayoutItemTextDelegate(
-    const Glom::FieldFormatting &formatting, const GlomSharedField details,
+    const Glom::Formatting &formatting, const GlomSharedField details,
     const QString &displayText, QObject *parent) :
     QlomFieldFormattingDelegate(formatting, details, parent),
     theDisplayText(displayText)

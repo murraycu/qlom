@@ -38,7 +38,7 @@ public:
       * installs them in the view. */
     void setupDelegateForColumn(int column);
 
-    /** Applies Glom's FieldFormatting to a QStyledItemDelegate. Since the view
+    /** Applies Glom's Formatting to a QStyledItemDelegate. Since the view
      *  only knows about columns (during setup) we need to map columns to
      *  LayoutItems, as it is already done in the query builder, even if not
      *  stated explicitly.

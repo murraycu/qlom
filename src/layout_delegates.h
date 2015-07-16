@@ -25,10 +25,10 @@
 #include <QModelIndex>
 #include <QSize>
 
-#include <libglom/data_structure/layout/fieldformatting.h>
+#include <libglom/data_structure/layout/formatting.h>
 #include <libglom/data_structure/field.h>
 
-/** This is the base class for Glom::FieldFormatting-specific delegates used to
+/** This is the base class for Glom::Formatting-specific delegates used to
   * format the style of Glom::LayoutItems in the view. In principle, each
   * Glom::LayoutItem implementing get_formatting_used() (which is not part of
   * the interface, though) gets its own delegate class derived from
@@ -39,12 +39,12 @@ class QlomFieldFormattingDelegate : public QStyledItemDelegate
     Q_OBJECT
 
 public:
-    typedef Glom::sharedptr<const Glom::Field> GlomSharedField;
+    typedef std::shared_ptr<const Glom::Field> GlomSharedField;
 
     /* Explicit ctor, although it might have been useful for implicit type
        conversions. */
     explicit QlomFieldFormattingDelegate(
-        const Glom::FieldFormatting &formatting, const GlomSharedField details,
+        const Glom::Formatting &formatting, const GlomSharedField details,
         QObject *parent = 0);
     virtual ~QlomFieldFormattingDelegate();
 
@@ -54,7 +54,7 @@ public:
         const QModelIndex &index) const;
 
 protected:
-    const Glom::FieldFormatting theFormattingUsed;
+    const Glom::Formatting theFormattingUsed;
     const GlomSharedField theFieldDetails;
 };
 
@@ -65,7 +65,7 @@ class QlomLayoutItemFieldDelegate : public QlomFieldFormattingDelegate
 
 public:
     explicit QlomLayoutItemFieldDelegate(
-        const Glom::FieldFormatting &formatting, const GlomSharedField details,
+        const Glom::Formatting &formatting, const GlomSharedField details,
         QObject *parent = 0);
     virtual ~QlomLayoutItemFieldDelegate();
 
@@ -81,7 +81,7 @@ class QlomLayoutItemTextDelegate : public QlomFieldFormattingDelegate
     Q_OBJECT
 
 public:
-    QlomLayoutItemTextDelegate(const Glom::FieldFormatting &formatting,
+    QlomLayoutItemTextDelegate(const Glom::Formatting &formatting,
         const GlomSharedField details, const QString &displayText, QObject *parent = 0);
     virtual ~QlomLayoutItemTextDelegate();
 
